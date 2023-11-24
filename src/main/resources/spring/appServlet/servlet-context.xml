@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 어노테이션을 사용하기 위한 -->
+    <mvc:annotation-driven />
+
+    <!-- HTTP GET 요청을 통해 Spring에서 정적인 리소스인 CSS,HTML 등 파일들을 처리할 수 있도록 등록 -->
+    <mvc:resources location="/resources/**/" mapping="/resources/**/"></mvc:resources>
+
+    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="favorPathExtension" value="true" />
+        <property name="ignoreAcceptHeader" value="true" />
+        <property name="useJaf" value="false" />
+        <property name="defaultContentType" value="text/html" />
+
+        <property name="mediaTypes">
+            <map>
+                <entry key="html" value="text/html" />
+                <entry key="json" value="application/json" />
+                <entry key="do" value="text/html" />
+            </map>
+        </property>
+    </bean>
+
+    <bean
+        class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="contentNegotiationManager" ref="contentNegotiationManager" />
+
+        <property name="viewResolvers">
+            <list>
+                <bean id="beanNameViewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+                <bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <property name="prefix" value="/WEB-INF/views/" />
+                    <property name="suffix" value=".jsp" />
+                </bean>
+            </list>
+        </property>
+
+        <property name="defaultViews">
+            <list>
+                <bean id="mappingJacksonJsonView" name="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- 파일 업로드를 위한 MultipartResolver 빈 등록 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="1000000" />
+        <property name="defaultEncoding" value="UTF-8" />
+    </bean>
+
+    <context:component-scan
+        base-package="com.mococo.biz, com.mococo.web.util, com.custom">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+</beans>

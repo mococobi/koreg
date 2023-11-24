@@ -1,0 +1,19 @@
+@charset "UTF-8";
+
+.textCenter {
+	text-align : center;
+}
+
+.cursor {
+	cursor: pointer;
+}
+
+.not-a-text {
+	text-decoration-line : none;
+	color: black;
+	cursor: pointer;
+}
+
+table.dataTablesCommonStyle thead th {
+	text-align :center;
+}

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Board">
+	<!-- <cache /> -->
+	
+	<resultMap id="oracleBoardMap" type="HashMap">
+		<result property="POST_CONTENT" column="POST_CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
+		<result property="CRT_DT_TM" column="CRT_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+		<result property="MOD_DT_TM" column="MOD_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+	</resultMap>
+	
+	<select id="Board.boardList" resultType="HashMap" parameterType="Map">
+		SELECT /* Board.boardList */
+			  BRD_ID
+			, BRD_NM
+			, BRD_DESC
+			, BRD_ADM_USR
+			, BRD_CRT_AUTH
+			, BRD_VIEW_AUTH
+			, POST_FILE_YN
+			, POST_CMNT_YN
+			, POST_CMNT_FILE_YN
+			, POST_POPUP_YN
+			, POST_SECRET_YN
+			, POST_FIX_YN
+			, DEL_YN
+			, CRT_DT_TM
+			, CRT_USR_ID
+			, MOD_DT_TM
+			, MOD_USR_ID
+		FROM 
+			PORTAL.BOARD
+		WHERE 1=1
+			AND BOARD.BRD_ID = #{boardId}
+			AND DEL_YN = 'N'
+		ORDER BY
+			CRT_DT_TM DESC
+	</select>
+	
+	
+	<select id="Board.boardPostList" parameterType="Map" resultMap="oracleBoardMap">
+		WITH /* Board.BoardPostList */
+		POST_LIST AS (
+			SELECT
+				  post.POST_ID
+				, post.BRD_ID
+				, post.POST_TITLE
+				/* , TO_CHAR(post.CRT_DT_TM, 'yyyy-mm-dd') AS CRT_DT_TM */
+				, post.CRT_DT_TM
+				, post.CRT_USR_ID
+			FROM 
+				PORTAL.BOARD_POST post
+			WHERE 1=1
+				AND post.BRD_ID = #{boardId}
+				AND post.DEL_YN = 'N'
+				<if test="searchKey != null and !searchKey.equals('') and searchVal != null and !searchVal.equals('')">
+					<choose>
+						<when test="searchKey.equals('POST_TITLE')">
+							AND post.POST_TITLE = #{searchVal}
+				    	</when>
+				    	<when test="searchKey.equals('CRT_USR_ID')">
+				    		AND post.CRT_USR_ID = #{searchVal}
+				    	</when>
+				    </choose>
+				</if>
+		)
+		SELECT 
+			*
+		FROM (
+			SELECT 
+				<choose>
+					<when test="countCheck != null and countCheck == true">
+						COUNT(ORDER_T.POST_ID) AS COUNT
+					</when>
+					<otherwise>
+						  ROWNUM rn
+						, ORDER_T.* 
+					</otherwise>
+				</choose>
+			FROM (
+				SELECT 
+					* 
+				FROM 
+					POST_LIST 
+				ORDER BY 
+					POST_ID DESC
+			) ORDER_T
+		) T
+		WHERE 1=1
+			<if test="countCheck != null and countCheck == false">
+				AND rn BETWEEN #{listViewCount} * (((#{start} + #{length}) / 10) - 1) + 1 AND #{listViewCount} * ((#{start} + #{length}) / 10)
+			</if>
+	</select>
+	
+	
+	<select id="Board.boardPostDetail" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
+		SELECT /* Board.boardPostDetail */
+		 	  post.POST_ID
+			, post.BRD_ID
+			, post.POST_TITLE
+			, post.POST_CONTENT
+			, post.POST_VIEW_AUTH
+			, post.POPUP_YN
+			, post.POPUP_START_DT_TM
+			, post.POPUP_END_DT_TM
+			, post.SECRET_YN
+			, post.FIX_YN
+			, post.CRT_DT_TM
+			, post.CRT_USR_ID
+			, post.MOD_DT_TM
+			, post.MOD_USR_ID
+			, board.BRD_NM
+			, board.BRD_DESC
+			, board.BRD_ADM_USR
+			, board.BRD_CRT_AUTH
+			, board.BRD_VIEW_AUTH
+			, board.POST_FILE_YN
+			, board.POST_CMNT_YN
+			, board.POST_CMNT_FILE_YN
+			, board.POST_POPUP_YN
+			, board.POST_SECRET_YN
+			, board.POST_FIX_YN
+		FROM 
+			PORTAL.BOARD_POST post 
+			INNER JOIN PORTAL.BOARD board
+				ON (post.BRD_ID = board.BRD_ID) 
+		WHERE 1=1
+			AND post.DEL_YN = 'N'
+			AND post.POST_ID = #{postId}
+			AND post.BRD_ID = #{boardId}
+	</select>
+	
+	
+	<select id="Board.boardPostFileList" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
+		SELECT /* Board.boardPostFileList */
+			  post_file.FILE_ID
+			, post_file.POST_ID
+			, post_file.FILE_TYPE
+			, post_file.PARENT_CMNT_ID
+			, post_file.SRV_FILE_PATH
+			, post_file.SRV_FILE_NM
+			, post_file.ORG_FILE_NM
+			, post_file.FILE_EXT
+			, post_file.FILE_SIZE
+			, post_file.DEL_YN
+			, post_file.CRT_DT_TM
+			, post_file.CRT_USR_ID
+			, post_file.MOD_DT_TM
+			, post_file.MOD_USR_ID
+		FROM
+			PORTAL.BOARD_POST_FILE post_file
+		WHERE 1=1
+			AND post_file.DEL_YN = 'N'
+			AND post_file.POST_ID = #{postId}
+	</select>
+	
+	
+	<insert id="Board.boardPostInsert" parameterType="Map" useGeneratedKeys="true" keyColumn="POST_ID" keyProperty="keyNum">
+		<selectKey resultType="int" keyProperty="insertKey" order="BEFORE">
+        	SELECT
+        		NVL(MAX(post.POST_ID)+1, 1) AS INSERTKEY
+        	FROM 
+        		PORTAL.BOARD_POST post
+        	WHERE 1=1
+				AND post.BRD_ID = #{BRD_ID}
+    	</selectKey>
+		INSERT INTO  /* Board.boardPostInsert */
+			PORTAL.BOARD_POST(
+				  POST_ID
+				, BRD_ID
+				, POST_TITLE
+				, POST_CONTENT
+				, POST_VIEW_AUTH
+				, POPUP_YN
+				, POPUP_START_DT_TM
+				, POPUP_END_DT_TM
+				, SECRET_YN
+				, FIX_YN
+				, DEL_YN
+				, CRT_DT_TM
+				, CRT_USR_ID
+			)
+			VALUES(
+				  #{insertKey}
+				, #{BRD_ID}
+				, #{POST_TITLE}
+				, #{POST_CONTENT}
+				, #{POST_VIEW_AUTH}
+				, #{POPUP_YN}
+				, #{POPUP_START_DT_TM}
+				, #{POPUP_END_DT_TM}
+				, #{SECRET_YN}
+				, #{FIX_YN}
+				, 'N'
+				, SYSDATE
+				, #{userId}
+			)
+	</insert>
+	
+</mapper>

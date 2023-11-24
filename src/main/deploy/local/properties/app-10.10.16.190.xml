@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="mstr.server.name">WIN-5C5JL8U1B0K</entry>
+	<entry key="mstr.server.port">34952</entry>
+	<entry key="mstr.default.project.name">MicroStrategyTutorial</entry>
+	<entry key="mstr.session.locale">1042</entry><!-- 한글 -->
+	<!-- <entry key="mstr.session.locale">1033</entry> --><!-- 영어 -->
+	
+	<entry key="mstr.admin.user.id">administrator</entry>
+	<entry key="mstr.admin.user.pwd"></entry>
+	
+	<entry key="mstr.trust.token">Token531585B94160BDB22DF7E09C37F36EAC</entry>
+	<entry key="mstr.esm.fail.url">/plugins/esm/jsp/loginfail.jsp</entry>
+	
+	<entry key="portal.login.page">/app/login/loginUserView.do</entry>
+	
+	<!-- 프로젝트 > 공용 개체 > 리포트 (공유 리포트) -->
+	<entry key="mstr.menu.folder.id">D3C7D461F69C4610AA6BAA5EF51F4125</entry>
+	
+	<entry key="attach.base.location">/mococo/portal/</entry>
+	
+</properties>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  	<settings>
+	    <setting name="jdbcTypeForNull" value="VARCHAR"/>
+	    <setting name="callSettersOnNulls" value="true"/>
+	    <setting name="useGeneratedKeys" value="false"/>
+	    <setting name="defaultExecutorType" value="REUSE"/>
+  	</settings>
+  	<typeAliases>
+	    <typeAlias alias="hmap" type="java.util.HashMap"/>
+	    <typeAlias alias="lmap" type="java.util.LinkedHashMap"/>
+  	</typeAliases>
+  	<typeHandlers>
+    	<typeHandler javaType="java.lang.String" jdbcType="CLOB" handler="org.apache.ibatis.type.ClobTypeHandler"/>
+  	</typeHandlers>
+</configuration>

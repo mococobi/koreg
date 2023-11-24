@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Log">
+	<!-- <cache /> -->
+	
+	<insert id="Log.addPortalLog" parameterType="Map">
+		<selectKey resultType="int" keyProperty="insertKey" order="BEFORE">
+        	SELECT
+        		NVL(MAX(LOG_ID)+1, 1) AS INSERTKEY
+        	FROM 
+        		PORTAL.PORTAL_LOG 
+    	</selectKey>
+		INSERT INTO /* Log.addPortalLog */
+			PORTAL.PORTAL_LOG (
+				  LOG_ID
+				, USR_ID
+				, USR_NM
+				, USR_DEPT_ID
+				, USR_DEPT_NM
+				, USR_POS_ID
+				, USR_POS_NM
+				, USR_IP
+				, SCRN_ID
+				, SCRN_DET_ID
+				, USR_ACTN
+				, DET_INFO_MAP
+				, CRT_DT_TM
+			)
+		VALUES (
+			  #{insertKey}
+			, #{userId}
+			, #{userNm}
+			, #{userDeptId}
+			, #{userDeptNm}
+			, #{userPosId}
+			, #{userPosNm}
+			, #{userIp}
+			, #{screenId}
+			, #{screenDetailId}
+			, #{userAction}
+			, #{datilInfo}
+			, SYSDATE
+		)
+	
+	</insert>
+	
+</mapper>

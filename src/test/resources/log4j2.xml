@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+	<Appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d %5p [%c] %m%n" />
+		</Console>
+		<!-- <RollingFile name="file" fileName="로그 디렉토리 위치/${date:yyyy}/${date:MM}/dailyLog.log" 
+			filePattern="로그 디렉토리 위치/${date:yyyy}/${date:MM}/dailyLog_%d{yyyyMMdd}.log"> 
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/> 
+			<Policies> <TimeBasedTriggeringPolicy /> </Policies> </RollingFile> -->
+	</Appenders>
+
+	<Loggers>
+
+		<Logger name="org.mococo.biz" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+		<Logger name="com.sfactory.biz" level="DEBUG"
+			additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+
+		<Logger name="org.springframework" level="INFO"
+			additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+
+		<Root level="DEBUG" additivity="false"> <!--OFF DEBUG ERROR INFO -->
+			<AppenderRef ref="console" />
+			<!-- <AppenderRef ref="file"/> -->
+		</Root>
+
+	</Loggers>
+</Configuration>

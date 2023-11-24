@@ -1,0 +1,241 @@
+package com.custom.login.controller;
+
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.custom.login.service.LoginService;
+import com.mococo.biz.exception.BizException;
+import com.mococo.microstrategy.sdk.esm.vo.MstrUser;
+import com.mococo.web.util.CustomProperties;
+import com.mococo.web.util.HttpUtil;
+
+@Controller
+@RequestMapping("/login/*")
+public class LoginController2 {
+
+    final Logger LOGGER = LoggerFactory.getLogger(LoginController2.class);
+    
+    @Autowired
+    LoginService loginService;
+    
+    private static String RSA_WEB_KEY = "_RSA_SF_KEY_"; // 개인키 session key
+    private static String RSA_INSTANCE = "RSA"; // rsa transformation
+    
+    
+    /**
+     * 1. View(로그인 화면) 호출/반환
+     * 2. 로그인 정보 송/수신 (암호화) 인증 처리
+     * 3. 인증 처리 및 View(Main 화면) 호출/반환
+     * 4. 기타
+     */
+    @RequestMapping(value = "/view.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView loginView() {
+        ModelAndView view = new ModelAndView("loginView");
+        
+        LOGGER.info("call login page..[{}]", "LoginView");
+        
+        return view;
+    }
+    
+    @RequestMapping(value = "/proc.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView loginProc() {
+        ModelAndView view = new ModelAndView("loginProc");
+        
+        LOGGER.info("call bridge page..[{}]", "LoginProc");
+        
+        return view;
+    }
+    
+    /**
+     * RSA 공개키, 개인키 생성
+     * 
+     * @param request
+     */
+    @RequestMapping(value = "/initSignIn.json", method = { RequestMethod.POST })
+    @ResponseBody
+    public Map<String, Object> initRSA(HttpServletRequest request) {
+        
+        Map<String, Object> rstMap = new HashMap<String, Object>();
+        
+        HttpSession session = request.getSession();
+        try {
+            KeyPairGenerator generator;
+            
+            generator = KeyPairGenerator.getInstance(LoginController2.RSA_INSTANCE);
+            generator.initialize(1024);
+            
+            KeyPair keyPair = generator.genKeyPair();
+            KeyFactory keyFactory = KeyFactory.getInstance(LoginController2.RSA_INSTANCE);
+            PublicKey publicKey = keyPair.getPublic();
+            PrivateKey privateKey = keyPair.getPrivate();
+            
+            session.setAttribute(LoginController2.RSA_WEB_KEY, privateKey); // session에 RSA 개인키를 세션에 저장
+            
+            RSAPublicKeySpec publicSpec = (RSAPublicKeySpec) keyFactory.getKeySpec(publicKey, RSAPublicKeySpec.class);
+            String publicKeyModulus = publicSpec.getModulus().toString(16);
+            String publicKeyExponent = publicSpec.getPublicExponent().toString(16);
+            
+            rstMap.put("RSAModulus", publicKeyModulus);
+            rstMap.put("RSAExponent", publicKeyExponent);
+            
+        } catch (Exception e) {
+            LOGGER.error("initRsa error!! : {}", e.getMessage());
+            throw new BizException("error");
+        }
+        
+        return rstMap;
+    }
+    
+    /**
+     * 16진 문자열을 byte 배열로 변환한다.
+     * 
+     * @param hex
+     * @return
+     */
+    private static byte[] hexToByteArray(String hex) {
+        if (hex == null || hex.length() % 2 != 0) { return new byte[] {}; }
+        
+        byte[] bytes = new byte[hex.length() / 2];
+        for (int i = 0; i < hex.length(); i += 2) {
+            byte value = (byte) Integer.parseInt(hex.substring(i, i + 2), 16);
+            bytes[(int) Math.floor(i / 2)] = value;
+        }
+        return bytes;
+    }
+    
+    /**
+     * 복호화
+     * 
+     * @param privateKey
+     * @param securedValue
+     * @return
+     * @throws NoSuchPaddingException 
+     * @throws NoSuchAlgorithmException 
+     * @throws InvalidKeyException 
+     * @throws BadPaddingException 
+     * @throws IllegalBlockSizeException 
+     * @throws UnsupportedEncodingException 
+     * @throws Exception
+     */
+    private String decryptRsa(PrivateKey privateKey, String securedValue) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance(LoginController2.RSA_INSTANCE);
+        byte[] encryptedBytes = hexToByteArray(securedValue);
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+        String decryptedValue = new String(decryptedBytes, "utf-8"); // 문자 인코딩 주의.
+        return decryptedValue;
+    }
+    
+    @RequestMapping(value = "/signIn.do", method = { RequestMethod.POST })
+//    public ModelAndView loginProc(@RequestBody final Map<String, Object> param, HttpServletRequest request) {
+    public ModelAndView loginProc(HttpServletRequest request, RedirectAttributes rattr) {
+        
+//        Map<String, Object> rstMap = new HashMap<String, Object>();
+        ModelAndView view = new ModelAndView("mainCategory");
+        
+//        String uid = (String) param.get("encAcntID");
+//        String pwd = (String) param.get("encAcntPW");
+        String uid = (String) request.getParameter("encAcntID");
+        String pwd = (String) request.getParameter("encAcntPW");
+        LOGGER.debug("enc uid : {}", uid);
+        LOGGER.debug("enc pwd : {}", pwd);
+        
+//        String typeAuthentication = "Standard";
+        String clientIp = HttpUtil.getClientIP(request);
+        LOGGER.debug("Smart Factory(Web) Login User Client IP [{}]", clientIp);
+
+        String sIServerName = CustomProperties.getProperty("mstr.server.name");
+        LOGGER.debug("IServerName : {}", sIServerName);
+        int iIServerPort = Integer.parseInt(CustomProperties.getProperty("mstr.server.port"));
+        LOGGER.debug("IServerPort : {}", iIServerPort);
+        String project = CustomProperties.getProperty("mstr.default.project.name");
+        LOGGER.debug("Project : {}", project);
+        
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            try {
+                // 복호화
+                PrivateKey privateKey = (PrivateKey) session.getAttribute(LoginController2.RSA_WEB_KEY);
+                
+                uid = decryptRsa(privateKey, uid);
+                pwd = decryptRsa(privateKey, pwd);
+                LOGGER.debug("dec uid : {}", uid);
+                LOGGER.debug("dec pwd : {}", pwd);
+                
+                Map<String, Object> mParam = new HashMap<String, Object>();
+                mParam.put("uid", uid);
+                mParam.put("pwd", pwd);
+                mParam.put("clientIp", clientIp);
+                mParam.put("iServerName", sIServerName);
+                mParam.put("iServerPort", iIServerPort);
+                mParam.put("project", project);
+                
+                String sMstrSessStat = loginService.createMstrSession(mParam);
+                
+                if (StringUtils.isEmpty(sMstrSessStat)) {
+                    // 표준 인증 실패
+                    LOGGER.info("Failed. MSTR Session Create. : {}", sMstrSessStat);
+                    view.setViewName("redirect:/app/login/view.do");
+                    String sErrorMsg = "로그인 실패";
+                    rattr.addFlashAttribute("errorMsg", sErrorMsg);
+                } else {
+                    // 표준 인증 성공
+                    //view.setViewName("redirect:/app/main/category.do");
+                    view.setViewName("redirect:/app/login/proc.do");
+                    
+                    // 사용자 ID 세션 저장
+                    //session.setAttribute("uid", uid);
+                    MstrUser mstrUser = new MstrUser(uid);
+                    mstrUser.setClientIp(clientIp);
+                    mstrUser.setServer(sIServerName);
+                    mstrUser.setPort(iIServerPort);
+                    mstrUser.setProject(project);
+                    session.setAttribute("mstr-user-vo", mstrUser);
+                }
+                // 표준 인증 완료 Close MstrSession!
+                loginService.closeMstrSession(sMstrSessStat);
+                
+            } catch (Exception e) {
+                LOGGER.error("Smart Factory(Web) Login Error!! ", e);
+                // Bi Portal 로그인 오류 - 로그인 페이지 이동
+                view.setViewName("redirect:/app/login/view.do");
+                String sErrorMsg = "로그인 실패";
+                rattr.addFlashAttribute("errorMsg", sErrorMsg);
+            } finally {
+                session.removeAttribute(LoginController2.RSA_WEB_KEY);
+            }
+        } else {
+            LOGGER.error("Smart Factory(Web) Login Session not found!! - session : " + session);
+            throw new BizException("noSession");
+        }
+        
+        return view;
+    }
+}

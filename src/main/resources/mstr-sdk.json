@@ -1,0 +1,14 @@
+{
+    "mstrSessionProvider":{
+        "className": "com.demo.sdk.session.CustomMstrSessionProvider"
+    },
+    "configHandler":{
+        "config1":{
+            "className": "com.mococo.microstrategy.sdk.prompt.config.impl.LongDescConfigHandler"
+        }
+    },
+    "requestHandler":{
+        "mstr.report.info": "com.mococo.microstrategy.sdk.servlet.impl.ReportRequestHandler",
+        "mstr.prompt.subelements": "com.mococo.microstrategy.sdk.servlet.impl.PromptRequestHandler"
+    }
+}
