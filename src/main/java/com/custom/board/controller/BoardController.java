@@ -1,6 +1,5 @@
 package com.custom.board.controller;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 

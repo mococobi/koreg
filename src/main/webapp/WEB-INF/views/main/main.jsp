@@ -17,7 +17,7 @@
 	
 	<div style="text-align: center;">
 		<!-- 포탈 메인 이미지 영역 -->
-		<img alt="메인 이미지" src="${pageContext.request.contextPath}/image/main/mainImage.png?v=20231123001" style="width: 600px;">
+		<img alt="메인 이미지" src="${pageContext.request.contextPath}/image/main/mainImage.png?v=20231123001" style="width: 100%; height: 287px;">
 	</div>
 	<div style="min-height: 300px;">
 		<!-- 공지사항 영역 -->

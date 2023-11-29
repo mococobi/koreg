@@ -8,101 +8,99 @@
 	String objectId = StringUtils.defaultString(request.getParameter("objectId"));
     String type = StringUtils.defaultString(request.getParameter("type"));
     boolean isvi = StringUtils.equalsIgnoreCase("y", request.getParameter("isvi"));
-	String uid = request.getParameter("uid");
-
-	if (StringUtils.isEmpty(uid)) {
-		uid = CustomProperties.getProperty("mstr.admin.user.id");
-	}
-%><!DOCTYPE html>
+%>
+<!DOCTYPE html>
 <html>
 <head>
 	<title></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/jquery-multiselect/jquery.multiselect.css?v=20231006001" />
+	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/jquery-multiselect/jquery.multiselect.js?v=20231128001"></script>
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/prompt-renderer.js?v=20231128001"></script>
+	
 	<style type="text/css">
-	body {
-		font-family: "Malgun Gothic";
-		font-size: 12px;
-		padding: 10px;
-		margin: 0px;
-	}
-	
-	button#run {
-		float: right;
-		margin-bottom: 10px;
-		padding: 5px 10px;
-		background-color: #0078D4;
-		border: 0;
-		color: #ffffff;
-	}
-	
-	.wrapper {
-		width: 100%;
-		height: 100%;
-	}
-	
-	.top-wrapper {
-		display: flex;
-	}
-	
-	.prompt-wrapper {
-		width: calc(100% - 100px);
-	}
-	
-	.run-wrapper {
-		width: 100px;
-	}
-	
-	.elem-wrapper {
-		display: inline-flex;
-		align-items: center;
-		margin: 0px 7px;
-		height: 30px;
-	}
-	
-	.elem-wrapper .elem-label {
-		padding: 0 10px 0 0;
-	}
-	
-	.elem-wrapper select {
-		width: 120px;
-	}
-	
-	.elem-wrapper input[type=text] {
-		height: 30px;
-		width: 150px;
-	}
-	
-	.ms-options-wrap button {
-		width: 150px !important;
-	}
-	
-	#mstrReport {
-		height: 100%;
-	}
-	</style>
+.wrapper {
+	font-family: "Malgun Gothic";
+	font-size: 12px;
+	padding: 10px;
+	margin: 0px;
+}
+
+button#run {
+	float: right;
+	margin-bottom: 10px;
+	padding: 5px 10px;
+	background-color: #0078D4;
+	border: 0;
+	color: #ffffff;
+}
+
+.wrapper {
+	width: 100%;
+	height: 100%;
+}
+
+.top-wrapper {
+	display: flex;
+}
+
+.prompt-wrapper {
+	width: calc(100% - 100px);
+}
+
+.run-wrapper {
+	width: 100px;
+}
+
+.elem-wrapper {
+	display: inline-flex;
+	align-items: center;
+	margin: 0px 7px;
+	height: 30px;
+}
+
+.elem-wrapper .elem-label {
+	padding: 0 10px 0 0;
+}
+
+.elem-wrapper select {
+	width: 120px;
+}
+
+.elem-wrapper input[type=text] {
+	height: 30px;
+	width: 150px;
+}
+
+.ms-options-wrap button {
+	width: 150px !important;
+}
+
+#mstrReport {
+	height: 100%;
+}
+
+</style>
 <script type="text/javascript">
-    /*
-	예시 :
-		주제영역 / 수익 및 예측 비교 (08450DF4E71E2068B9AE78845C1BA28) 
-			http://localhost:8080/MicroStrategy/plugins/main/jsp/report.jsp?objectId=D08450DF4E71E2068B9AE78845C1BA28&type=3&isvi=n 
-		http://localhost:8080/MicroStrategy/plugins/main/jsp/mstrReport.jsp?objectId=B18B0E72470AF00D7097C59AAB65E00F&type=55&isvi=y
-		http://localhost:8080/MicroStrategy/plugins/main/jsp/mstrReport.jsp?objectId=56F013D8442F2E22E073AB9EA4F1D3E6&type=3&isvi=n
-	*/
-	
 	var objectId = "<%= objectId %>";
 	var type = <%= type %>;
 	var isvi = <%= isvi %>;
-	var uid = "<%= uid %>";
+	var reportInfo = undefined;
 	
-	$(function() { init(); });
-
+	$(function() { 
+		init(); 
+	});
+	
+	
     function popupCallback(promptId) {
         console.log("=> promptId", promptId);
-    }	
+    }
     
-	function init(){
+    
+	function init() {
 		$(window).resize(function() {
 			var height	= $(window).height();
 			
@@ -119,16 +117,27 @@
 		
 		getPromptInfo();
 		$("#run").click(getAnswerXML);
-		
-		
-		$("#run").trigger('click');
-		
 	}
 	
-	var reportInfo = undefined;
-
+	
 	/* 리포트정보 및 프롬프트정보의 조회 */
 	function getPromptInfo() {
+		let callParams = {
+			  objectId : objectId
+			, type : type
+		};
+		callAjaxPost('/mstr/getReportInfo.json', callParams, function(data){
+			if (data) {
+    			reportInfo = data.report;
+	    		renderPrompt();
+    		} else {
+    		    alert("리포트정보를 가져올 수 없습니다.");	    			
+    		}
+			
+			$(window).resize(); // 프롬프트 랜더링이 종료되고 iframe 높이 조정
+		});
+		
+		/*
 	    $.ajax({
 	    	type: "post",
 	    	url: "${pageContext.request.contextPath}/app/getReportInfo.json",
@@ -153,11 +162,16 @@
 	    		console.log(jqXHR);
 	    	}
 	    });	
-	}	
+		*/
+	}
+	
 	
 	/* 프롬프트정보를 이용한 랜더링 */
 	function renderPrompt() {
-        if (reportInfo.promptList == undefined) {
+		
+		if (reportInfo == undefined || reportInfo.promptList == undefined) {
+			//자동실행
+			$("#run").trigger('click');
         	return; 
         }
         	
@@ -189,7 +203,13 @@
         		promptRenderer[uiType]["body"]($wrapper, v);
         	}
         });
+        
+        if(reportInfo.promptList.length == 0) {
+			//자동실행
+			$("#run").trigger('click');
+        }
 	}
+	
 	
 	function getPromptVal() {
 		var elemVal = {};
@@ -200,6 +220,7 @@
 		
 		return elemVal;
 	}
+	
 	
 	var formDefs = {
 		common: {
@@ -227,10 +248,11 @@
 		}
 	}
 	
-	function getAnswerXML() { 
+	
+	function getAnswerXML() {
 	    $.ajax({
 	    	type: "post",
-	    	url: "${pageContext.request.contextPath}/app/getAnswerXML.json",
+	    	url: "${pageContext.request.contextPath}/app/mstr/getAnswerXML.json",
 	    	async: true,
 	    	contentType: "application/json;charset=utf-8",
 	    	data: JSON.stringify({
@@ -244,17 +266,17 @@
 	    		var inputs = $.extend({}, formDefs["common"]);
 	    		
 	    		switch (type) {
-	    		case 3:
-	    			$.extend(inputs, formDefs["report"]);
-	    			break;
-	    		case 55:
-                    if (isvi == true) {
-                    	$.extend(inputs, formDefs["dossier"]);
-                    } else {
-                    	$.extend(inputs, formDefs["document"]);
-                    }
-	    			break;
-	    		default:
+		    		case 3:
+		    			$.extend(inputs, formDefs["report"]);
+		    			break;
+		    		case 55:
+	                    if (isvi == true) {
+	                    	$.extend(inputs, formDefs["dossier"]);
+	                    } else {
+	                    	$.extend(inputs, formDefs["document"]);
+	                    }
+		    			break;
+		    		default:
 	    		}
 	    		
 	    		$.extend(inputs, {promptsAnswerXML: data["xml"]});
@@ -268,6 +290,8 @@
 </script>
 </head>
 <body>
+	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart.jsp" />
+	
 	<div class="wrapper">
 		<div class="top-wrapper">
 			<div class="prompt-wrapper"></div>
@@ -281,5 +305,7 @@
 				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto"></iframe>
 		</div>
 	</div>
+	
+	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
 </body>
 </html>

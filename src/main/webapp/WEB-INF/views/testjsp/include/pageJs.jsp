@@ -6,8 +6,7 @@
 	src="${pageContext.request.contextPath}/plugins/main/javascript/jquery-ui/jquery-ui-1.9.2.min.js"></script>
 <script type="text/javascript" charset="UTF-8"
 	src="${pageContext.request.contextPath}/plugins/main/javascript/jquery-easyui-1.9.15/jquery.easyui.min.js"></script>
-<script type="text/javascript" charset="UTF-8"
-	src="${pageContext.request.contextPath}/plugins/main/javascript/jquery-multiselect/jquery.multiselect.js"></script>
+<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/plugins/main/javascript/jquery-multiselect/jquery.multiselect.js"></script>
 <script type="text/javascript" charset="UTF-8"
 	src="${pageContext.request.contextPath}/plugins/main/javascript/prompt-renderer.js?v=2020032501"></script>
 <script type="text/javascript" charset="UTF-8"

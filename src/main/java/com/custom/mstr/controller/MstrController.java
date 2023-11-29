@@ -1,4 +1,4 @@
-package com.custom.demo.controller;
+package com.custom.mstr.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,13 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
-import com.custom.board.controller.BoardController;
 import com.microstrategy.web.objects.WebIServerSession;
 import com.microstrategy.web.objects.WebObjectsException;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
-import com.mococo.microstrategy.sdk.esm.vo.MstrUser;
 import com.mococo.microstrategy.sdk.prompt.ReportCharger;
 import com.mococo.microstrategy.sdk.prompt.vo.Report;
 import com.mococo.microstrategy.sdk.util.MstrFolderBrowseUtil;
@@ -32,32 +29,21 @@ import com.mococo.web.util.CustomProperties;
 import com.mococo.web.util.HttpUtil;
 
 @Controller
+@RequestMapping("/mstr/*")
 public class MstrController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MstrController.class);
 
-    private static final String getUid(HttpServletRequest request) {
-        MstrUser mstrUser = (MstrUser) request.getSession().getAttribute("mstr-user-vo");
-
-        String userId = null;
-
-        if (mstrUser != null) {
-            userId = mstrUser.getId();
-        }
-
-        return userId;
-    }
-
+    
     @RequestMapping(value = "/getReportInfo.json", method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
-    public Map<String, Object> getReportInfo(@RequestBody final Map<String, Object> param,
-            final HttpServletRequest request) {
+    public Map<String, Object> getReportInfo(@RequestBody final Map<String, Object> param, final HttpServletRequest request) {
     	LOGGER.debug("=> param : [{}]", param);
 
         String objectId = (String) param.get("objectId");
         int type = (int) param.get("type");
-        String uid = getUid(request);
+        String uid = HttpUtil.getLoginUserId(request);
 
-        Map<String, Object> success = ControllerUtil.getSuccessMap();
+        Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
 
         WebIServerSession session = null;
         try {
@@ -68,16 +54,18 @@ public class MstrController {
 
             LOGGER.debug("==> report: [{}]", report);
 
-            success.put("report", report);
+            rtnMap.put("report", report);
         } catch (WebObjectsException e) {
-        	LOGGER.error("!!! error", e);
+        	rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			LOGGER.error("getReportInfo WebObjectsException", e);
         } catch (Exception e) {
-        	LOGGER.error("!!! error", e);
+        	rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			LOGGER.error("getReportInfo Exception", e);
         } finally {
             MstrUtil.closeISession(session);
         }
 
-        return success;
+        return rtnMap;
     }
 
     @RequestMapping(value = "/getAnswerXML.json", method = { RequestMethod.GET, RequestMethod.POST })
@@ -88,7 +76,7 @@ public class MstrController {
 
         String objectId = (String) param.get("objectId");
         int type = (int) param.get("type");
-        String uid = getUid(request);
+        String uid = HttpUtil.getLoginUserId(request);
 
         Map<String, List<String>> promptVal = (Map<String, List<String>>) param.get("promptVal");
 

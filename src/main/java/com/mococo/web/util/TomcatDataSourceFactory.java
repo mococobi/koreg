@@ -17,7 +17,7 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
-import org.apache.commons.dbcp2.BasicDataSourceFactory;
+import org.apache.commons.dbcp.BasicDataSourceFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

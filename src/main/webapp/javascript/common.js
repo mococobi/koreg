@@ -54,10 +54,29 @@ function pageGoPost(target, url, params) {
 }
 
 
+//파라메터에 포함된 정보로 ajax 호출
+function _submit(action, target, inputs) {
+    var $form = $("#__term_form");
+    if ($form.length != 0) { $form.remove(); }
+    
+    $form = $("<form id='__temp_form' action='" + action + "' target='" + target + "' method='post'></form>"); 
+    $("body").append($form);
+
+    $.each(inputs || [], function(i, v) {
+        // $form.append("<input type='hidden' name='" + i + "' value='" + v + "'/>");
+        var $input = $("<input type='hidden' name='" + i + "' value=''/>");
+        $input.val(v);
+        $form.append($input);
+    });
+    
+    $form.submit();
+}
+
+
 //XSS 방지 코드
 function XSSCheck(str, level) {
 	//숫자형 패스
-	if(typeof str == 'number') {
+	if(typeof str == 'number' ||typeof str == 'boolean') {
 		return str;
 	}
 	
@@ -127,6 +146,7 @@ function callAjaxForm(url, params, callFunction) {
 }
 
 
+//날짜 타입 표시
 function changeDisplayDate(orgDate, changeType) {
   let changeDate = new Date(orgDate);
 

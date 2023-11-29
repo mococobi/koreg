@@ -28,7 +28,7 @@
 		let callParams = {
 			folderId : '032A5E114A59D28267BDD8B6D9E58B22'
 		};
-		callAjaxPost('/getFolderList.json', callParams, function(data){
+		callAjaxPost('/mstr/getFolderList.json', callParams, function(data){
 			let menuReport = data['folder'];
 			let drawHtml = drawMenuReport(menuReport, $('<ul>'));
 			$('#left_menu_tree').append(drawHtml);
@@ -45,7 +45,14 @@
 				, class : ''
 				, style : ''
 				, click : function(e) {
-					menu['id']
+					let pagePrams = [
+						  ["objectId", menu['id']]
+						, ["type", menu['type']]
+						, ["subType", menu['subType']]
+					  	, ["isvi", menu['isVI']]
+					];
+					
+					pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams);
 				}
 			});
 			$(rtnHtml).append(menuHtml);

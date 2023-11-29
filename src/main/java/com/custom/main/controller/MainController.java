@@ -167,4 +167,16 @@ public class MainController {
         
         return view;
     }
+    
+    
+    /**
+     * 리포트 메인 화면 이동
+     * @return
+     */
+    @RequestMapping(value = "/main/reportMainView.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView reportMainView() {
+        ModelAndView view = new ModelAndView("/main/reportMain");
+        
+        return view;
+    }
 }

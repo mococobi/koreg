@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.mococo.microstrategy.sdk.esm.vo.MstrUser;
+
 public class HttpUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpUtil.class);
     
@@ -172,14 +174,30 @@ public class HttpUtil {
 	 * @return
 	 */
 	public static String getLoginUserId(HttpServletRequest request) {
-		String result = null;
-		
+		String resultUserId = null;
+		String resultUserVo = null;
+		/*
+        */
+
+		/*
 		if (request != null && request.getSession() != null) {
 			HttpSession session = request.getSession();
-			result = (String)session.getAttribute("mstrUserIdAttr"); 
+			resultUserId = (String)session.getAttribute("mstrUserIdAttr"); 
 		}
+		*/
 		
-		return result;
+		MstrUser mstrUser = (MstrUser) request.getSession().getAttribute("mstr-user-vo");
+        if (mstrUser != null) {
+        	resultUserId = mstrUser.getId();
+        }
+		
+        /*
+        if(resultUserId == null || resultUserVo == null) {
+        	resultUserId = null;
+        }
+        */
+		
+		return resultUserId;
 	}
 	
 	

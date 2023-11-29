@@ -1,4 +1,4 @@
-package com.custom.demo.service.impl;
+package com.custom.mstr.service.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -13,7 +13,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.custom.demo.service.DemoService;
+import com.custom.mstr.service.DemoService;
 import com.mococo.biz.common.dao.SimpleBizDao;
 
 @Service(value = "demoService")

@@ -1,4 +1,4 @@
-package com.custom.demo.controller;
+package com.custom.mstr.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.custom.demo.service.DemoService;
+import com.custom.mstr.service.DemoService;
 import com.mococo.biz.exception.BizException;
 import com.mococo.web.util.ParamUtil;
 

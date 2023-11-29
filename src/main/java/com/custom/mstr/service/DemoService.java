@@ -1,4 +1,4 @@
-package com.custom.demo.service;
+package com.custom.mstr.service;
 
 import java.util.List;
 import java.util.Map;

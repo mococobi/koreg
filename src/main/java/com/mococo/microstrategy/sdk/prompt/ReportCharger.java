@@ -87,7 +87,8 @@ public class ReportCharger {
                 chargePrompts(session, report, reportInstance.getPrompts());
             }
         } catch (Exception e) {
-            throw new SdkRuntimeException("!!! error on charge report prompts.", e);
+//            throw new SdkRuntimeException("!!! error on charge report prompts.", e);
+        	throw new SdkRuntimeException(e.getMessage());
         } finally {
             MstrReportUtil.closeReport(reportInstance);
         }

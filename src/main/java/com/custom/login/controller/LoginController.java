@@ -32,10 +32,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.custom.log.service.LogService;
 import com.custom.login.service.LoginService;
+import com.microstrategy.utils.serialization.EnumWebPersistableState;
 import com.microstrategy.web.objects.WebIServerSession;
 import com.microstrategy.web.objects.WebObjectsException;
 import com.microstrategy.web.objects.admin.users.WebUser;
 import com.mococo.biz.exception.BizException;
+import com.mococo.microstrategy.sdk.esm.vo.MstrUser;
 import com.mococo.microstrategy.sdk.util.MstrUserUtil;
 import com.mococo.microstrategy.sdk.util.MstrUtil;
 import com.mococo.web.util.ControllerUtil;
@@ -291,10 +293,17 @@ public class LoginController {
 			}
 			
 			//사용자 정보 세션 저장
+			MstrUser mstrUser = new MstrUser(user.getAbbreviation());
+            mstrUser.setClientIp(userIp);
+            mstrUser.setServer(isession.getServerName());
+            mstrUser.setPort(isession.getServerPort());
+            mstrUser.setProject(isession.getProjectName());
+            mstrUser.setProjectSession(isession.getProjectName(), isession.saveState(EnumWebPersistableState.MAXIMAL_STATE_INFO));
+            request.getSession().setAttribute("mstr-user-vo", mstrUser);
+			
 			request.getSession().setAttribute("mstrUserIdAttr", user.getAbbreviation());
 			request.getSession().setAttribute("mstrUserNameAttr", user.getDisplayName());
 			request.getSession().setAttribute("mstrGroupIdMapAttr", groupIdMap);
-			request.getSession().setAttribute("mstrUserIpAttr", userIp);
 			
 //			resultMap.put("mstrUserIdAttr", request.getSession().getAttribute("mstrUserIdAttr"));
 //			resultMap.put("mstrUserNameAttr", request.getSession().getAttribute("mstrUserNameAttr"));
@@ -303,7 +312,7 @@ public class LoginController {
 			//포탈 로그 기록(로그인)
 			logService.addPortalLog(request, "PORTAL", "PORTAL", "LOGIN", null);
 			
-			LOGGER.info("MSTR 사용자 로그인 [{}][{}][{}]", request.getSession().getAttribute("mstrUserIdAttr"), request.getSession().getAttribute("mstrUserNameAttr"), request.getSession().getAttribute("mstrGroupIdMapAttr"));
+			LOGGER.info("MSTR 사용자 로그인 [{}][{}][{}]", request.getSession().getAttribute("mstr-user-vo"), request.getSession().getAttribute("mstrUserNameAttr"), request.getSession().getAttribute("mstrGroupIdMapAttr"));
 		}
 		
 		return resultMap;
