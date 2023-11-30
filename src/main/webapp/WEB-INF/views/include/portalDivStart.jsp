@@ -6,18 +6,11 @@
 	<div id="top_div">
 		<jsp:include flush="true" page="/WEB-INF/views/include/portalTop.jsp" />
 	</div>
-	<div id="main_div">
-		<table style="width: 100%">
-			<colgroup>
-				<col width="20%">
-				<col width="80%">
-			</colgroup>
-			<tbody>
-				<tr>
-					<td>
-						<jsp:include flush="true" page="/WEB-INF/views/include/portalLeft.jsp" />
-					</td>
-					<td>
-						<div id="frame_div" style="height: calc(90vh);">
+	<div class="row" style="width: 100%;">
+		<div class="col-md-2 themed-grid-col">
+			<jsp:include flush="true" page="/WEB-INF/views/include/portalLeft.jsp" />
+		</div>
+		<div id="frame_div" class="col-md-10 themed-grid-col">
+		
 </body>
 </html>

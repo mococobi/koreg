@@ -65,8 +65,20 @@ public class LoginController {
      * @return
      */
     @RequestMapping(value = "/login/loginUserView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView loginView(HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView view = new ModelAndView("/login/loginUser");
+    public ModelAndView loginUserView(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView view = new ModelAndView("login/loginUser");
+        
+        return view;
+    }
+    
+    
+    /**
+     * EIS 로그인 화면 이동
+     * @return
+     */
+    @RequestMapping(value = "/login/loginUserEisView.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView loginUserEisView(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView view = new ModelAndView("login/loginUserEis");
         
         return view;
     }
@@ -159,15 +171,16 @@ public class LoginController {
 	 * @param param
 	 * @return
 	 */
-	@RequestMapping(value = "/login/loginUser.do", method = {RequestMethod.POST})
+	@RequestMapping(value = {"/login/loginUser.do", "/login/loginUserEis.do"}, method = {RequestMethod.POST})
 	@ResponseBody
 	public ModelAndView loginUser(HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-		ModelAndView view = new ModelAndView("/login/loginUser");
+		ModelAndView view = new ModelAndView("login/loginUser");
 		
 		HttpSession session = request.getSession(false);
 		WebIServerSession isession = null;
 		String userId = (String)request.getParameter("encAcntID");
 		String userPwd = (String)request.getParameter("encAcntPW");
+		String screenId = (String)request.getParameter("screenId");
 		
 		try {
 			// 복호화
@@ -188,7 +201,11 @@ public class LoginController {
 			loginSessionProcess(request, isession, view, userId);
 			
 			//정상 로그인 - 메인 화면 이동
-			view.setViewName("redirect:/app/main/mainView.do");
+			if(screenId.equals("EIS")) {
+				view.setViewName("redirect:/app/main/mainEisView.do");
+			} else {
+				view.setViewName("redirect:/app/main/mainView.do");
+			}
 			
 		} catch (BizException e) {
 			LOGGER.debug("=> 요청 사용자 : [{}]", userId);
@@ -220,7 +237,7 @@ public class LoginController {
 	@RequestMapping(value = "/login/loginTrust.do", method = {RequestMethod.GET, RequestMethod.POST})
 	@ResponseBody
 	public ModelAndView loginUserTrust(HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-		ModelAndView view = new ModelAndView("/login/loginUser");
+		ModelAndView view = new ModelAndView("login/loginUser");
 		
 		WebIServerSession isession = null;
 		String userId = (String)request.getParameter("userId");
@@ -283,6 +300,7 @@ public class LoginController {
 			request.getSession().setAttribute("mstrGroupIdMapAttr", "");
 		} else {
 			//정상 로그인 처리
+			String screenId = (String)request.getParameter("screenId");
 			
 			//MSTR 그룹 확인
 			Map<String, String> groupIdMap = new HashMap<String, String>();
@@ -300,7 +318,8 @@ public class LoginController {
             mstrUser.setProject(isession.getProjectName());
             mstrUser.setProjectSession(isession.getProjectName(), isession.saveState(EnumWebPersistableState.MAXIMAL_STATE_INFO));
             request.getSession().setAttribute("mstr-user-vo", mstrUser);
-			
+            request.getSession().setAttribute("portal-screen-id", screenId);
+            
 			request.getSession().setAttribute("mstrUserIdAttr", user.getAbbreviation());
 			request.getSession().setAttribute("mstrUserNameAttr", user.getDisplayName());
 			request.getSession().setAttribute("mstrGroupIdMapAttr", groupIdMap);
@@ -310,7 +329,7 @@ public class LoginController {
 //			resultMap.put("mstrGroupIdMapAttr", request.getSession().getAttribute("mstrGroupIdMapAttr"));
 			
 			//포탈 로그 기록(로그인)
-			logService.addPortalLog(request, "PORTAL", "PORTAL", "LOGIN", null);
+			logService.addPortalLog(request, screenId, screenId, "LOGIN", null);
 			
 			LOGGER.info("MSTR 사용자 로그인 [{}][{}][{}]", request.getSession().getAttribute("mstr-user-vo"), request.getSession().getAttribute("mstrUserNameAttr"), request.getSession().getAttribute("mstrGroupIdMapAttr"));
 		}
@@ -329,14 +348,26 @@ public class LoginController {
 	@RequestMapping(value = "/login/logoutUser.do", method = {RequestMethod.GET, RequestMethod.POST})
 	@ResponseBody
 	public ModelAndView logoutUser(HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> param) {
-		ModelAndView view = new ModelAndView("/login/loginUser");
+		ModelAndView view = null;
+		String screenId = (String)request.getSession().getAttribute("portal-screen-id");
+		if(screenId.equals("EIS")) {
+			view = new ModelAndView("login/loginUserEis");
+		} else {
+			view = new ModelAndView("login/loginUser");
+		}
 		
 		//포탈 로그 기록(로그아웃)
+		if(HttpUtil.getLoginUserId(request) != null) {
+			logService.addPortalLog(request, screenId, screenId, "LOGOUT", null);
+		}
 		
 		//MSTR 세션 제거
 		MstrUtil.cleanMstrSession(request.getSession());
 		
 		//포탈 세션 제거
+		request.getSession().setAttribute("mstr-user-vo", null);
+		request.getSession().setAttribute("portal-screen-id", "");
+		
 		request.getSession().setAttribute("mstrUserIdAttr", "");
 		request.getSession().setAttribute("mstrUserNameAttr", "");
 		request.getSession().setAttribute("mstrGroupIdMapAttr", "");

@@ -86,8 +86,15 @@ public class SessionFilter implements Filter {
 				}
 				*/
 				
-				LOGGER.debug("=> 세션 없는 요청 URI [{}] foward : [{}]", uri, CustomProperties.getProperty("portal.login.page"));
-				RequestDispatcher dispatcher = request.getSession().getServletContext().getRequestDispatcher(CustomProperties.getProperty("portal.login.page"));
+				String fowardUrl = "";
+				if(uri.indexOf("Eis") > -1) {
+					fowardUrl = CustomProperties.getProperty("eis.login.page");
+				} else {
+					fowardUrl = CustomProperties.getProperty("portal.login.page");
+				}
+				
+				LOGGER.debug("=> 세션 없는 요청 URI [{}] foward : [{}]", uri, fowardUrl);
+				RequestDispatcher dispatcher = request.getSession().getServletContext().getRequestDispatcher(fowardUrl);
 				dispatcher.forward(request, response);
 				
 				return;

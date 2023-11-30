@@ -37,7 +37,7 @@ public class BoardController {
     @RequestMapping(value = "/board/boardPostListView.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView boardPostListView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
     	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("/board/boardPostList");
+        ModelAndView view = new ModelAndView("board/boardPostList");
         
         return view;
     }
@@ -97,7 +97,7 @@ public class BoardController {
     @RequestMapping(value = "/board/boardPostWriteView.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView boardPostWriteView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
     	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("/board/boardPostWrite");
+        ModelAndView view = new ModelAndView("board/boardPostWrite");
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         
         try {
@@ -120,7 +120,7 @@ public class BoardController {
     @RequestMapping(value = "/board/boardPostDetailView.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView boardPostDetailView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
     	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("/board/boardPostDetail");
+        ModelAndView view = new ModelAndView("board/boardPostDetail");
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         
         try {

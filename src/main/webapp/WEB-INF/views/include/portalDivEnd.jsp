@@ -7,11 +7,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+		</div>
 	</div>
 </body>
 </html>

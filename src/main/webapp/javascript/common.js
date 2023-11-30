@@ -15,6 +15,31 @@ function unwait() {
 }
 
 
+//MSTR 새탭 열기
+function popupMstrPage(popupName) {
+	let eventParam = '';
+	
+	switch (popupName) {
+		case 'MY_REPORT' :
+			eventParam = 'evt=3003&src=mstrWeb.3003';
+			break;
+		case 'SHARE_REPORT' :
+			eventParam = 'evt=3002&src=mstrWeb.3002';
+			break;
+		case 'NEW_REPORT' :
+			eventParam = 'evt=3011&src=mstrWeb.3011';
+			break;
+		case 'NEW_DOSSIER' :
+			eventParam = 'evt=3187&src=mstrWeb.3187';
+			break;
+		default :
+			break;
+	}
+	
+	let newTab = window.open(__contextPath + '/servlet/mstrWeb?' + eventParam, popupName);
+}
+
+
 //커뮤니티 - 리스트 화면 이동
 function moveCommunityPage(moveBoardId) {
 	let pagePrams = [

@@ -136,33 +136,6 @@ button#run {
 			
 			$(window).resize(); // 프롬프트 랜더링이 종료되고 iframe 높이 조정
 		});
-		
-		/*
-	    $.ajax({
-	    	type: "post",
-	    	url: "${pageContext.request.contextPath}/app/getReportInfo.json",
-	    	async: true,
-	    	contentType: "application/json;charset=utf-8",
-	    	data: JSON.stringify({
-    			objectId:objectId, 
-    			type:type
-    		}),
-	    	dataType: "json",
-	    	success: function(data, text, request) {
-	    		if (data) {
-	    			reportInfo = data.report;
-		    		renderPrompt();
-	    		} else {
-	    		    alert("리포트정보를 가져올 수 없습니다.");	    			
-	    		}
-	    		
-	    		$(window).resize(); // 프롬프트 랜더링이 종료되고 iframe 높이 조정
-	    	},
-	    	error: function(jqXHR, textStatus, errorThrown) {
-	    		console.log(jqXHR);
-	    	}
-	    });	
-		*/
 	}
 	
 	

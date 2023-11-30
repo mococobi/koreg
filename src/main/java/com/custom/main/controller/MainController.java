@@ -37,11 +37,50 @@ public class MainController {
      * @return
      */
     @RequestMapping(value = "/main/mainView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView loginView() {
-        ModelAndView view = new ModelAndView("/main/main");
+    public ModelAndView mainView() {
+        ModelAndView view = new ModelAndView("main/main");
         
         return view;
     }
+    
+    
+    /**
+     * 리포트 메인 화면 이동
+     * @return
+     */
+    @RequestMapping(value = "/main/reportMainView.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView reportMainView() {
+        ModelAndView view = new ModelAndView("main/reportMain");
+        
+        return view;
+    }
+    
+    
+    /**
+     * EIS 메인 화면 이동
+     * @return
+     */
+    @RequestMapping(value = "/main/mainEisView.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView mainEisView() {
+        ModelAndView view = new ModelAndView("main/mainEis");
+        
+        return view;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     @RequestMapping(value = "/category.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView mainCategoryView(HttpServletRequest request, HttpServletResponse response) {
@@ -169,14 +208,5 @@ public class MainController {
     }
     
     
-    /**
-     * 리포트 메인 화면 이동
-     * @return
-     */
-    @RequestMapping(value = "/main/reportMainView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView reportMainView() {
-        ModelAndView view = new ModelAndView("/main/reportMain");
-        
-        return view;
-    }
+
 }
