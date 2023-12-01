@@ -52,7 +52,8 @@
 				, post.CRT_DT_TM
 				, bpf.FILE_ID
 				, post.CRT_USR_ID
-				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS LOG_COUNT
+				, post.CRT_USR_ID AS CRT_USR_NM
+				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
 			FROM 
 				PORTAL.BOARD_POST post 
 				LEFT JOIN PORTAL.BOARD_POST_FILE bpf 
@@ -90,7 +91,37 @@
 				FROM 
 					POST_LIST 
 				ORDER BY 
-					POST_ID DESC
+					<choose>
+						<when test="customOrder1 != null and customOrder1 == 0">
+							POST_LIST.POST_ID
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 1">
+							POST_LIST.POST_TITLE
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 2">
+							POST_LIST.CRT_DT_TM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 3">
+							POST_LIST.CRT_USR_NM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 4">
+							POST_LIST.POST_VIEW_COUNT
+						</when>
+						<otherwise>
+							POST_LIST.POST_ID
+						</otherwise>
+					</choose>
+					<choose>
+						<when test="customOrder2 != null and customOrder2.equals('asc')">
+							ASC
+						</when>
+						<when test="customOrder2 != null and customOrder2.equals('desc')">
+							DESC
+						</when>
+						<otherwise>
+							DESC
+						</otherwise>
+					</choose>
 			) ORDER_T
 		) T
 		WHERE 1=1

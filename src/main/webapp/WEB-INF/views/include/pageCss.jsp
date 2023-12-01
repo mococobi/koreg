@@ -2,6 +2,7 @@
 
 <!-- Bootstrap Css -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/style/bootstrap/bootstrap.min.css?v=20231006001" >
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/image/bootstrap-icons-1.11.2/font/bootstrap-icons.css">
 
 <!-- Jquery Css -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/jquery-ui/themes/start/jquery-ui.css?v=20231006001" />

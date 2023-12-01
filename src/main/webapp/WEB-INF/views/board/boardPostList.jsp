@@ -38,8 +38,8 @@
 				<button class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
 			</div>
 	    </div>
-		<div id="boardTable_div">
-			<table id="boardTable" class="table hover table-striped table-bordered dataTablesCommonStyle">
+		<div id="boardPostTable_div">
+			<table id="boardPostTable" class="table hover table-striped table-bordered dataTablesCommonStyle">
 				<colgroup>
 					<col width="5%">
 					<col >
@@ -81,7 +81,7 @@
 	//게시물 목록
 	function fnBoardInit() {
 		let listViewCount = 10;
-		$('#boardTable').DataTable({
+		$('#boardPostTable').DataTable({
 			  lengthChange : false
 			, searching : false
 			, serverSide : true
@@ -89,6 +89,7 @@
 			, ordering : true
 			, pageLength : listViewCount
 			, pagingType : 'full_numbers'
+			, order : [[ 0, 'desc' ]]
 			, ajax : {
 				  url : '${pageContext.request.contextPath}/app/board/boardPostListGrid.json'
 				, type : 'POST'
@@ -97,6 +98,9 @@
 					data['listViewCount'] = listViewCount;
 					data['searchKey'] = searchKey;
 					data['searchVal'] = searchVal;
+					
+					data['customOrder1'] = $('#boardPostTable').DataTable().order()[0][0];
+					data['customOrder2'] = $('#boardPostTable').DataTable().order()[0][1];
 				}
 				, dataSrc : function (data) {
 					if (data['errorCode'] != 'success') {
@@ -116,6 +120,7 @@
 					}
 			    }
 			}
+			, language : commonDatatableLanguage()
 			, columns : [
 				{
 					  data : 'POST_ID'
@@ -126,7 +131,7 @@
 							rtnData = XSSCheck(data, 0);
 						}
 						if (row['POPUP_YN'] == 'Y') {
-					        return '공지';
+					        return '<i class="bi bi-megaphone-fill"></i>';
 					    } else {
 					        return rtnData;
 					    }
@@ -140,9 +145,9 @@
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
-						if(row['FILE_ID'] > 0){
-							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '<img src="../../image/board/clip.png" style="width:20px; height:20px;">' + '</a>';
-						}else{
+						if(row['FILE_ID'] > 0) {
+							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '<i class="bi bi-paperclip"></i>' + '</a>';
+						} else {
 							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
 						}
 					}
@@ -170,7 +175,7 @@
 					}
 	            }
 				, {
-					  data : 'LOG_COUNT'
+					  data : 'POST_VIEW_COUNT'
 					, className : 'textCenter'
 					, render : function (data, type, row) {
 						let rtnData = 0;
@@ -190,7 +195,7 @@
 		searchKey = $('#searchKey option:selected').val();
 		searchVal = $('#searchVal').val();
 		
-		$('#boardTable').DataTable().ajax.reload();
+		$('#boardPostTable').DataTable().ajax.reload();
 	}
 	
 	
