@@ -46,12 +46,17 @@
 			SELECT
 				  post.POST_ID
 				, post.BRD_ID
+				, post.POPUP_YN
 				, post.POST_TITLE
 				/* , TO_CHAR(post.CRT_DT_TM, 'yyyy-mm-dd') AS CRT_DT_TM */
 				, post.CRT_DT_TM
+				, bpf.FILE_ID
 				, post.CRT_USR_ID
+				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS LOG_COUNT
 			FROM 
-				PORTAL.BOARD_POST post
+				PORTAL.BOARD_POST post 
+				LEFT JOIN PORTAL.BOARD_POST_FILE bpf 
+					ON (post.POST_ID = bpf.POST_ID)
 			WHERE 1=1
 				AND post.BRD_ID = #{boardId}
 				AND post.DEL_YN = 'N'
@@ -85,7 +90,37 @@
 				FROM 
 					POST_LIST 
 				ORDER BY 
-					POST_ID DESC
+					<choose>
+				    <when test="order[0][column] == '0'">
+				    	POST_LIST.POST_ID
+				    </when>
+				    <when test="order[0][column] == '1'">
+				    	POST_LIST.POST_TITLE
+				    </when>
+				    <when test="order[0][column] == '2'">
+				    	POST_LIST.CRT_DT_TM
+				    </when>
+				    <when test="order[0][column] == '3'">
+				    	POST_LIST.CRT_USR_ID
+				    </when>
+				    <when test="order[0][column] == '4'">
+				    	POST_LIST.LOG_COUNT
+				    </when>
+				    <otherwise>
+				    	POST_LIST.POST_ID
+				    </otherwise>
+				</choose>
+	        	<choose>
+				    <when test="order[0][dir] == 'desc'">
+				    	DESC
+				    </when>
+				    <when test="order[0][dir] == 'asc'">
+				    	ASC
+				    </when>
+				    <otherwise>
+				    	ASC
+				    </otherwise>
+				</choose>
 			) ORDER_T
 		) T
 		WHERE 1=1
