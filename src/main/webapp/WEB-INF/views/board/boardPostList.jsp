@@ -45,13 +45,16 @@
 					<col >
 					<col width="10%">
 					<col width="10%">
+					<col width="10%">
 				</colgroup>
 				<thead>
-	    			<tr>
+    				<tr>
 	     				<th>NO</th>
-	      				<th>제목</th>
+	      				<th>제목
+	      				</th>
 	      				<th>작성일자</th>
 	      				<th>작성자</th>
+	      				<th>조회수</th>
 	    			</tr>
 	  			</thead>
 			</table>
@@ -122,7 +125,11 @@
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
-						return rtnData;
+						if (row['POPUP_YN'] == 'Y') {
+					        return '공지';
+					    } else {
+					        return rtnData;
+					    }
 					}
 	            }
 				, {
@@ -133,7 +140,11 @@
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
-						return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
+						if(row['FILE_ID'] > 0){
+							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '<img src="../../image/board/clip.png" style="width:20px; height:20px;">' + '</a>';
+						}else{
+							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
+						}
 					}
 	            }
 				, {
@@ -158,6 +169,17 @@
 						return rtnData;
 					}
 	            }
+				, {
+					  data : 'LOG_COUNT'
+					, className : 'textCenter'
+					, render : function (data, type, row) {
+						let rtnData = 0;
+						if(data) {
+							rtnData = XSSCheck(data, 0);
+						}
+						return rtnData;
+					}
+				}
 	        ]
 		});
 	}

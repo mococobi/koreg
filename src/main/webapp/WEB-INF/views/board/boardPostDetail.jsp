@@ -35,31 +35,16 @@
 		<p class="h3">${postData['BRD_NM']}</p>
 		<p class="h6">${postData['BRD_DESC']}</p>
 		<div class="row mb-3">
-			<div class="col text-end">
-				<button class="btn btn-secondary btn-sm" onclick="moveCommunityPage(<%=boardId%>)">목록</button>
+			<div class="col">
 				<button id="btn_post_modify" class="btn btn-secondary btn-sm" onclick="modifyBoardPost()" style="display: none;">수정</button>
 				<button id="btn_post_delete" class="btn btn-secondary btn-sm" onclick="deleteBoardPost()" style="display: none;">삭제</button>
 			</div>
-	    </div>
-	    
-   		<div class="row">
-			<div class="col-1 themed-grid-col">
-				<span>제목</span>
-			</div>
-	      	<div class="col themed-grid-col">
-	      		<span id="post_title"></span>
-			</div>
-	    </div>
-	    <div class="row">
-			<div class="col-2 themed-grid-col">
-				<span>제목</span>
-			</div>
-	      	<div class="col-10 themed-grid-col">
-	      		<span id="post_title"></span>
+			<div class="col text-end">
+				<button class="btn btn-secondary btn-sm" onclick="moveCommunityPage(<%=boardId%>)">목록</button>
 			</div>
 	    </div>
 	    
-    	<table id="board_table" class="table" style="width: 100%; border: 1px solid; border-collapse: collapse;">
+    	<table id="board_table" class="table table-sm table-bordered" style="width: 100%; border: 1px solid; border-collapse: collapse;">
 			<colgroup>
 				<col width="12.5%">
 				<col width="12.5%">
@@ -110,16 +95,14 @@
 						<td>
 							<span>팝업여부</span>
 						</td>
-						<td>
+						<td class="text-center">
 							<input type="checkbox" id="post_popup_yn" disabled>
 						</td>
 						<td>
 							<span>팝업일자</span>
 						</td>
 						<td colspan="5">
-							<span id="post_popup_start_dt"></span>
-							<span id="post_popup_span" style="display: none;"> ~ </span>
-							<span id="post_popup_end_dt"></span>
+							<span id="post_popup_dt"></span>
 						</td>
 					</tr>
 				</c:if>
@@ -140,12 +123,15 @@
 							<input type="checkbox" id="post_secret_yn" disabled>
 						</td>
 					</c:if>
-					<%-- 
-					<td>
-						<span>보기 권한</span>
-					</td>
-					<td colspan="3"></td>
-					--%>
+					
+				</tr>
+					<c:if test="${postData['BRD_VIEW_AUTH'] eq 'Y'}">
+						<td>
+							<span>보기 권한</span>
+						</td>
+						<td colspan="7"></td>
+					</c:if>
+				<tr>
 				</tr>
 				<tr>
 					<td>
@@ -168,14 +154,20 @@
 			</tbody>
 		</table>
 		
-		<div>
-			<div>
+		<div class="row mb-1">
+			<div class="col-1">
 				<span>이전글</span>
 			</div>
-			<div>
+			<div class="col-1">
+			</div>
+	    </div>
+	    <div class="row">
+			<div class="col-1">
 				<span>다음글</span>
 			</div>
-		</div>
+			<div class="col-1">
+			</div>
+	    </div>
 	</div>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
@@ -188,12 +180,12 @@
 	let searchVal = '';
 	
 	$(function() {
-		fnBoardInit();
+		fnBoardPostInit();
 	});
 	
 	
 	//초기 함수
-	function fnBoardInit() {
+	function fnBoardPostInit() {
 		let callParams = {
 			  boardId : boardId
 			, postId : postId
@@ -248,10 +240,13 @@
 			$('#btn_post_delete').show();
 		}
 		
-		
-		$('#post_create_date').text(changeDisplayDate(postData['CRT_DT_TM'], 'YYYY-MM-DD'));
-		$('#post_create_user_id').text(postData['CRT_USR_ID']);
 		$('#post_title').text(postData['POST_TITLE']);
+		
+		$('#post_create_user_id').text(postData['CRT_USR_ID']);
+		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);
+		$('#post_create_date').text(changeDisplayDate(postData['CRT_DT_TM'], 'YYYY-MM-DD'));
+		$('#post_count').text(postData['POST_COUNT']);
+		
 		$('#post_content').html(postData['POST_CONTENT']);
 		
 		if(postData['POPUP_YN'] == 'Y') {
@@ -263,8 +258,7 @@
 		}
 		
 		if(postData['POPUP_START_DT_TM'] || postData['POPUP_END_DT_TM']) {
-			$('#post_popup_start_dt').text(postData['POPUP_START_DT_TM']);
-			$('#post_popup_end_dt').text(postData['POPUP_END_DT_TM']);
+			$('#post_popup_dt').text(postData['POPUP_START_DT_TM'] + ' ~ ' + postData['POPUP_END_DT_TM']);
 		}
 		
 		if(postData['SECRET_YN'] == 'Y') {
@@ -281,7 +275,9 @@
 		
 		//TODO 첨부파일 리스트 표시
 		if(postData['file']) {
-			
+			postData.forEach((attachFile, idx) => {
+				
+			});
 		}
 	}
 	

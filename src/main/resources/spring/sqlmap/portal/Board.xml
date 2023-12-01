@@ -90,37 +90,7 @@
 				FROM 
 					POST_LIST 
 				ORDER BY 
-					<choose>
-				    <when test="order[0][column] == '0'">
-				    	POST_LIST.POST_ID
-				    </when>
-				    <when test="order[0][column] == '1'">
-				    	POST_LIST.POST_TITLE
-				    </when>
-				    <when test="order[0][column] == '2'">
-				    	POST_LIST.CRT_DT_TM
-				    </when>
-				    <when test="order[0][column] == '3'">
-				    	POST_LIST.CRT_USR_ID
-				    </when>
-				    <when test="order[0][column] == '4'">
-				    	POST_LIST.LOG_COUNT
-				    </when>
-				    <otherwise>
-				    	POST_LIST.POST_ID
-				    </otherwise>
-				</choose>
-	        	<choose>
-				    <when test="order[0][dir] == 'desc'">
-				    	DESC
-				    </when>
-				    <when test="order[0][dir] == 'asc'">
-				    	ASC
-				    </when>
-				    <otherwise>
-				    	ASC
-				    </otherwise>
-				</choose>
+					POST_ID DESC
 			) ORDER_T
 		) T
 		WHERE 1=1
