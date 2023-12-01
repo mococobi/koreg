@@ -36,7 +36,8 @@ function popupMstrPage(popupName) {
 			break;
 	}
 	
-	let newTab = window.open(__contextPath + '/servlet/mstrWeb?' + eventParam, popupName);
+	let mstrUlr = '/servlet/mstrWeb?&Server='+ __mstrServerName +'&Port='+ __mstrServerPort +'&Project='+ __mstrDefaultProjectName +'&';
+	let newTab = window.open(__contextPath + mstrUlr + eventParam, popupName);
 }
 
 

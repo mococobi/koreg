@@ -1,8 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
+<%@ page import="com.mococo.web.util.CustomProperties" %>
 <% 
 	String mstrUserIdAttr = (String)session.getAttribute("mstrUserIdAttr");
 	String mstrUserNameAttr = (String)session.getAttribute("mstrUserNameAttr");
+	
+	String mstrServerName = CustomProperties.getProperty("mstr.server.name");
+	String mstrServerPort = CustomProperties.getProperty("mstr.server.port");
+	String mstrDefaultProjectName = CustomProperties.getProperty("mstr.default.project.name");
 %>
 <!DOCTYPE html>
 <html>
@@ -84,7 +89,13 @@
 						<a onclick="popupMstrPage('MY_REPORT')" class="nav-link" aria-current="page" href="#">내 리포트</a>
 					</li>
 					<li class="nav-item">
+						<a onclick="popupMstrPage('SHARE_REPORT')" class="nav-link" aria-current="page" href="#">공유리포트</a>
+					</li>
+					<li class="nav-item">
 						<a onclick="popupMstrPage('NEW_REPORT')" class="nav-link" aria-current="page" href="#">비정형분석</a>
+					</li>
+					<li class="nav-item">
+						<a onclick="popupMstrPage('NEW_DOSSIER')" class="nav-link" aria-current="page" href="#">새 도씨에</a>
 					</li>
 					<li class="nav-item">
 						<a onclick="moveCommunityPage(1)" class="nav-link" aria-current="page" href="#">공지사항</a>
@@ -134,6 +145,10 @@
 	</nav>
 </body>
 <script type="text/javascript">
+	var __mstrServerName = "<%=mstrServerName%>";
+	var __mstrServerPort = "<%=mstrServerPort%>";
+	var __mstrDefaultProjectName = "<%=mstrDefaultProjectName%>";
+	
 	$(function() {
 		
 		//메인화면 이동
