@@ -8,7 +8,8 @@
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/jquery-3.7.0.min.js?v=20231006001"></script>
 
 <!-- dataTables -->
-<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/DataTables-1.13.6/js/jquery.dataTables.min.js?v=20231006001"></script>
+<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/DataTables-1.13.8/js/jquery.dataTables.min.js?v=20231006001"></script>
+<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/DataTables-1.13.8/js/dataTables.bootstrap5.min.js?v=20231006001"></script>
 
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/common.js?v=20231006001"></script>
 

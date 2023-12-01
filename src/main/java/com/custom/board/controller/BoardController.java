@@ -39,6 +39,16 @@ public class BoardController {
     	LOGGER.debug("params : [{}]", params);
         ModelAndView view = new ModelAndView("board/boardPostList");
         
+        Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+        try {
+    		Map<String, Object> boardMap = boardService.boardList(request, response, params);
+    		view.addObject("postData", boardMap);
+		} catch (Exception e) {
+			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			view.addObject("data", rtnMap);
+			LOGGER.error("boardPostListView Exception", e);
+		}
+        
         return view;
     }
     

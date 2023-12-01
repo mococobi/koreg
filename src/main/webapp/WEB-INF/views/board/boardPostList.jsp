@@ -10,7 +10,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>게시판</title>
+	<title>${postData['BRD_NM']}</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
@@ -18,37 +18,45 @@
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart.jsp" />
 	
-	<p>게시판</p> <%=boardId%>
-	<div>
-		<button onclick="writeBoardPost()">글쓰기</button>
+	<div class="container py-4">
+		<p class="h3">${postData['BRD_NM']}</p>
+		<p class="h6">${postData['BRD_DESC']}</p>
+		<div class="row mb-3">
+			<div class="col-md-1">
+				<select id="searchKey" class="form-select form-select-sm">
+					<option value="POST_TITLE">제목</option>
+					<option value="CRT_USR_ID">작성자</option>
+				</select>
+			</div>
+			<div class="col-md-4">
+				<input id="searchVal" class="form-control form-control-sm" type="search" placeholder="Search" aria-label="Search">
+			</div>
+			<div class="col-md-1">
+				<button class="btn btn-primary btn-sm" onclick="searchBoardPostList()">조회</button>
+			</div>
+			<div class="col text-end">
+				<button class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
+			</div>
+	    </div>
+		<div id="boardTable_div">
+			<table id="boardTable" class="table hover table-striped table-bordered dataTablesCommonStyle">
+				<colgroup>
+					<col width="5%">
+					<col >
+					<col width="10%">
+					<col width="10%">
+				</colgroup>
+				<thead>
+	    			<tr>
+	     				<th>NO</th>
+	      				<th>제목</th>
+	      				<th>작성일자</th>
+	      				<th>작성자</th>
+	    			</tr>
+	  			</thead>
+			</table>
+		</div>
 	</div>
-	<div>
-		<select id="searchKey">
-			<option value="POST_TITLE">제목</option>
-			<option value="CRT_USR_ID">작성자</option>
-		</select>
-		<input type="text" id="searchVal">
-		<button onclick="searchBoardPostList()">조회</button>
-	</div>
-	<div id="boardTable_div">
-		<table id="boardTable" class="table table-bordered dataTablesCommonStyle">
-			<colgroup>
-				<col width="5%">
-				<col >
-				<col width="10%">
-				<col width="10%">
-			</colgroup>
-			<thead>
-    			<tr>
-     				<th>NO</th>
-      				<th>제목</th>
-      				<th>작성일자</th>
-      				<th>작성자</th>
-    			</tr>
-  			</thead>
-		</table>
-	</div>
-	
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
 </body>
 <script type="text/javascript">

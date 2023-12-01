@@ -32,24 +32,7 @@
         <servlet-name>appServlet</servlet-name>
         <url-pattern>/app/*</url-pattern>
     </servlet-mapping>
-	    
-	<filter>
-		<filter-name>SessionFilter</filter-name>
-		<filter-class>com.mococo.web.filter.SessionFilter</filter-class>
-    	<init-param>
-			<param-name>entryPoints</param-name>
-			<param-value>.*/login/.*\.do$</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>SessionFilter</filter-name>
-		<url-pattern>*.do</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>SessionFilter</filter-name>
-		<url-pattern>*.jsp</url-pattern>
-	</filter-mapping>
-    
+      
     <context-param>
           	
         <!--
@@ -129,7 +112,7 @@
             
         <filter-name>cookieProcessorFilter</filter-name>
             
-        <filter-class>com.microstrategy.web.filter.WebCookieProcessorFilter</filter-class>
+        <filter-class>com.microstrategy.web.filter.CookieProcessorFilter</filter-class>
             
         <init-param>
                   
@@ -209,24 +192,24 @@
         <url-pattern>/*</url-pattern>
           
     </filter-mapping>
-      
-    <filter>
-            
-        <filter-name>resourceAccessConstraintFilter</filter-name>
-            
-        <filter-class>com.microstrategy.web.filter.ResourceAccessConstraintFilter</filter-class>
-          
-    </filter>
-      
-    <filter-mapping>
-            
-        <filter-name>resourceAccessConstraintFilter</filter-name>
-            
-        <url-pattern>/plugins/*</url-pattern>
-          
-    </filter-mapping>
-      
+        
     <!-- ================== Auth Filter Support ================ -->
+        
+    <context-param>
+                
+        <param-name>oidcConfigLocation</param-name>
+                
+        <param-value>classpath:auth/OidcConfig.xml</param-value>
+            
+    </context-param>
+        
+    <context-param>
+                
+        <param-name>samlConfigLocation</param-name>
+                
+        <param-value>classpath:resources/SAML/SpringSAMLConfig.xml</param-value>
+            
+    </context-param>
         
     <context-param>
         		    
@@ -259,10 +242,9 @@
         	
     
     </filter-mapping>
-    	
-
-    <!-- 
-    <filter>
+	
+    
+    <!-- <filter>
                 
         <filter-name>springSecurityFilterChain</filter-name>
                 
@@ -276,16 +258,19 @@
                 
         <url-pattern>/*</url-pattern>
             
-    </filter-mapping>
-    --> 	
+    </filter-mapping> -->
+    	
+	
     <!-- ===================== SAML Config GUI ================ -->
-    <!--     
+        
     <servlet>
                 
         <servlet-name>samlConfig</servlet-name>
                 
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
                 
+        <!-- multipart config is needed to support idpmetadata file upload -->
+        		    
         <multipart-config>
                       
             <max-file-size>5242880</max-file-size>
@@ -293,7 +278,7 @@
             <max-request-size>10485760</max-request-size>
                       
             <file-size-threshold>5242880</file-size-threshold>
-                	
+                	  
         </multipart-config>
             
     </servlet>
@@ -305,7 +290,14 @@
         <url-pattern>/saml/*</url-pattern>
             
     </servlet-mapping>
-    -->  
+    
+	<!-- start::add mococo -->
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	<!-- end::add mococo -->
+
+	
     <!-- End SAML Config GUI -->
       
     <!-- SPNEGO Integrated Authentication/Kerberos - uncomment <filter> & pick appropriate <filter-mapping> below...
@@ -666,14 +658,6 @@
       
     <servlet-mapping>
             
-        <servlet-name>mstrWeb</servlet-name>
-            
-        <url-pattern>/saml/SingleLogout</url-pattern>
-          
-    </servlet-mapping>
-      
-    <servlet-mapping>
-            
         <servlet-name>mstrWebAdmin</servlet-name>
             
         <url-pattern>/servlet/mstrWebAdmin</url-pattern>
@@ -721,7 +705,97 @@
         </taglib>
           
     </jsp-config>
+     
+	<!-- start::add mococo -->
+    <!-- IMPORTANT NOTICE: UNCOMMENT CONSTRAINTS WHEN SWITCHING TO ANY NON-SAML  AUTHENTICATION MODE -->
       
+    <security-constraint>
+        	
+    
+        <web-resource-collection>
+            	
+      
+            <web-resource-name>Administrator</web-resource-name>
+            	
+      
+            <url-pattern>/servlet/mstrWebAdmin</url-pattern>
+            	
+      
+            <!-- TQMS 245539: The following url-patterns are to prevent IBM WebSphere 6.0.2 security hole being exploited.  -->
+                  
+            <url-pattern>/servlet/mstrWebAdmin/*</url-pattern>
+            	
+      
+            <url-pattern>/servlet/mstrWeb/mstrWebAdmin</url-pattern>
+            	
+      
+            <url-pattern>/servlet/mstrWeb/mstrWebAdmin/*</url-pattern>
+            	
+    
+        </web-resource-collection>
+        	
+    
+        <auth-constraint>
+            	
+      
+            <role-name>admin</role-name>
+            	
+    
+        </auth-constraint>
+        	
+    
+        <user-data-constraint>
+            	
+      
+            <transport-guarantee>NONE</transport-guarantee>
+            	
+    
+        </user-data-constraint>
+        	
+  
+    </security-constraint>
+    	
+  
+    <security-constraint>
+        	
+    
+        <web-resource-collection>
+            	
+      
+            <web-resource-name>TaskAdministrator</web-resource-name>
+            	
+      
+            <url-pattern>/servlet/taskAdmin</url-pattern>
+            	
+      
+            <url-pattern>/servlet/taskAdmin/*</url-pattern>
+            	
+    
+        </web-resource-collection>
+        	
+    
+        <auth-constraint>
+            	
+      
+            <role-name>admin</role-name>
+            	
+    
+        </auth-constraint>
+        	
+    
+        <user-data-constraint>
+            	
+      
+            <transport-guarantee>NONE</transport-guarantee>
+            	
+    
+        </user-data-constraint>
+        	
+  
+    </security-constraint>
+      
+    <!-- End of constrains -->
+	<!-- end::add mococo -->
 
     <security-constraint>
             

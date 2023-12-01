@@ -9,7 +9,7 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/jquery-easyui-1.9.15/themes/icon.css?v=20231006001" />
 
 <!-- dataTables -->
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/DataTables-1.13.6/css/jquery.dataTables.min.css?v=20231006001"></script>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/DataTables-1.13.8/css/dataTables.bootstrap5.min.css?v=20231006001"></script>
 
 <!-- Application Css -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/style/common.css?v=20231006001" />
