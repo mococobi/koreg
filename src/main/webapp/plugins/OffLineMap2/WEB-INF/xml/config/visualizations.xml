@@ -1,0 +1,5 @@
+<visualizations>
+  <visualization-list name="ajax" show-in-web="true" view-mode="51">
+    <visualization attribute-minimum="0" desc="OffLineMap2" drop-zones="plugins.OffLineMap2.OffLineMap2DropZones" editor-model="plugins.OffLineMap2.OffLineMap2EditorModel" is-mojo="true" metric-minimum="0" scope="19" style-name="OffLineMap2" widget-type="7"/>
+  </visualization-list>
+</visualizations>

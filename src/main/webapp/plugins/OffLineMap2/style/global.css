@@ -1,0 +1,34 @@
+/*import awesom fonts 
+*/
+@import url("leaflet.css")  ;
+
+.regionlabel2 {  
+	/* width: 100% !important; */
+    /* width: auto !important; */
+    font-size: 9px ;
+    font-family: Malgun-Gothic;
+    fill:#cfcfcf ;   
+}
+
+.offlinemap-regionlabel {  
+    font-size: 9px ;
+    font-family: Malgun-Gothic;
+    fill:#cfcfcf ;   
+    min-width: 100px;
+    max-width: 500px;
+}
+
+.offlinemap-regionlabel-center {
+    width: 100%;
+    /* transform: translate(-50%, -50%); */
+    text-align: center;
+}
+
+.OffLineMapLabel {  
+    stroke: #b5b5b5;
+    stroke-width: 0.5;
+    paint-order: stroke;
+    stroke-linecap: butt; 
+    stroke-linejoin: miter ;     
+}
+
