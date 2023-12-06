@@ -28,43 +28,10 @@
 			.dropdown-toggle:not(:focus) {
 			  outline: 0;
 			}
-			
-			
 		</style>
 	</head>
 <body>
-	<%--
-	<table style="width: 100%">
-		<colgroup>
-			<col width="20%">
-			<col width="80%">
-		</colgroup>
-		<tbody>
-			<tr>
-				<td>
-					<img id="top_menu_logo" alt="로고 이미지" src="${pageContext.request.contextPath}/image/logo/logo_hdr.png?v=20231123001" style="background: linear-gradient(125deg, #1575c7 0%, #1677c9 43%, #22a3f4 100%); box-shadow: 0.5rem 0.5rem 0.45rem rgba(8,132,229,.25);">
-				</td>
-				<td>
-					<div style="float: right;">
-						<div>
-							<span>${mstrUserNameAttr}(${mstrUserIdAttr})님 환영합니다</span>
-							<button id="top_menu_logout">로그아웃</button>
-						</div>
-						<div>
-							<button onclick="popupMstrPage('MY_REPORT')">내 리포트</button>
-							<button onclick="popupMstrPage('NEW_REPORT')">비정형 분석</button>
-							<button onclick="moveCommunityPage(1)">공지사항</button>
-							<button onclick="moveCommunityPage(2)">FAQ</button>
-							<button onclick="moveCommunityPage(3)">자료실</button>
-						</div>
-					</div>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	--%>
-	
-	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+	<nav id="portal-top-nav-div" class="navbar navbar-expand-lg navbar-dark bg-primary">
 		<div class="container-fluid">
 			<a class="navbar-brand" href="#">
 				<img id="top_menu_logo" alt="로고 이미지" src="${pageContext.request.contextPath}/image/logo/logo_hdr.png?v=20231123001" style="width: 100%; height: 30px;" class="d-inline-block align-top">
@@ -89,13 +56,13 @@
 						<a onclick="popupMstrPage('MY_REPORT')" class="nav-link" aria-current="page" href="#">내 리포트</a>
 					</li>
 					<li class="nav-item">
-						<a onclick="popupMstrPage('SHARE_REPORT')" class="nav-link" aria-current="page" href="#">공유리포트</a>
+						<a onclick="popupMstrPage('SHARE_REPORT')" class="nav-link" aria-current="page" href="#">공유 리포트</a>
 					</li>
 					<li class="nav-item">
-						<a onclick="popupMstrPage('NEW_REPORT')" class="nav-link" aria-current="page" href="#">비정형분석</a>
+						<a onclick="popupMstrPage('NEW_REPORT')" class="nav-link" aria-current="page" href="#">비정형 분석</a>
 					</li>
 					<li class="nav-item">
-						<a onclick="popupMstrPage('NEW_DOSSIER')" class="nav-link" aria-current="page" href="#">새 도씨에</a>
+						<a onclick="popupMstrPage('NEW_DOSSIER')" class="nav-link" aria-current="page" href="#">새 대시보드</a>
 					</li>
 					<li class="nav-item">
 						<a onclick="moveCommunityPage(1)" class="nav-link" aria-current="page" href="#">공지사항</a>
@@ -109,9 +76,6 @@
 				</ul>
 				<div class="flex-shrink-0 dropdown text-end">
 					<a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle-x" data-bs-toggle="dropdown" aria-expanded="false">
-						<!--  
-						<img src="${pageContext.request.contextPath}/image/logo/logo_hdr.png?v=20231123001" alt="사용자" width="32" height="32" class="rounded-circle">
-						-->
 						<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="white" class="bi bi-person-circle" viewBox="0 0 16 16">
 						  <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
 						  <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.mococo.biz.exception.BizException;
 import com.mococo.microstrategy.sdk.esm.vo.MstrUser;
+import com.mococo.web.util.CustomProperties;
 import com.mococo.web.util.JsonUtil;
 
 @Controller
@@ -38,7 +39,29 @@ public class MainController {
      */
     @RequestMapping(value = "/main/mainView.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView mainView() {
-        ModelAndView view = new ModelAndView("main/main");
+    	String mainViewName = "";
+    	
+    	switch (CustomProperties.getProperty("portal.main.display")) {
+		case "MSTR_DASHBOARD":
+			mainViewName = "main/mainDashboard";
+			break;
+		case "MAIN":
+			mainViewName = "main/main";
+			break;
+		default:
+			break;
+		}
+    	
+        ModelAndView view = new ModelAndView(mainViewName);
+        switch (CustomProperties.getProperty("portal.main.display")) {
+		case "MSTR_DASHBOARD":
+			view.addObject("portalMainDashboardId", CustomProperties.getProperty("portal.main.dashboard.id"));
+			view.addObject("type", 55);
+			view.addObject("isvi", true);
+			break;
+		default:
+			break;
+		}
         
         return view;
     }
@@ -66,20 +89,6 @@ public class MainController {
         
         return view;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     @RequestMapping(value = "/category.do", method = { RequestMethod.GET, RequestMethod.POST })

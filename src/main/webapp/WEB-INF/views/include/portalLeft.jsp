@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
+<%@ page import="com.mococo.web.util.CustomProperties" %>
 <% 
-	String mstrUserIdAttr = (String)session.getAttribute("mstrUserIdAttr");
-	String mstrUserNameAttr = (String)session.getAttribute("mstrUserNameAttr");
+	String portalIframePageMoveYn = CustomProperties.getProperty("portal.iframe.page.move.yn");
 %>
 <!DOCTYPE html>
 <html>
@@ -93,175 +93,43 @@
 		</style>
 	</head>
 <body>
-<%-- 
-	<div id="left_menu_tree" style="height: calc(93vh); overflow: auto;">
-		<!-- 
-		<ul>
-			<li>상담/접수/실행 분석</li>
-			<li>
-				<ol>
-					<li>고객 속성별</li>
-					<li>상품별</li>
-					<li>업체수</li>
-				</ol>
-			</li>
-		</ul>
-		-->
-	</div>
---%>
-<div class="flex-shrink-0 p-3" style="width: 280px;">
-	<!-- 
-	<a href="/"
-		class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom">
-		<svg class="bi pe-none me-2" width="30" height="24">
-			<use xlink:href="#bootstrap" /></svg> <span class="fs-5 fw-semibold">Collapsible</span>
-	</a>
-	 -->
-	
-	<!--
-	<ul class="list-unstyled ps-0">
-		<li class="mb-1">
-			<button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">Home</button>
-			<div class="collapse show" id="home-collapse">
-				<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-					<li class="mb-1">
-						<button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">Dashboard</button>
-						<div class="collapse" id="dashboard-collapse">
-							<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-								<li>
-									<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a>
-								</li>
-								<li>
-									<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Weekly</a>
-								</li>
-								<li>
-									<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Monthly</a>
-								</li>
-								<li>
-									<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Annually</a>
-								</li>
-							</ul>
-						</div>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Updates</a>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Reports</a>
-					</li>
-				</ul>
-			</div>
-		</li>
-		<li class="mb-1">
-			<button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">Dashboard</button>
-			<div class="collapse" id="dashboard-collapse">
-				<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Weekly</a>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Monthly</a>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Annually</a>
-					</li>
-				</ul>
-			</div>
-		</li>
-		<li class="mb-1">
-			<button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">Orders</button>
-			<div class="collapse" id="orders-collapse">
-				<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">New</a>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Processed</a>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Shipped</a>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Returned</a>
-					</li>
-				</ul>
-			</div>
-		</li>
-		<li class="border-top my-3"></li>
-		<li class="mb-1">
-			<button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">Account</button>
-			<div class="collapse" id="account-collapse">
-				<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">New...</a>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Profile</a>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Settings</a>
-					</li>
-					<li>
-						<a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Sign out</a>
-					</li>
-				</ul>
-			</div>
-		</li>
+<div class="flex-shrink-0 p-3" style="">
+	<ul id="left_menu_tree" class="list-unstyled ps-0" style="height: calc(75vh); overflow: auto;">
 	</ul>
-	-->
-	
-	<ul id="left_menu_tree" class="list-unstyled ps-0" style="height: calc(87vh); overflow: auto;">
-		
-	</ul>
-	
 </div>
 </body>
 <script type="text/javascript">
-
+	var portalIframePageMoveYn = "<%=portalIframePageMoveYn%>"
+	
+	
 	$(function() {
+		initLeftMenu();
+	});
+	
+	
+	//초기함수
+	function initLeftMenu() {
+		$(window).resize(function() {
+			let height	= $(window).height();
+			$('#left_menu_tree').height(height - $('#portal-top-nav-div').height() - 70);
+		});
+		
+		$(window).resize();
+		
 		let callParams = {
 			folderId : '032A5E114A59D28267BDD8B6D9E58B22'
 		};
-		callAjaxPost('/mstr/getFolderList.json', callParams, function(data){
+		callAjaxPost('/mstr/getFolderList.json', callParams, function(data) {
 			let menuReport = data['folder'];
 			let drawHtml = drawMenuReport(menuReport, $('<ul>', {class : 'list-unstyled ps-0'}));
 			$('#left_menu_tree').append(drawHtml);
 		});
-	});
+	}
+	
 	
 	//메뉴 리포트 동적 생성
 	function drawMenuReport(menuReport, rtnHtml) {
-		
 		menuReport.forEach((menu, idx) => {
-			/*
-			let menuHtml = $('<li>', {
-				  text : menu['name']
-				, title : menu['name']
-				, class : 'mb-1'
-				, click : function(e) {
-					let pagePrams = [
-						  ["objectId", menu['id']]
-						, ["type", menu['type']]
-						, ["subType", menu['subType']]
-					  	, ["isvi", menu['isVI']]
-					];
-					
-					pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams);
-				}
-			});
-			$(rtnHtml).append(menuHtml);
-			
-			if(menu['child']) {
-				let childHtml = drawMenuReport(menu['child'], $('<ul>'));
-				let liHtml = $('<li>');
-				$(liHtml).append(childHtml);
-				$(rtnHtml).append(liHtml);
-			}
-			*/
-			
 			if(menu['type'] == 8) {
 				let buttonHtml = $('<button>', {
 					  text : menu['name']
@@ -291,7 +159,19 @@
 						  	, ["isvi", menu['isVI']]
 						];
 						
-						pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams);
+						if(portalIframePageMoveYn == 'Y') {
+							pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams);
+						} else {
+							if($('#mstrReport').length == 0) {
+								pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams);
+							} else {
+								objectId = menu['id'];
+								type = menu['type'];
+								isvi = menu['isVI'];
+// 								$('.prompt-wrapper').parent().show();
+								getPromptInfo();
+							}
+						}
 					}
 				});
 				let liHtml = $('<li>');
@@ -318,7 +198,6 @@
 			}
 			
 		});
-		
 		
 		return rtnHtml;
 	}

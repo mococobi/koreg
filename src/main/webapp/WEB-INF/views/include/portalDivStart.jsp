@@ -2,9 +2,9 @@
 <%@ page import="java.util.*" %>
 <!DOCTYPE html>
 <html>
-<body>
+<body style="background-color: rgb(234 240 251);">
 	<div id="top_div">
-		<jsp:include flush="true" page="/WEB-INF/views/include/portalTop.jsp" />
+		<jsp:include flush="true" page="/WEB-INF/views/include/portalTop_Center.jsp" />
 	</div>
 	<div class="row" style="width: 100%;">
 		<div class="col-md-2">

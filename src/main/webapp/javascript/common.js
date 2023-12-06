@@ -134,11 +134,7 @@ function callAjaxPost(url, params, callFunction) {
 			}
 		}
 		, error : function(jqXHR, textStatus, errorThrown) { 
-            if(jqXHR['status'] == 404) {
-				alert('지정되지 않은 URL입니다.');
-			} else {
-				alert('에러 처리 필요');
-			}
+           errorProcess(jqXHR, textStatus, errorThrown);
 		}
 	});
 }
@@ -161,14 +157,20 @@ function callAjaxForm(url, params, callFunction) {
 				alert(data['errorMessage']);
 			}
 		}
-		, error : function(jqXHR, textStatus, errorThrown) { 
-            if(jqXHR['status'] == 404) {
-				alert('지정되지 않은 URL입니다.');
-			} else {
-				alert('에러 처리 필요');
-			}
+		, error : function(jqXHR, textStatus, errorThrown) {
+            errorProcess(jqXHR, textStatus, errorThrown);
 		}
 	});
+}
+
+
+//공통 에러 처리
+function errorProcess(jqXHR, textStatus, errorThrown) {
+	if(jqXHR['status'] == 404) {
+		alert('지정되지 않은 URL입니다.');
+	} else {
+		alert('에러 처리 필요');
+	}
 }
 
 
