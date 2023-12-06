@@ -107,7 +107,7 @@
 					<li class="nav-item" style="margin-right: 10px;">
 						<button onclick="popupMstrPage('NEW_DOSSIER')" type="button" class="btn btn-outline-primary">새 대시보드</button>
 					</li>
-					<%--
+					<%-- --%>
 					<li class="nav-item" style="margin-right: 10px;">
 						<button onclick="moveCommunityPage(1)" type="button" class="btn btn-outline-primary">공지사항</button>
 					</li>
@@ -117,7 +117,6 @@
 					<li class="nav-item" style="margin-right: 10px;">
 						<button onclick="moveCommunityPage(3)" type="button" class="btn btn-outline-primary">자료실</button>
 					</li>
-					--%>
 				</ul>
 			</header>
 		</div>
