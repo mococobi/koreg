@@ -86,8 +86,8 @@
 						<h3>FAQ</h3>
 						<h3 onclick="moveCommunityPage(2)" title="더보기" style="margin-left: auto; cursor: pointer;">+</h3>
 					</div>
-					<div class="table-responsive small">
-						<table class="table table-striped table-sm" style="min-height: calc(22.5vh);">
+					<div class="table-responsive small" style="min-height: calc(22.5vh);">
+						<table class="table table-striped table-sm">
 							<colgroup>
 								<col width="80%">
 								<col width="20%">

@@ -8,6 +8,8 @@
 	String mstrServerName = CustomProperties.getProperty("mstr.server.name");
 	String mstrServerPort = CustomProperties.getProperty("mstr.server.port");
 	String mstrDefaultProjectName = CustomProperties.getProperty("mstr.default.project.name");
+	
+	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
 %>
 <!DOCTYPE html>
 <html>
@@ -117,6 +119,12 @@
 					<li class="nav-item" style="margin-right: 10px;">
 						<button onclick="moveCommunityPage(3)" type="button" class="btn btn-outline-primary">자료실</button>
 					</li>
+					<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
+						<!-- 관리자 기능 -->
+						<li class="nav-item" style="margin-right: 10px;">
+							<button onclick="moveAdminPage('BOARD_ADMIN')" type="button" class="btn btn-outline-primary">관리자</button>
+						</li>
+					<% } %>
 				</ul>
 			</header>
 		</div>

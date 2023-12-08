@@ -9,7 +9,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.crypto.BadPaddingException;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.custom.admin.service.AdminService;
 import com.custom.log.service.LogService;
 import com.custom.login.service.LoginService;
 import com.microstrategy.utils.serialization.EnumWebPersistableState;
@@ -58,6 +61,9 @@ public class LoginController {
     
     @Autowired
     LogService logService;
+    
+    @Autowired
+    AdminService adminService;
     
     
     /**
@@ -198,7 +204,7 @@ public class LoginController {
 			);
 			
 			//로그인 프로세스 처리(데이터 및 로그 기록시)
-			loginSessionProcess(request, isession, view, userId);
+			loginSessionProcess(request, response, isession, view, userId);
 			
 			//정상 로그인 - 메인 화면 이동
 			if(screenId.equals("EIS")) {
@@ -253,7 +259,7 @@ public class LoginController {
 			);
 			
 			//로그인 프로세스 처리(데이터 및 로그 기록시)
-			loginSessionProcess(request, isession, view, userId);
+			loginSessionProcess(request, response, isession, view, userId);
 			
 			//정상 로그인 - 메인 화면 이동
 			view.setViewName("redirect:/app/main/mainView.do");
@@ -286,7 +292,7 @@ public class LoginController {
 	 * @return
 	 * @throws WebObjectsException
 	 */
-	private Map<String, Object> loginSessionProcess(HttpServletRequest request, WebIServerSession isession, ModelAndView view, String userId) throws WebObjectsException {
+	private Map<String, Object> loginSessionProcess(HttpServletRequest request, HttpServletResponse response, WebIServerSession isession, ModelAndView view, String userId) throws WebObjectsException {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		WebUser user = (WebUser) isession.getUserInfo();
 		
@@ -323,6 +329,15 @@ public class LoginController {
 			request.getSession().setAttribute("mstrUserIdAttr", user.getAbbreviation());
 			request.getSession().setAttribute("mstrUserNameAttr", user.getDisplayName());
 			request.getSession().setAttribute("mstrGroupIdMapAttr", groupIdMap);
+			
+			//포탈 관리자 정보
+			Map<String, Object> params = new HashMap<String, Object>();
+			List<Map<String, Object>> authListMap = adminService.adminAuthList(request, response, params);
+			List<String> authList = new ArrayList<>();
+			for(int i=0; i<authListMap.size(); i++) {
+				authList.add(authListMap.get(i).get("ADM_CD").toString());
+			}
+			request.getSession().setAttribute("PORTAL_AUTH", authList);
 			
 //			resultMap.put("mstrUserIdAttr", request.getSession().getAttribute("mstrUserIdAttr"));
 //			resultMap.put("mstrUserNameAttr", request.getSession().getAttribute("mstrUserNameAttr"));

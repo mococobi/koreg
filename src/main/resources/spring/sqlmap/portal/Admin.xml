@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Admin">
+	<!-- <cache /> -->
+	
+	<select id="Admin.adminAuthList" resultType="HashMap" parameterType="Map">
+		SELECT /* Admin.adminAuthList */ 
+			  ADM_CD
+			, USR_ID
+			, DEL_YN
+			, CRT_DT_TM
+			, CRT_USR_ID
+			, MOD_DT_TM
+			, MOD_USR_ID
+		FROM
+			PORTAL.PORTAL_ADMIN
+		WHERE 1=1
+			AND DEL_YN = 'N'
+			AND USR_ID = #{userId}
+	</select>
+	
+	
+	<resultMap id="oracleBoardMap" type="HashMap">
+		<result property="POST_CONTENT" column="POST_CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
+		<result property="CRT_DT_TM" column="CRT_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+		<result property="MOD_DT_TM" column="MOD_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+	</resultMap>
+	
+	
+	<select id="Admin.boardList" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
+		WITH /* Admin.boardList */
+		BOARD_LIST AS (
+			SELECT
+				  BRD_ID
+				, BRD_NM
+				, BRD_DESC
+				, BRD_TYPE
+				, BRD_ADM_USR
+				, BRD_CRT_AUTH
+				, BRD_VIEW_AUTH
+				, POST_FILE_YN
+				, POST_CMNT_YN
+				, POST_CMNT_FILE_YN
+				, POST_POPUP_YN
+				, POST_SECRET_YN
+				, POST_FIX_YN
+				, DEL_YN
+				, CRT_DT_TM
+				, CRT_USR_ID
+				, CRT_USR_ID AS CRT_USR_NM
+				, MOD_DT_TM
+				, MOD_USR_ID
+			FROM 
+				PORTAL.BOARD
+			WHERE 1=1
+		)
+		SELECT 
+			*
+		FROM (
+			SELECT 
+				<choose>
+					<when test="countCheck != null and countCheck == true">
+						COUNT(ORDER_T.BRD_ID) AS COUNT
+					</when>
+					<otherwise>
+						  ROWNUM rn
+						, ORDER_T.* 
+					</otherwise>
+				</choose>
+			FROM (
+				SELECT 
+					* 
+				FROM 
+					BOARD_LIST 
+				ORDER BY 
+					<choose>
+						<when test="customOrder1 != null and customOrder1 == 0">
+							BRD_ID
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 1">
+							BRD_NM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 2">
+							CRT_DT_TM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 3">
+							CRT_USR_NM
+						</when>
+						<otherwise>
+							1
+						</otherwise>
+					</choose>
+					<choose>
+						<when test="customOrder2 != null and customOrder2.equals('asc')">
+							ASC
+						</when>
+						<when test="customOrder2 != null and customOrder2.equals('desc')">
+							DESC
+						</when>
+						<otherwise>
+							DESC
+						</otherwise>
+					</choose>
+			) ORDER_T
+		) T
+		WHERE 1=1
+			<if test="countCheck != null and countCheck == false">
+				AND rn BETWEEN #{listViewCount} * (((#{start} + #{length}) / #{listViewCount}) - 1) + 1 AND #{listViewCount} * ((#{start} + #{length}) / #{listViewCount})
+			</if>
+	</select>
+	
+	
+	<select id="Admin.boardDetail" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
+		SELECT /* Admin.boardDetail */
+			  BRD_ID
+			, BRD_NM
+			, BRD_DESC
+			, BRD_TYPE
+			, BRD_ADM_USR
+			, BRD_CRT_AUTH
+			, BRD_VIEW_AUTH
+			, POST_FILE_YN
+			, POST_CMNT_YN
+			, POST_CMNT_FILE_YN
+			, POST_POPUP_YN
+			, POST_SECRET_YN
+			, POST_FIX_YN
+			, DEL_YN
+			, CRT_DT_TM
+			, CRT_USR_ID
+			, CRT_USR_ID AS CRT_USR_NM
+			, MOD_DT_TM
+			, MOD_USR_ID
+		FROM 
+			PORTAL.BOARD
+		WHERE 1=1
+			AND BRD_ID = #{boardId}
+	</select>
+	
+	
+	<insert id="Admin.boardInsert" parameterType="Map">
+		<selectKey resultType="int" keyProperty="insertKey" order="BEFORE">
+        	SELECT
+        		NVL(MAX(BRD_ID)+1, 1) AS INSERTKEY
+        	FROM 
+        		PORTAL.BOARD
+    	</selectKey>
+		INSERT INTO /* Admin.boardInsert */ 
+			PORTAL.BOARD(
+				  BRD_ID
+				, BRD_NM
+				, BRD_DESC
+				, BRD_TYPE
+				, POST_FILE_YN
+				, POST_CMNT_YN
+				, POST_CMNT_FILE_YN
+				, POST_POPUP_YN
+				, POST_SECRET_YN
+				, POST_FIX_YN
+				, DEL_YN
+				, CRT_DT_TM
+				, CRT_USR_ID
+			)
+			VALUES(
+				  #{insertKey}
+				, #{BRD_NM}
+				, #{BRD_DESC}
+				, #{BRD_TYPE}
+				, #{POST_FILE_YN}
+				, #{POST_CMNT_YN}
+				, 'N'
+				, #{POST_POPUP_YN}
+				, 'N'
+				, 'N'
+				, #{DEL_YN}
+				, SYSDATE
+				, #{userId}
+			)
+	</insert>
+	
+	
+	<update id="Admin.boardUpdate" parameterType="Map">
+		UPDATE /* Admin.boardUpdate */ 
+			PORTAL.BOARD
+		SET
+			  BRD_NM = #{BRD_NM}
+			, BRD_DESC = #{BRD_DESC}
+			, BRD_TYPE = #{BRD_TYPE}
+			, POST_FILE_YN = #{POST_FILE_YN}
+			, POST_CMNT_YN = #{POST_CMNT_YN}
+			, POST_POPUP_YN = #{POST_POPUP_YN}
+			, DEL_YN = #{DEL_YN}
+			, MOD_DT_TM = SYSDATE
+			, MOD_USR_ID = #{userId}
+		WHERE
+			BRD_ID = #{BRD_ID}
+	</update>
+	
+	
+	<select id="Admin.logList" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
+		WITH /* Admin.logList */
+		LOG_LIST AS (
+			SELECT
+				  plog.LOG_ID
+				, plog.USR_ID
+				, plog.USR_NM
+				, plog.USR_DEPT_ID
+				, plog.USR_DEPT_NM
+				, plog.USR_POS_ID
+				, plog.USR_POS_NM
+				, plog.USR_IP
+				, plog.SCRN_ID
+				, plog.SCRN_DET_ID
+				, plog.USR_ACTN
+				, plog.DET_INFO_MAP
+				, plog.CRT_DT_TM
+				<if test="LOG_TYPE != null and LOG_TYPE.equals('BOARD')">
+					, board.BRD_NM
+					, post.POST_TITLE
+				</if>
+			FROM 
+				PORTAL.PORTAL_LOG plog
+				<if test="LOG_TYPE != null and LOG_TYPE.equals('BOARD')">
+					INNER JOIN PORTAL.BOARD board
+						ON plog.SCRN_ID = TO_CHAR(board.BRD_ID)
+					LEFT OUTER JOIN PORTAL.BOARD_POST post
+						ON (
+							    plog.SCRN_ID = TO_CHAR(post.BRD_ID)
+							AND plog.SCRN_DET_ID = TO_CHAR(post.POST_ID)
+						)
+				</if>
+			WHERE 1=1
+				<if test="LOG_TYPE != null and LOG_TYPE.equals('LOGIN')">
+					AND plog.SCRN_ID IN('PORTAL', 'EIS')
+				</if>
+		)
+		SELECT 
+			*
+		FROM (
+			SELECT 
+				<choose>
+					<when test="countCheck != null and countCheck == true">
+						COUNT(ORDER_T.LOG_ID) AS COUNT
+					</when>
+					<otherwise>
+						  ROWNUM rn
+						, ORDER_T.* 
+					</otherwise>
+				</choose>
+			FROM (
+				SELECT 
+					* 
+				FROM 
+					LOG_LIST 
+				ORDER BY 
+					<choose>
+						<when test="customOrder1 != null and customOrder1 == 0">
+							LOG_ID
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 1">
+							USR_ID
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 2">
+							USR_IP
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 3">
+							SCRN_ID
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 4">
+							SCRN_DET_ID
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 5">
+							USR_ACTN
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 6">
+							CRT_DT_TM
+						</when>
+						<otherwise>
+							1
+						</otherwise>
+					</choose>
+					<choose>
+						<when test="customOrder2 != null and customOrder2.equals('asc')">
+							ASC
+						</when>
+						<when test="customOrder2 != null and customOrder2.equals('desc')">
+							DESC
+						</when>
+						<otherwise>
+							DESC
+						</otherwise>
+					</choose>
+			) ORDER_T
+		) T
+		WHERE 1=1
+			<if test="countCheck != null and countCheck == false">
+				AND rn BETWEEN #{listViewCount} * (((#{start} + #{length}) / #{listViewCount}) - 1) + 1 AND #{listViewCount} * ((#{start} + #{length}) / #{listViewCount})
+			</if>
+	</select>
+</mapper>

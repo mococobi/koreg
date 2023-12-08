@@ -10,51 +10,36 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>${postData['BRD_NM']}</title>
+	<title>관리자 페이지</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 </head>
 <body>
-	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart.jsp" />
+	<jsp:include flush="true" page="/WEB-INF/views/include/adminDivStart.jsp" />
 	
 	<div class="container py-4">
-		<p class="h3">${postData['BRD_NM']}</p>
-		<p class="h6">${postData['BRD_DESC']}</p>
+		<p class="h3">게시판 관리</p>
+		<p class="h6">게시판을 관리할 수 있습니다.</p>
 		<div class="row mb-3">
-			<div class="col-md-1">
-				<select id="searchKey" class="form-select form-select-sm">
-					<option value="POST_TITLE">제목</option>
-					<option value="CRT_USR_ID">작성자</option>
-				</select>
-			</div>
-			<div class="col-md-4">
-				<input id="searchVal" class="form-control form-control-sm" type="search" placeholder="Search" aria-label="Search">
-			</div>
-			<div class="col-md-1">
-				<button class="btn btn-primary btn-sm" onclick="searchBoardPostList()">조회</button>
-			</div>
 			<div class="col text-end">
-				<button class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
+				<button class="btn btn-secondary btn-sm" onclick="writeBoard()">글쓰기</button>
 			</div>
-	    </div>
-		<div id="boardPostTable_div">
-			<table id="boardPostTable" class="table hover table-striped table-bordered dataTablesCommonStyle">
+		</div>
+		<div id="boardTable_div">
+			<table id="boardTable" class="table hover table-striped table-bordered dataTablesCommonStyle">
 				<colgroup>
-					<col width="5%">
-					<col >
 					<col width="10%">
+					<col >
 					<col width="10%">
 					<col width="10%">
 				</colgroup>
 				<thead>
     				<tr>
-	     				<th>NO</th>
-	      				<th>제목
-	      				</th>
+	     				<th>게시판 ID</th>
+	      				<th>게시판 이름</th>
 	      				<th>작성일자</th>
 	      				<th>작성자</th>
-	      				<th>조회수</th>
 	    			</tr>
 	  			</thead>
 			</table>
@@ -63,25 +48,18 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
 </body>
 <script type="text/javascript">
-	let boardId = <%=boardId%>;
 	let searchKey = '';
 	let searchVal = '';
 	
 	$(function() {
 		fnBoardInit();
-		
-		$('#searchVal').keypress(function(e){
-			if(e.keyCode && e.keyCode == 13){
-				searchBoardPostList();
-			}
-		});
 	});
 	
 	
-	//게시물 목록
+	//게시판 목록
 	function fnBoardInit() {
 		let listViewCount = 10;
-		$('#boardPostTable').DataTable({
+		$('#boardTable').DataTable({
 			  lengthChange : false
 			, searching : false
 			, serverSide : true
@@ -91,16 +69,15 @@
 			, pagingType : 'full_numbers'
 			, order : [[ 0, 'desc' ]]
 			, ajax : {
-				  url : '${pageContext.request.contextPath}/app/board/boardPostListGrid.json'
+				  url : '${pageContext.request.contextPath}/app/admin/boardListGrid.json'
 				, type : 'POST'
 				, data : function(data) {
-					data['boardId'] = boardId;
 					data['listViewCount'] = listViewCount;
 					data['searchKey'] = searchKey;
 					data['searchVal'] = searchVal;
 					
-					data['customOrder1'] = $('#boardPostTable').DataTable().order()[0][0];
-					data['customOrder2'] = $('#boardPostTable').DataTable().order()[0][1];
+					data['customOrder1'] = $('#boardTable').DataTable().order()[0][0];
+					data['customOrder2'] = $('#boardTable').DataTable().order()[0][1];
 				}
 				, dataSrc : function (data) {
 					if (data['errorCode'] != 'success') {
@@ -119,33 +96,25 @@
 			, language : commonDatatableLanguage()
 			, columns : [
 				{
-					  data : 'POST_ID'
+					  data : 'BRD_ID'
 					, className : 'textCenter'
 					, render : function (data, type, row) {
 						let rtnData = '-';
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
-						if (row['POPUP_YN'] == 'Y') {
-					        return '<i class="bi bi-megaphone-fill"></i>';
-					    } else {
-					        return rtnData;
-					    }
+						return rtnData;
 					}
 	            }
 				, {
-					  data : 'POST_TITLE'
+					  data : 'BRD_NM'
 					, className : ''
 					, render : function (data, type, row) {
 						let rtnData = '-';
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
-						if(row['FILE_ID'] > 0) {
-							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '<i class="bi bi-paperclip"></i>' + '</a>';
-						} else {
-							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
-						}
+						return '<a onclick="detailBoard('+ row['BRD_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
 					}
 	            }
 				, {
@@ -170,37 +139,24 @@
 						return rtnData;
 					}
 	            }
-				, {
-					  data : 'POST_VIEW_COUNT'
-					, className : 'textCenter'
-					, render : function (data, type, row) {
-						let rtnData = 0;
-						if(data) {
-							rtnData = XSSCheck(data, 0);
-						}
-						return rtnData;
-					}
-				}
 	        ]
 		});
 	}
 	
 	
-	//게시물 검색
-	function searchBoardPostList() {
-		searchKey = $('#searchKey option:selected').val();
-		searchVal = $('#searchVal').val();
-		
-		$('#boardPostTable').DataTable().ajax.reload();
+	//게시판 작성
+	function writeBoard() {
+		let pagePrams = [];
+		pageGoPost('_self', '${pageContext.request.contextPath}/app/admin/boardWriteView.do', pagePrams);
 	}
 	
 	
-	//게시물 작성
-	function writeBoardPost() {
+	//관리자 - 게시판 상세 화면 이동
+	function detailBoard(moveBoardId) {
 		let pagePrams = [
-			["boardId", boardId]
+			["boardId", moveBoardId]
 		];
-		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
+		pageGoPost('_self', '${pageContext.request.contextPath}/app/admin/boardDetailView.do', pagePrams);
 	}
 	
 	
