@@ -1,6 +1,5 @@
 package com.custom.admin.service.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.custom.admin.service.AdminService;
 import com.custom.log.service.LogService;
-import com.microstrategy.web.objects.WebAccessControlEntry;
 import com.mococo.biz.common.dao.SimpleBizDao;
 import com.mococo.web.util.HttpUtil;
 
@@ -33,7 +31,8 @@ public class AdminServiceImpl implements AdminService {
     LogService logService;
     
     
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public List<String> getSessionPortalAuthList(HttpServletRequest request) {
     	List<String> rtnList = (List<String>) request.getSession().getAttribute("PORTAL_AUTH");
     	return rtnList;
@@ -50,7 +49,7 @@ public class AdminServiceImpl implements AdminService {
     
     
     @Override
-    public Map<String, Object> boardList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) {
+    public Map<String, Object> boardList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception {
     	Map<String, Object> rtnMap = new HashMap<String, Object>();
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
@@ -75,7 +74,7 @@ public class AdminServiceImpl implements AdminService {
     
     
     @Override
-    public Map<String, Object> boardDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) {
+    public Map<String, Object> boardDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception {
     	Map<String, Object> rtnMap = new HashMap<String, Object>();
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
@@ -94,7 +93,7 @@ public class AdminServiceImpl implements AdminService {
     
     @Override
     @Transactional("transactionManager")
-    public Map<String, Object> boardInsert(MultipartHttpServletRequest request, HttpServletResponse response, Map<String, Object> params) {
+    public Map<String, Object> boardInsert(MultipartHttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception {
     	Map<String, Object> rtnMap = new HashMap<String, Object>();
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
@@ -115,7 +114,7 @@ public class AdminServiceImpl implements AdminService {
     
     @Override
     @Transactional("transactionManager")
-    public Map<String, Object> boardUpdate(MultipartHttpServletRequest request, HttpServletResponse response, Map<String, Object> params) {
+    public Map<String, Object> boardUpdate(MultipartHttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception {
     	Map<String, Object> rtnMap = new HashMap<String, Object>();
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
@@ -135,7 +134,7 @@ public class AdminServiceImpl implements AdminService {
     
     
     @Override
-    public Map<String, Object> logList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) {
+    public Map<String, Object> logList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception {
     	Map<String, Object> rtnMap = new HashMap<String, Object>();
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));

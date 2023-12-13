@@ -25,9 +25,10 @@ public class DemoController {
     private static final Logger logger = LoggerFactory.getLogger(DemoController.class);
 
     @Autowired
-    private DemoService service;
-
-    @RequestMapping(value = "/test.json", method = { RequestMethod.GET, RequestMethod.POST })
+    private DemoService demoService;
+    
+    
+    @RequestMapping(value = "/demo/test.json", method = { RequestMethod.GET, RequestMethod.POST })
     public List<Map<String, Object>> test(@RequestParam Map<String, Object> param) {
         Map<String, Object> map = null;
 
@@ -46,8 +47,9 @@ public class DemoController {
 
         return list;
     }
-
-    @RequestMapping(value = "/list.json", method = { RequestMethod.GET, RequestMethod.POST })
+    
+    
+    @RequestMapping(value = "/demo/list.json", method = { RequestMethod.GET, RequestMethod.POST })
     public List<Map<String, Object>> list(@RequestParam Map<String, Object> param) {
         Map<String, Object> map = null;
 
@@ -66,13 +68,15 @@ public class DemoController {
 
         return list;
     }
-
-    @RequestMapping(value = "/demo.do", method = { RequestMethod.GET, RequestMethod.POST })
+    
+    
+    @RequestMapping(value = "/demo/demo.do", method = { RequestMethod.GET, RequestMethod.POST })
     public String demo() {
         return "demo/demo";
     }
-
-    @RequestMapping(value = "/jsonParam.json", method = { RequestMethod.GET, RequestMethod.POST })
+    
+    
+    @RequestMapping(value = "/demo/jsonParam.json", method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
     public Map<String, Object> jsonParam(@RequestBody Map<String, Object> param) {
         logger.debug("=> param: [{}]", param);
@@ -89,8 +93,9 @@ public class DemoController {
 
         return map;
     }
-
-    @RequestMapping(value = "/error.json", method = { RequestMethod.GET, RequestMethod.POST })
+    
+    
+    @RequestMapping(value = "/demo/error.json", method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
     public Map<String, Object> errorJson() {
         if (true) {

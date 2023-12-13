@@ -61,6 +61,15 @@ function detailBoardPost(moveBoardId, movePostId) {
 }
 
 
+//관리자 화면 이동
+function moveAdminPage(moveAdminPage) {
+	let pagePrams = [
+		["page", moveAdminPage]
+	];
+	pageGoPost('_self', __contextPath + '/app/admin/adminPage.do', pagePrams);
+}
+
+
 //POST 페이지 이동
 function pageGoPost(target, url, params) {
 	var insdoc = "";
@@ -145,7 +154,7 @@ function callAjaxForm(url, params, callFunction) {
 		  type : 'post'
 		, url : __contextPath + '/app' + url
 		, data : params
-    	, dataType : 'json'
+		, dataType : "json"
     	, enctype : "multipart/form-data"
    		, processData : false
     	, contentType : false
@@ -176,15 +185,56 @@ function errorProcess(jqXHR, textStatus, errorThrown) {
 
 //날짜 타입 표시
 function changeDisplayDate(orgDate, changeType) {
-  let changeDate = new Date(orgDate);
+	
+	if(orgDate == null) {
+		return '';
+	}
+	
+	let changeDate = new Date(orgDate);
 
-  const year = changeDate.getFullYear(); // 2023
-  const month = (changeDate.getMonth() + 1).toString().padStart(2, '0'); // 06
-  const day = changeDate.getDate().toString().padStart(2, '0'); // 18
+	let year = changeDate.getFullYear(); // 2023
+	let month = (changeDate.getMonth() + 1).toString().padStart(2, '0');
+	let day = changeDate.getDate().toString().padStart(2, '0');
+	
+	let hours = changeDate.getHours().toString().padStart(2, '0');
+	let mins = changeDate.getMinutes().toString().padStart(2, '0');
+    let sec = changeDate.getSeconds().toString().padStart(2, '0');
+	
+	switch(changeType) {
+		case "YYYY-MM-DD":
+			dateString = year + '-' + month + '-' + day;
+			break;
+		case "YYYY-MM-DD HH:mm:ss":
+			dateString = year + '-' + month + '-' + day;
+			dateString += ' ' + hours + ':' + mins + ':' + sec;
+			break;
+		default :
+			break;
+	}
+	
+	return dateString;
+}
 
-  const dateString = year + '-' + month + '-' + day; // 2023-06-18
 
-  return dateString;
+//스트링 날짜 타입 변환
+function changeStringToDate(date_str) {
+    let yyyyMMdd = String(date_str);
+    let sYear = yyyyMMdd.substring(0,4);
+    if(sYear == '') {
+		sYear = '2000';
+	}
+    
+    let sMonth = yyyyMMdd.substring(4,6);
+    if(sMonth == '') {
+		sMonth = '01';
+	}
+	
+    let sDate = yyyyMMdd.substring(6,8);
+    if(sDate == '') {
+		sDate = '01';
+	}
+
+    return new Date(Number(sYear), Number(sMonth)-1, Number(sDate));
 }
 
 
@@ -216,4 +266,92 @@ function commonDatatableLanguage() {
 	}
 	
 	return language;
+}
+
+//Air Datepicker 기본 텍스트 설정
+function commonAirDatepickerLanguage() {
+	let language = {
+		  days: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
+		, daysShort: ['일', '월', '화', '수', '목', '금', '토']
+		, daysMin: ['일', '월', '화', '수', '목', '금', '토']
+		, months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+		, monthsShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+		, today: '오늘'
+		, clear: '초기화'
+		, dateFormat: 'yyyy-MM-dd'
+		, timeFormat: 'hh:mm aa'
+		, firstDay: 0
+	}
+	
+	return language;
+}
+
+
+//jQuery MultiSelect 기본 텍스트 설정
+function commonMultiSelectLanguage() {
+	let language = {
+          placeholder: '선택하세요'
+        , search : '검색어를 입력하세요'
+        , searchNoResult : '검색 결과 없음'
+        , selectedOptions : '개 선택'
+        , selectAll : '전체 선택'
+        , unselectAll : '전체 선택 해제'
+	}
+	
+	return language;
+}
+
+
+//MSTR Form 데이터 정의
+function getMstrFormDefinition(type) {
+	let rtnInput;
+	
+	let formDefs = {
+		common: {
+			  server: __mstrServerName
+			, port: __mstrServerPort
+			, project: __mstrDefaultProjectName
+			, hiddenSections: 'path,header,footer,dockLeft'
+			, promptAnswerMode: '2'
+		}
+		, report: {
+			  evt: '4001'
+			, src: 'mstrWeb.4001'
+			, reportID: objectId
+		}
+		, document: {
+	          evt: '2048001'
+	        , src: 'mstrWeb.2048001'
+	        , documentID: objectId
+	        , share: '1'
+	    	, hiddenSections: 'dockTop'
+		}
+		, dossier: {
+	          evt: '3140'
+	        , src: 'mstrWeb.3140'
+	        , documentID: objectId
+	        , share: '1'
+	    	, hiddenSections: 'dockTop'
+		}
+	}
+	
+	rtnInput = $.extend({}, formDefs['common']);
+	
+	switch (type) {
+		case 3:
+			$.extend(rtnInput, formDefs['report']);
+			break;
+		case 55:
+	        if (isvi == true) {
+	        	$.extend(rtnInput, formDefs['dossier']);
+	        } else {
+	        	$.extend(rtnInput, formDefs['document']);
+	        }
+			break;
+		default:
+			$.extend(rtnInput, formDefs['dossier']);
+			break;
+	}
+	
+	return rtnInput;
 }

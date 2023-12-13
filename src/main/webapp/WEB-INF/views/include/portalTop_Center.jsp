@@ -38,7 +38,7 @@
 				top: 0px;
 				left: 0px;
 				*/
-				top: 14%;
+				top: 15%;
     			left: 15%;
 				position: fixed;
 				display: block;
@@ -77,7 +77,6 @@
 				<div class="col-md-3 text-end">
 					 <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
 				        <li>
-				        	<i class="bi bi-person-circle"></i>
 				        	<button class="btn" style="cursor: default;">
 								<i class="bi bi-person-circle" style="color: white; font-size: 1.2rem;"></i>
 							</button>
@@ -109,16 +108,18 @@
 					<li class="nav-item" style="margin-right: 10px;">
 						<button onclick="popupMstrPage('NEW_DOSSIER')" type="button" class="btn btn-outline-primary">새 대시보드</button>
 					</li>
-					<%-- --%>
 					<li class="nav-item" style="margin-right: 10px;">
 						<button onclick="moveCommunityPage(1)" type="button" class="btn btn-outline-primary">공지사항</button>
 					</li>
+					
 					<li class="nav-item" style="margin-right: 10px;">
 						<button onclick="moveCommunityPage(2)" type="button" class="btn btn-outline-primary">FAQ</button>
 					</li>
+					<%-- 
 					<li class="nav-item" style="margin-right: 10px;">
 						<button onclick="moveCommunityPage(3)" type="button" class="btn btn-outline-primary">자료실</button>
 					</li>
+					--%>
 					<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
 						<!-- 관리자 기능 -->
 						<li class="nav-item" style="margin-right: 10px;">

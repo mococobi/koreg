@@ -121,6 +121,7 @@ public class PromptCharger {
             prompt.setSuggestedAnswers(dao.getSuggestedAnswers());
             prompt.setControlType(dao.getControlType());
             prompt.setDaoClassName(dao.getClass().getName());
+            prompt.setRequired(dao.isRequired());
         } else {
             // throw new SdkRuntimeException("No dao found.");
         }

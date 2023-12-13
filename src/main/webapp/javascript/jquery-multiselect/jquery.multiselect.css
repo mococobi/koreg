@@ -1,5 +1,5 @@
 .ms-options-wrap {
-    display: inline-block;
+    position: relative;
 }
 
 .ms-options-wrap,
@@ -21,10 +21,8 @@
     color: #aaa;
     outline-offset: -2px;
     white-space: nowrap;
-}
-
-.ms-options-wrap > button > span {
-    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ms-options-wrap > button[disabled] {
@@ -73,6 +71,11 @@
     border: none;
     border-bottom: 1px groove;
     outline: none;
+}
+
+.ms-options-wrap > .ms-options > .no-result-message {
+    padding: 4px 5px;
+    display: none;
 }
 
 .ms-options-wrap > .ms-options .ms-selectall {

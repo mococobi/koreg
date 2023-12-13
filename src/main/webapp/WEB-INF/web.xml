@@ -38,12 +38,16 @@
 		<filter-class>com.mococo.web.filter.SessionFilter</filter-class>
     	<init-param>
 			<param-name>entryPoints</param-name>
-			<param-value>.*/login/.*\.do$</param-value>
+			<param-value>.*/login/.*\.do$;.*/login/.*\.json$;</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
 		<filter-name>SessionFilter</filter-name>
 		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>SessionFilter</filter-name>
+		<url-pattern>*.json</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>SessionFilter</filter-name>

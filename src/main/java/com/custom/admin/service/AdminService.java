@@ -15,13 +15,13 @@ public interface AdminService {
 	
 	public List<Map<String, Object>> adminAuthList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params);
 	
-	public Map<String, Object> boardList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params);
+	public Map<String, Object> boardList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
 	
-	public Map<String, Object> boardDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params);
+	public Map<String, Object> boardDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
 	
-	public Map<String, Object> boardInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params);
+	public Map<String, Object> boardInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception;
 	
-	public Map<String, Object> boardUpdate(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params);
+	public Map<String, Object> boardUpdate(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception;
 	
-	public Map<String, Object> logList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params);
+	public Map<String, Object> logList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
 }

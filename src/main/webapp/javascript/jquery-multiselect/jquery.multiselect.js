@@ -1,6 +1,6 @@
 /**
  * Display a nice easy to use multiselect list
- * @Version: 2.4.18
+ * @Version: 2.4.22
  * @Author: Patrick Springstubbe
  * @Contact: @JediNobleclem
  * @Website: springstubbe.us
@@ -47,6 +47,7 @@
         texts: {
             placeholder    : 'Select options', // text to use in dummy input
             search         : 'Search',         // search input placeholder text
+            searchNoResult : 'No results',     // search results not found text
             selectedOptions: ' selected',      // selected suffix text
             selectAll      : 'Select all',     // select all text
             unselectAll    : 'Unselect all',   // unselect all text
@@ -54,20 +55,22 @@
         },
 
         // general options
-        selectAll          : false, // add select all option
-        selectGroup        : false, // select entire optgroup
-        minHeight          : 200,   // minimum height of option overlay
-        maxHeight          : null,  // maximum height of option overlay
-        maxWidth           : null,  // maximum width of option overlay (or selector)
-        maxPlaceholderWidth: null,  // maximum width of placeholder button
-        maxPlaceholderOpts : 10,    // maximum number of placeholder options to show until "# selected" shown instead
-        showCheckbox       : true,  // display the checkbox to the user
-        checkboxAutoFit    : false,  // auto calc checkbox padding
-        optionAttributes   : [],    // attributes to copy to the checkbox from the option element
+        selectAll              : false, // add select all option
+        selectGroup            : false, // select entire optgroup
+        minHeight              : 200,   // minimum height of option overlay
+        maxHeight              : null,  // maximum height of option overlay
+        maxWidth               : null,  // maximum width of option overlay (or selector)
+        maxPlaceholderWidth    : null,  // maximum width of placeholder button
+        maxPlaceholderOpts     : 10,    // maximum number of placeholder options to show until "# selected" shown instead
+        showCheckbox           : true,  // display the checkbox to the user
+        checkboxAutoFit        : false,  // auto calc checkbox padding
+        optionAttributes       : [],    // attributes to copy to the checkbox from the option element
+        replacePlaceholderText : true, // replace text of placeholder if button is too small
 
         // Callbacks
         onLoad        : function( element ){},           // fires at end of list initialization
         onOptionClick : function( element, option ){},   // fires when an option is clicked
+        onControlOpen : function( element ){},           // fires when the options list is opened
         onControlClose: function( element ){},           // fires when the options list is closed
         onSelectAll   : function( element, selected ){}, // fires when (un)select all is clicked
         onPlaceholder : function( element, placeholder, selectedOpts ){}, // fires when the placeholder txt is updated
@@ -256,6 +259,11 @@
 
                 // recalculate height
                 if( optionsWrap.closest('.ms-options-wrap').hasClass('ms-active') ) {
+                    // USER CALLBACK
+                    if( typeof instance.options.onControlOpen == 'function' ) {
+                        instance.options.onControlOpen( instance.element );
+                    }
+
                     optionsWrap.css( 'maxHeight', '' );
 
                     // override with user defined maxHeight
@@ -277,8 +285,6 @@
                 else if( typeof instance.options.onControlClose == 'function' ) {
                     instance.options.onControlClose( instance.element );
                 }
-                
-                optionsWrap.offset({top: optionsWrap.offset().top, left: optionsWrap.closest('.ms-options-wrap').offset().left});
             }).click(function( event ){ event.preventDefault(); });
 
             // add placeholder copy
@@ -289,8 +295,10 @@
             // add search box
             if( instance.options.search ) {
                 optionsList.before('<div class="ms-search"><input type="text" value="" placeholder="'+ instance.options.texts.search +'" /></div>');
+                optionsList.after('<div class="no-result-message">' + instance.options.texts.searchNoResult + '</div>');
 
                 var search = optionsWrap.find('.ms-search input');
+
                 search.on('keyup', function(){
                     // ignore keystrokes that don't make a difference
                     if( $(this).data('lastsearch') == $(this).val() ) {
@@ -355,14 +363,14 @@
 
                 if( $(this).hasClass('global') ) {
                     // check if any options are not selected if so then select them
-                    if( optionsList.find('li:not(.optgroup, .selected, .ms-hidden)').length ) {
+                    if( optionsList.find('li:not(.optgroup, .selected, .ms-hidden) input[type="checkbox"]:not(:disabled)').length ) {
                         // get unselected vals, mark as selected, return val list
-                        optionsList.find('li:not(.optgroup, .selected, .ms-hidden)').addClass('selected');
+                        optionsList.find('li:not(.optgroup, .selected, .ms-hidden) input[type="checkbox"]:not(:disabled)').closest('li').addClass('selected');
                         optionsList.find('li.selected input[type="checkbox"]:not(:disabled)').prop( 'checked', true );
                     }
                     // deselect everything
                     else {
-                        optionsList.find('li:not(.optgroup, .ms-hidden).selected').removeClass('selected');
+                        optionsList.find('li:not(.optgroup, .ms-hidden).selected input[type="checkbox"]:not(:disabled)').closest('li').removeClass('selected');
                         optionsList.find('li:not(.optgroup, .ms-hidden, .selected) input[type="checkbox"]:not(:disabled)').prop( 'checked', false );
                     }
                 }
@@ -370,13 +378,13 @@
                     var optgroup = $(this).closest('li.optgroup');
 
                     // check if any selected if so then select them
-                    if( optgroup.find('li:not(.selected, .ms-hidden)').length ) {
-                        optgroup.find('li:not(.selected, .ms-hidden)').addClass('selected');
+                    if( optgroup.find('li:not(.selected, .ms-hidden) input[type="checkbox"]:not(:disabled)').length ) {
+                        optgroup.find('li:not(.selected, .ms-hidden) input[type="checkbox"]:not(:disabled)').closest('li').addClass('selected');
                         optgroup.find('li.selected input[type="checkbox"]:not(:disabled)').prop( 'checked', true );
                     }
                     // deselect everything
                     else {
-                        optgroup.find('li:not(.ms-hidden).selected').removeClass('selected');
+                        optgroup.find('li:not(.ms-hidden).selected input[type="checkbox"]:not(:disabled)').closest('li').removeClass('selected');
                         optgroup.find('li:not(.ms-hidden, .selected) input[type="checkbox"]:not(:disabled)').prop( 'checked', false );
                     }
                 }
@@ -490,6 +498,7 @@
 
         /* LOAD SELECT OPTIONS */
         loadOptions: function( options, overwrite, updateSelect ) {
+            // console.log( options );
             overwrite    = (typeof overwrite == 'boolean') ? overwrite : true;
             updateSelect = (typeof updateSelect == 'boolean') ? updateSelect : true;
 
@@ -788,6 +797,14 @@
                     unselected.length ? instance.options.texts.selectAll : instance.options.texts.unselectAll
                 );
             });
+
+            var shownOptionsCount = optionsWrap.find('> ul li:not(.optgroup,.ms-hidden)').length;
+
+            // show/hide no-results message
+            optionsWrap.find('.no-result-message').toggle( shownOptionsCount ? false : true );
+
+            // show/hide (un)select all element as necessary
+            optionsWrap.find('.ms-selectall.global').toggle( shownOptionsCount ? true : false );
         },
 
         // update selected placeholder text
@@ -848,7 +865,7 @@
                 placeholderTxt.text( instance.options.texts.placeholder );
             }
             // if copy is larger than button width use "# selected"
-            else if( (placeholderTxt.width() > placeholder.width()) || (selOpts.length != selectVals.length) ) {
+            else if( instance.options.replacePlaceholderText && ((placeholderTxt.width() > placeholder.width()) || (selOpts.length != selectVals.length)) ) {
                 placeholderTxt.text( selectVals.length + instance.options.texts.selectedOptions );
             }
         },
@@ -860,7 +877,7 @@
 
             var thisOption = $('<label/>', {
                 for : 'ms-opt-'+ msOptCounter
-            }).html( option.name );
+            }).text( optionNameText );
 
             var thisCheckbox = $('<input>', {
                 type : 'checkbox',

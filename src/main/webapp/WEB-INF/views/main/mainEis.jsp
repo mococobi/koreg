@@ -212,35 +212,7 @@
 	
 	
 	function getAnswerXML() {
-		let formDefs = {
-			common: {
-				  server: "<%= CustomProperties.getProperty("mstr.server.name") %>"
-				, port: "<%= CustomProperties.getProperty("mstr.server.port") %>"
-				, project: "<%= CustomProperties.getProperty("mstr.default.project.name") %>"
-				, hiddenSections: 'path,header,footer,dockLeft'
-				, promptAnswerMode: '2'
-			}
-			, report: {
-				  evt: '4001'
-				, src: 'mstrWeb.4001'
-				, reportID: objectId
-			}
-			, document: {
-	              evt: '2048001'
-	            , src: 'mstrWeb.2048001'
-	            , documentID: objectId
-	            , share: '1'
-            	, hiddenSections: 'dockTop'
-			}
-			, dossier: {
-	              evt: '3140'
-	            , src: 'mstrWeb.3140'
-	            , documentID: objectId
-	            , share: '1'
-            	, hiddenSections: 'dockTop'
-			}
-		}
-		
+
 	    $.ajax({
 	    	  type: 'post'
 	    	, url: '${pageContext.request.contextPath}/app/mstr/getAnswerXML.json'
@@ -254,22 +226,7 @@
     		, dataType: 'json'
     		, success: function(data, text, request) {
 	    		// 리포트 실행 시 파라미터로 전달될 promptsAnswerXML의 값을 서버로부터 조회 성공
-	    		var inputs = $.extend({}, formDefs['common']);
-	    		
-	    		switch (type) {
-		    		case 3:
-		    			$.extend(inputs, formDefs['report']);
-		    			break;
-		    		case 55:
-	                    if (isvi == true) {
-	                    	$.extend(inputs, formDefs['dossier']);
-	                    } else {
-	                    	$.extend(inputs, formDefs['document']);
-	                    }
-		    			break;
-		    		default:
-	    		}
-	    		
+	    		var inputs = let inputs = getMstrFormDefinition(type);
 	    		$.extend(inputs, {promptsAnswerXML: data['xml']});
 	    		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', inputs);
 	    	}

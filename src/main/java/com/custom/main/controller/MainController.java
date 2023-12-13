@@ -37,13 +37,13 @@ public class MainController {
      */
     @RequestMapping(value = "/main/mainView.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView mainView(HttpServletRequest request, HttpServletResponse response) {
-    	ModelAndView view = new ModelAndView("error/404");
+    	ModelAndView view = new ModelAndView("error/auth");
     	
     	switch (CustomProperties.getProperty("portal.main.display")) {
 			case "MSTR_DASHBOARD":
 				view.setViewName("main/mainDashboard");
 				view.addObject("portalMainDashboardId", CustomProperties.getProperty("portal.main.dashboard.id"));
-				view.addObject("type", 55);
+				view.addObject("type", CustomProperties.getProperty("portal.main.dashboard.type"));
 				view.addObject("isvi", true);
 				break;
 			case "MAIN":
@@ -88,6 +88,18 @@ public class MainController {
     @RequestMapping(value = "/main/mainEisView.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView mainEisView() {
         ModelAndView view = new ModelAndView("main/mainEis");
+        
+        return view;
+    }
+    
+    
+    /**
+     * 프롬프트 선택 화면
+     * @return
+     */
+    @RequestMapping(value = "/main/selectPrompt.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView selectPrompt() {
+        ModelAndView view = new ModelAndView("main/selectPrompt");
         
         return view;
     }

@@ -12,6 +12,9 @@
 <!-- dataTables -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/DataTables-1.13.8/css/dataTables.bootstrap5.min.css?v=20231006001"></script>
 
+<!-- Air Datepicker -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/air-datepicker-3/dist/air-datepicker.css?v=20231006001"></script>
+
 <!-- Application Css -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/style/common.css?v=20231006001" />
 

@@ -85,11 +85,23 @@
 		}
 		
 		.ms-options-wrap button {
+			font-size: 1rem;
 			width: 150px !important;
 		}
 		
 		#mstrReport {
 			height: 100%;
+		}
+		
+		.ms-options-wrap {
+			font-size: 1rem;
+		}
+		
+		.ms-options-wrap > .ms-options > ul input[type="checkbox"] {
+		    margin: 0 5px 0 0;
+		    position: absolute;
+		    left: 4px;
+		    top: 11px;
 		}
 	</style>
 <script type="text/javascript">
@@ -103,13 +115,15 @@
 		//메인 대시보드 프롬프트 화면 숨김 처리
 		if('${portalMainDashboardId}' != '') {
 			$('.prompt-wrapper').parent().hide();
+		} else {
+			$('.prompt-wrapper').parent().show();
 		}
 	
 		$('#mstrReport').on("load", function() {
 			$('#portal-loading').hide();
 		});
 		
-		init();
+		fnReportInit();
 	});
 	
 	
@@ -118,12 +132,13 @@
     }
     
     
-	function init() {
+    //초기 실행 함수
+	function fnReportInit() {
 		$(window).resize(function() {
 			var height	= $(window).height();
 			var $report = $('.report-wrapper');
 			
-			$report.height( height - $report.offset().top - 10 );
+			$report.height( height - $report.offset().top - 17);
 		});
 		
 		$(window).resize();
@@ -165,22 +180,22 @@
         	
         $.each(reportInfo.promptList, function(i, v) {
         	var uiType = undefined;
-        	 
+        	
         	if (v['exUiType']) {
         		uiType = v['exUiType'];
         	} else {
 	            switch (v['type']) { // 프롬프트유형을 이용한 UI유형결정
-	            case 1:
-	            	uiType = 'value-default';
-	            	break;
-	            case 2:	  
-	            case 4:
-	            	uiType = 'list-default';
-	            	if ((v['max'] && Number(v['max']) > 1) || !v['max']) {
-	            	    uiType = 'multiSelect-default';		            		
-	            	}
-	                break;
-	            default:
+		            case 1:
+		            	uiType = 'value-default';
+		            	break;
+		            case 2:	  
+		            case 4:
+		            	uiType = 'list-default';
+		            	if ((v['max'] && Number(v['max']) > 1) || !v['max']) {
+		            	    uiType = 'multiSelect-default';		            		
+		            	}
+		                break;
+		            default:
 	            } 
         	}
         	
@@ -196,11 +211,23 @@
 			//자동실행
 			$('#run').trigger('click');
         } else {
-        	$('#run').trigger('click');
+        	$('#mstrReport').attr('src', '${pageContext.request.contextPath}/app/main/selectPrompt.do');
         }
 	}
 	
 	
+	//정합성 체크
+	function validationPrompt() {
+		var elemVal = {};
+		$('[prompt-id]').each(function(i, v) {
+			var $elem = $(v);
+			elemVal[$elem.attr('prompt-id')] = promptRenderer[$elem.attr('ui-type')]['validation']($elem);
+		});
+		
+		return elemVal;
+	}
+	
+	//프롬프트 값 세팅
 	function getPromptVal() {
 		var elemVal = {};
 		$('[prompt-id]').each(function(i, v) {
@@ -212,37 +239,22 @@
 	}
 	
 	
+	//리포트 실행
 	function getAnswerXML() {
 		$('#portal-loading').show();
 		
-		let formDefs = {
-			common: {
-				  server: "<%= CustomProperties.getProperty("mstr.server.name") %>"
-				, port: "<%= CustomProperties.getProperty("mstr.server.port") %>"
-				, project: "<%= CustomProperties.getProperty("mstr.default.project.name") %>"
-				, hiddenSections: 'path,header,footer,dockLeft'
-				, promptAnswerMode: '2'
-			}
-			, report: {
-				  evt: '4001'
-				, src: 'mstrWeb.4001'
-				, reportID: objectId
-			}
-			, document: {
-	              evt: '2048001'
-	            , src: 'mstrWeb.2048001'
-	            , documentID: objectId
-	            , share: '1'
-            	, hiddenSections: 'dockTop'
-			}
-			, dossier: {
-	              evt: '3140'
-	            , src: 'mstrWeb.3140'
-	            , documentID: objectId
-	            , share: '1'
-            	, hiddenSections: 'dockTop'
+		//정합성 체크
+		let promptCheck = validationPrompt();
+		for (const [key, value] of Object.entries(promptCheck)) {
+			if(value) {
+				alert(value);
+				$('#portal-loading').hide();
+				return false;
 			}
 		}
+		
+		//현재 선택된 프롬프트값들을 파라미터로 전달하여 XML형태로 반환 받음.
+		let promptVal = getPromptVal();
 		
 	    $.ajax({
 	    	  type: 'post'
@@ -250,30 +262,15 @@
 	    	, async: true
 	    	, contentType: 'application/json;charset=utf-8'
 	    	, data : JSON.stringify({
-    			objectId: objectId, 
-    			type: type,
-//     			promptVal: getPromptVal() // 현재 선택된 프롬프트값들을 파라미터로 전달하여 XML형태로 반환 받음.
+    			  objectId: objectId
+    			, type: type
+    			, promptVal: promptVal
     		})
     		, dataType: 'json'
     		, success: function(data, text, request) {
 	    		// 리포트 실행 시 파라미터로 전달될 promptsAnswerXML의 값을 서버로부터 조회 성공
-	    		var inputs = $.extend({}, formDefs['common']);
-	    		
-	    		switch (type) {
-		    		case 3:
-		    			$.extend(inputs, formDefs['report']);
-		    			break;
-		    		case 55:
-	                    if (isvi == true) {
-	                    	$.extend(inputs, formDefs['dossier']);
-	                    } else {
-	                    	$.extend(inputs, formDefs['document']);
-	                    }
-		    			break;
-		    		default:
-	    		}
-	    		
-	    		$.extend(inputs, {promptsAnswerXML: data['xml']});
+	    		let inputs = getMstrFormDefinition(type);
+	    		$.extend(inputs, {promptsAnswerXML : data['xml']});
 	    		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', inputs);
 	    	}
 	    	, error : function(jqXHR, textStatus, errorThrown) {

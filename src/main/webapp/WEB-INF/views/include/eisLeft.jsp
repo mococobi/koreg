@@ -3,6 +3,7 @@
 <%@ page import="com.mococo.web.util.CustomProperties" %>
 <% 
 	String portalIframePageMoveYn = CustomProperties.getProperty("portal.iframe.page.move.yn");
+	String mstrMenuFolderId = CustomProperties.getProperty("mstr.menu.folder.id");
 %>
 <!DOCTYPE html>
 <html>
@@ -116,7 +117,7 @@
 		$(window).resize();
 		
 		let callParams = {
-			folderId : '032A5E114A59D28267BDD8B6D9E58B22'
+			folderId : "<%=mstrMenuFolderId%>"
 		};
 		callAjaxPost('/mstr/getFolderList.json', callParams, function(data) {
 			let menuReport = data['folder'];

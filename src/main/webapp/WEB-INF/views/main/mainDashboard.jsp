@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
 <%@ page import="org.apache.commons.lang3.StringUtils"%>
+<%@ page import="com.mococo.web.util.CustomProperties"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
 	String objectId = "";
@@ -12,7 +13,7 @@
     	type = StringUtils.defaultString(request.getParameter("type"));
     } else if(request.getAttribute("portalMainDashboardId") != null) {
     	objectId = StringUtils.defaultString((String)request.getAttribute("portalMainDashboardId"));
-    	type = ((Integer)request.getAttribute("type")).toString();
+    	type = StringUtils.defaultString((String)request.getAttribute("type"));
     	isvi = (Boolean)request.getAttribute("isvi");
     }
 %>
@@ -60,7 +61,7 @@
 	
 <script type="text/javascript">
 	var objectId = "<%= objectId %>";
-	var type = <%= type %>;
+	var type = "<%= type %>";
 	var isvi = <%= isvi %>;
 	
 
@@ -81,15 +82,13 @@
 			let height	= $(window).height();
 			let $report = $('.report-wrapper');
 			
-			$report.height( height - $report.offset().top - 10 );
+			$report.height( height - $report.offset().top - 17);
 		});
 		
 		$(window).resize();
 		
 		//메인 대시보드 실행
-		let dossierUrl =  'evt=3140&src=mstrWeb.3140&' + '&Server='+ __mstrServerName +'&Port='+ __mstrServerPort +'&Project='+ __mstrDefaultProjectName +'&share=1&hiddensections=path,dockTop&';
-		dossierUrl += 'documentID=' + objectId;
-		$('#mainReport').attr('src', '${pageContext.request.contextPath}/servlet/mstrWeb?' + dossierUrl);
+		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mainReport', getMstrFormDefinition(type));
 	}
 	
 
