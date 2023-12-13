@@ -10,11 +10,11 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface BoardService {
 
-	public Map<String, Object> boardList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params);
+	public Map<String, Object> boardList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
 	
-	public Map<String, Object> boardPostList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params);
+	public Map<String, Object> boardPostList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
 	
-	public Map<String, Object> boardPostDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params);
+	public Map<String, Object> boardPostDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
 	
-	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params);
+	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception;
 }

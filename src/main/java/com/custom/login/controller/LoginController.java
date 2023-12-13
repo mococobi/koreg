@@ -292,7 +292,7 @@ public class LoginController {
 	 * @return
 	 * @throws WebObjectsException
 	 */
-	private Map<String, Object> loginSessionProcess(HttpServletRequest request, HttpServletResponse response, WebIServerSession isession, ModelAndView view, String userId) throws WebObjectsException {
+	private Map<String, Object> loginSessionProcess(HttpServletRequest request, HttpServletResponse response, WebIServerSession isession, ModelAndView view, String userId) throws WebObjectsException, Exception {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		WebUser user = (WebUser) isession.getUserInfo();
 		
@@ -362,7 +362,7 @@ public class LoginController {
 	 */
 	@RequestMapping(value = "/login/logoutUser.do", method = {RequestMethod.GET, RequestMethod.POST})
 	@ResponseBody
-	public ModelAndView logoutUser(HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> param) {
+	public ModelAndView logoutUser(HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> param) throws Exception {
 		ModelAndView view = null;
 		String screenId = (String)request.getSession().getAttribute("portal-screen-id");
 		if(screenId.equals("EIS")) {

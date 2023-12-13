@@ -1,5 +1,6 @@
 package com.custom.board.controller;
 
+import java.net.FileNameMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.custom.board.service.BoardService;
+import com.microstrategy.web.app.tags.Log;
 import com.mococo.web.util.ControllerUtil;
 
 @Controller
@@ -129,13 +132,16 @@ public class BoardController {
      */
     @RequestMapping(value = "/board/boardPostDetailView.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView boardPostDetailView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	params.put("PORTAL_LOG", false);//값을 불러오는게 아닌 화면 이동에선 로그처리 필요X
     	LOGGER.debug("params : [{}]", params);
         ModelAndView view = new ModelAndView("board/boardPostDetail");
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         
         try {
-    		Map<String, Object> boardMap = boardService.boardList(request, response, params);
+    		//Map<String, Object> boardMap = boardService.boardList(request, response, params);
+        	Map<String, Object> boardMap = boardService.boardPostDetail(request, response, params);
     		view.addObject("postData", boardMap);
+    		
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
 			view.addObject("data", rtnMap);
@@ -153,6 +159,7 @@ public class BoardController {
     @RequestMapping(value = "/board/boardPostDetail.json", method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
     public Map<String, Object> boardPostDetail(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+    	params.put("PORTAL_LOG", true);
     	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
@@ -176,11 +183,10 @@ public class BoardController {
      * @return
      */
     @RequestMapping(value = "/board/boardPostInsert.json", method = {RequestMethod.GET, RequestMethod.POST})
-	@ResponseBody
 	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) {
     	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
-		
+    	
 		try {
 			Map<String, Object> rtnList = new HashMap<String, Object>();
     		rtnList = boardService.boardPostInsert(request, response, params);
@@ -191,5 +197,6 @@ public class BoardController {
 		}
 		
 		return rtnMap;
-	}	
+	}
+    
 }

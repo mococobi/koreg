@@ -1,9 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
 	String boardId = (String)request.getParameter("boardId");
+System.out.println("\n\n\n boardPostList.jsp =>>> " + boardId);
+
+System.out.println("USR_ID(SESS) ["+session.getAttribute("mstrUserIdAttr")+"]");
+String sUserId = (String) session.getAttribute("mstrUserIdAttr");
+
 %>
+<c:set var="usrId" value="<%=sUserId%>"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,9 +41,11 @@
 			<div class="col-md-1">
 				<button class="btn btn-primary btn-sm" onclick="searchBoardPostList()">조회</button>
 			</div>
+			<c:if test="${fn:contains(postData['BRD_ADM_USR'] , usrId)}">
 			<div class="col text-end">
-				<button class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
+				<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
 			</div>
+			</c:if>
 	    </div>
 		<div id="boardPostTable_div">
 			<table id="boardPostTable" class="table hover table-striped table-bordered dataTablesCommonStyle">
@@ -75,6 +84,13 @@
 				searchBoardPostList();
 			}
 		});
+		
+		try {
+			console.log("PostData[%s]", '${postData}');
+		} catch(e) {
+			console.log(e);
+		}
+		
 	});
 	
 	
@@ -112,8 +128,12 @@
 						return data['data'];
 					}
 			    } 
-				, error : function (jqXHR, textStatus, errorThrown) {
-					errorProcess(jqXHR, textStatus, errorThrown);
+				, error: function (jqXHR, textStatus, errorThrown) {
+					if(xhr['status'] == 404) {
+						alert('지정되지 않은 URL입니다.');
+					} else {
+						alert('에러 처리 필요');
+					}
 			    }
 			}
 			, language : commonDatatableLanguage()
@@ -141,7 +161,7 @@
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
-						if(row['FILE_ID'] > 0) {
+						if(row['POST_FILE_COUNT'] > 0) {
 							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '<i class="bi bi-paperclip"></i>' + '</a>';
 						} else {
 							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
@@ -197,10 +217,12 @@
 	
 	//게시물 작성
 	function writeBoardPost() {
-		let pagePrams = [
-			["boardId", boardId]
-		];
-		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
+		/* if(postData['ADM_CD'] == 'PORTAL_SYSTEM_ADMIN'){
+				$('.btn btn-secondary btn-sm').show(); */
+				let pagePrams = [
+					["boardId", boardId]
+				];
+				pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
 	}
 	
 	

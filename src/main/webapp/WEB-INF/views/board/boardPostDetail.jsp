@@ -90,7 +90,6 @@
 						<span id="post_count"></span>
 					</td>
 				</tr>
-				<c:if test="${postData['POST_POPUP_YN'] eq 'Y'}">
 					<tr id="post_popup_yn_div">
 						<td>
 							<span>팝업여부</span>
@@ -105,7 +104,6 @@
 							<span id="post_popup_dt"></span>
 						</td>
 					</tr>
-				</c:if>
 				<tr>
 					<c:if test="${postData['POST_FIX_YN'] eq 'Y'}">
 						<td  id="post_fix_yn_div">
@@ -180,7 +178,7 @@
 	let searchVal = '';
 	
 	$(function() {
-		fnBoardPostInit();
+		fnBoardPostInit(); //로그2번찍힘
 	});
 	
 	
@@ -245,7 +243,7 @@
 		$('#post_create_user_id').text(postData['CRT_USR_ID']);
 		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);
 		$('#post_create_date').text(changeDisplayDate(postData['CRT_DT_TM'], 'YYYY-MM-DD'));
-		$('#post_count').text(postData['POST_COUNT']);
+		$('#post_count').text(postData['POST_VIEW_COUNT']);
 		
 		$('#post_content').html(postData['POST_CONTENT']);
 		
@@ -258,7 +256,7 @@
 		}
 		
 		if(postData['POPUP_START_DT_TM'] || postData['POPUP_END_DT_TM']) {
-			$('#post_popup_dt').text(postData['POPUP_START_DT_TM'] + ' ~ ' + postData['POPUP_END_DT_TM']);
+			$('#post_popup_dt').text(changeDisplayDate(postData['POPUP_START_DT_TM'], 'YYYY-MM-DD') + ' ~ ' + changeDisplayDate(postData['POPUP_END_DT_TM']), 'YYYY-MM-DD');
 		}
 		
 		if(postData['SECRET_YN'] == 'Y') {

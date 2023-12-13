@@ -9,6 +9,8 @@
 		<result property="POST_CONTENT" column="POST_CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
 		<result property="CRT_DT_TM" column="CRT_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
 		<result property="MOD_DT_TM" column="MOD_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+		<result property="POPUP_START_DT_TM" column="POPUP_START_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+		<result property="POPUP_END_DT_TM" column="POPUP_END_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
 	</resultMap>
 	
 	<select id="Board.boardList" resultType="HashMap" parameterType="Map">
@@ -31,7 +33,7 @@
 			, MOD_DT_TM
 			, MOD_USR_ID
 		FROM 
-			PORTAL.BOARD
+			PORTAL.BOARD <!-- LEFT JOIN PORTAL_ADMIN pa -->
 		WHERE 1=1
 			AND BOARD.BRD_ID = #{boardId}
 			AND DEL_YN = 'N'
@@ -50,24 +52,22 @@
 				, post.POST_TITLE
 				/* , TO_CHAR(post.CRT_DT_TM, 'yyyy-mm-dd') AS CRT_DT_TM */
 				, post.CRT_DT_TM
-				, bpf.FILE_ID
 				, post.CRT_USR_ID
 				, post.CRT_USR_ID AS CRT_USR_NM
 				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
+				, (SELECT COUNT(post_file.FILE_ID) FROM PORTAL.BOARD_POST_FILE post_file WHERE post.POST_ID = post_file.POST_ID) AS POST_FILE_COUNT
 			FROM 
 				PORTAL.BOARD_POST post 
-				LEFT JOIN PORTAL.BOARD_POST_FILE bpf 
-					ON (post.POST_ID = bpf.POST_ID)
 			WHERE 1=1
 				AND post.BRD_ID = #{boardId}
 				AND post.DEL_YN = 'N'
 				<if test="searchKey != null and !searchKey.equals('') and searchVal != null and !searchVal.equals('')">
 					<choose>
 						<when test="searchKey.equals('POST_TITLE')">
-							AND post.POST_TITLE = #{searchVal}
+							AND UPPER(post.POST_TITLE) LIKE UPPER('%'||#{searchVal}||'%')
 				    	</when>
 				    	<when test="searchKey.equals('CRT_USR_ID')">
-				    		AND post.CRT_USR_ID = #{searchVal}
+				    		AND UPPER(post.CRT_USR_ID) LIKE UPPER('%'||#{searchVal}||'%')
 				    	</when>
 				    </choose>
 				</if>
@@ -158,6 +158,7 @@
 			, board.POST_POPUP_YN
 			, board.POST_SECRET_YN
 			, board.POST_FIX_YN
+			, (SELECT COUNT(USR_ACTN) FROM PORTAL.PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
 		FROM 
 			PORTAL.BOARD_POST post 
 			INNER JOIN PORTAL.BOARD board
@@ -202,37 +203,75 @@
         	WHERE 1=1
 				AND post.BRD_ID = #{BRD_ID}
     	</selectKey>
-		INSERT INTO  /* Board.boardPostInsert */
-			PORTAL.BOARD_POST(
-				  POST_ID
-				, BRD_ID
-				, POST_TITLE
-				, POST_CONTENT
-				, POST_VIEW_AUTH
-				, POPUP_YN
-				, POPUP_START_DT_TM
-				, POPUP_END_DT_TM
-				, SECRET_YN
-				, FIX_YN
-				, DEL_YN
-				, CRT_DT_TM
-				, CRT_USR_ID
-			)
-			VALUES(
-				  #{insertKey}
-				, #{BRD_ID}
-				, #{POST_TITLE}
-				, #{POST_CONTENT}
-				, #{POST_VIEW_AUTH}
-				, #{POPUP_YN}
-				, #{POPUP_START_DT_TM}
-				, #{POPUP_END_DT_TM}
-				, #{SECRET_YN}
-				, #{FIX_YN}
-				, 'N'
-				, SYSDATE
-				, #{userId}
-			)
+    	INSERT INTO
+    		PORTAL.BOARD_POST(
+    			POST_ID
+    		  , BRD_ID
+    		  , POST_TITLE
+    		  , POST_CONTENT
+    		  , POST_VIEW_AUTH
+    		  , POPUP_YN
+    		  , POPUP_START_DT_TM
+    		  , POPUP_END_DT_TM
+    		  , SECRET_YN
+    		  , FIX_YN
+    		  , DEL_YN
+    		  , CRT_DT_TM
+    		  , CRT_USR_ID
+    		)
+    		VALUES(
+    			#{insertKey}
+    		  , #{BRD_ID}
+    		  , #{POST_TITLE}
+    		  , #{POST_CONTENT}
+    		  , #{POST_VIEW_AUTH}
+    		  , #{POPUP_YN}
+    		  , #{POPUP_START_DT_TM}
+		      , #{POPUP_END_DT_TM}
+    		  , #{SECRET_YN}
+    		  , #{FIX_YN}
+    		  , 'N'
+    		  , SYSDATE
+    		  , #{userId}
+    		)
 	</insert>
 	
+	<insert id="Board.boardPostFileInsert" parameterType="Map" useGeneratedKeys="true" keyColumn="POST_ID" keyProperty="keyNum">
+		<selectKey resultType="int" keyProperty="insertFileKey" order="BEFORE">
+			SELECT
+				NVL(MAX(post_file.FILE_ID)+1, 1) AS INSERTKEY
+			FROM
+				PORTAL.BOARD_POST_FILE post_file
+			WHERE 1=1
+		</selectKey>
+		INSERT INTO 
+			PORTAL.BOARD_POST_FILE(
+    			FILE_ID
+    		  , POST_ID
+    		  , FILE_TYPE
+    		  , PARENT_CMNT_ID
+    		  , SRV_FILE_PATH
+    		  , SRV_FILE_NM
+    		  , ORG_FILE_NM
+    		  , FILE_EXT
+    		  , FILE_SIZE
+    		  , DEL_YN
+    		  , CRT_DT_TM
+    		  , CRT_USR_ID
+    		)
+    		VALUES(
+    			#{insertFileKey}
+    		  , #{POST_ID}
+    		  , #{orgFileType}
+    		  , #{PARENT_CMNT_ID} 
+    		  , #{uploadFilePath}
+    		  , #{newFileName}
+    		  , #{orgFileName}
+    		  , #{orgFileType}
+    		  , #{fileSize}
+    		  , 'N'
+    		  , SYSDATE
+    		  , #{userId}
+    	)
+	</insert>
 </mapper>
