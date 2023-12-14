@@ -5,17 +5,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.microstrategy.utils.serialization.EnumWebPersistableState;
-import com.microstrategy.web.objects.EnumWebSubscriptionObjectTypes;
-import com.microstrategy.web.objects.WebContactsSource;
 import com.microstrategy.web.objects.WebIServerSession;
 import com.microstrategy.web.objects.WebObjectSource;
 import com.microstrategy.web.objects.WebObjectsFactory;
 import com.microstrategy.web.objects.WebSubscriptionContact;
-import com.microstrategy.web.objects.WebSubscriptionsSource;
 import com.microstrategy.web.objects.admin.users.WebUser;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
+import com.mococo.microstrategy.sdk.util.MstrUserUtil;
 import com.mococo.microstrategy.sdk.util.MstrUtil;
 import com.mococo.web.util.CustomProperties;
+import com.mococo.web.util.EncryptUtil;
 
 public class UserTest {
 	
@@ -78,6 +77,36 @@ public class UserTest {
 				System.out.println("user : " + user.getContacts().size());
 
 		    
+		} catch (Exception e) {
+			logger.error("!!! error", e);
+		} finally {
+			MstrUtil.closeISession(session);
+		}
+	}
+	
+	
+	/**
+	 * 사용자 생성 테스트
+	 * @throws Exception
+	 */
+	@Test
+	public void createUserTest() throws Exception {
+		WebIServerSession session = null; 
+		
+		try {
+		    WebObjectsFactory factory = WebObjectsFactory.getInstance();
+		    session = MstrUtil.connectSession(
+		    		CustomProperties.getProperty("mstr.server.name")
+		    		, CustomProperties.getProperty("mstr.default.project.name")
+		    		, CustomProperties.getProperty("mstr.admin.user.id")
+		    		, EncryptUtil.decrypt(CustomProperties.getProperty("mstr.admin.user.pwd"))
+		    	);
+		    
+		    	WebObjectSource source = session.getFactory().getObjectSource();
+
+		    	MstrUserUtil.createUser(session, "test", "테스트", "1");
+		    
+		    	logger.debug("끝");
 		} catch (Exception e) {
 			logger.error("!!! error", e);
 		} finally {

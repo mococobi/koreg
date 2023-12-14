@@ -34,7 +34,7 @@
 	<nav id="portal-top-nav-div" class="navbar navbar-expand-lg navbar-dark bg-primary">
 		<div class="container-fluid">
 			<a class="navbar-brand" href="#">
-				<img id="top_menu_logo" alt="로고 이미지" src="${pageContext.request.contextPath}/image/logo/logo_hdr.png?v=20231123001" style="width: 100%; height: 30px;" class="d-inline-block align-top">
+				<img id="top_menu_logo" alt="로고 이미지" src="${pageContext.request.contextPath}/_custom/image/logo/logo_hdr.png?v=20231123001" style="width: 100%; height: 30px;" class="d-inline-block align-top">
 			</a>
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
 				data-bs-target="#navbarSupportedContent2"

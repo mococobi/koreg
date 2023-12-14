@@ -1,22 +1,22 @@
 <%@ page language="java" contentType="thtml; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <!-- Bootstrap Css -->
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/style/bootstrap/bootstrap.min.css?v=20231006001" >
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/image/bootstrap-icons-1.11.2/font/bootstrap-icons.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/bootstrap-5.3.2-dist/css/bootstrap.min.css?v=20231006001" >
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/image/bootstrap-icons-1.11.2/font/bootstrap-icons.min.css?v=20231006001">
 
 <!-- Jquery Css -->
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/jquery-ui/themes/start/jquery-ui.css?v=20231006001" />
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/jquery-easyui-1.9.15/themes/default/easyui.css?v=20231006001" />
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/jquery-easyui-1.9.15/themes/icon.css?v=20231006001" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/jquery-ui/themes/start/jquery-ui.css?v=20231006001" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/jquery-easyui-1.10.18/themes/default/easyui.css?v=20231006001" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/jquery-easyui-1.10.18/themes/icon.css?v=20231006001" />
 
 <!-- dataTables -->
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/DataTables-1.13.8/css/dataTables.bootstrap5.min.css?v=20231006001"></script>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/DataTables-1.13.8/css/dataTables.bootstrap5.min.css?v=20231006001"></script>
 
 <!-- Air Datepicker -->
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/javascript/air-datepicker-3/dist/air-datepicker.css?v=20231006001"></script>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/air-datepicker-3/dist/air-datepicker.css?v=20231006001"></script>
 
 <!-- Application Css -->
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/style/common.css?v=20231006001" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/common.css?v=20231006001" />
 
 <!-- 파비콘 -->
-<link rel="shortcut icon" href="${pageContext.request.contextPath}/image/favicon/favicon.ico?v=20231006001">
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/_custom/image/favicon/favicon.ico?v=20231006001">

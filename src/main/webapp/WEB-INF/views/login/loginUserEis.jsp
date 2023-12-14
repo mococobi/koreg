@@ -11,10 +11,10 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 	
-	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/rsa/rsa.min.js"></script>
-	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/rsa/jsbn.min.js"></script>
-	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/rsa/prng4.min.js"></script>
-	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/javascript/rsa/rng.min.js"></script>
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/rsa/rsa.min.js"></script>
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/rsa/jsbn.min.js"></script>
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/rsa/prng4.min.js"></script>
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/rsa/rng.min.js"></script>
 	
 		<style type="text/css">
 		html, body {
@@ -47,7 +47,7 @@
 	<main class="form-signin w-100 m-auto">
 		<div id="container">
 			<%--
-			<img class="mb-4" src="${pageContext.request.contextPath}/image/logo/logo_hdr.png?v=20231123001" height="57" style="width: 100%">
+			<img class="mb-4" src="${pageContext.request.contextPath}/_custom/image/logo/logo_hdr.png?v=20231123001" height="57" style="width: 100%">
 			--%>
 			<h1 class="h3 mb-3 fw-normal">EIS 로그인</h1>
 	

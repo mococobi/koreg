@@ -48,7 +48,7 @@
 	<div class="container py-1">
 		<!-- 이미지 영역 -->
 		<div class="mb-4 bg-body-tertiary rounded-3">
-			<img alt="메인 이미지" src="${pageContext.request.contextPath}/image/main/mainImage.png?v=20231123001" style="width: 100%; height: calc(24vh);">
+			<img alt="메인 이미지" src="${pageContext.request.contextPath}/_custom/image/main/mainImage.png?v=20231123001" style="width: 100%; height: calc(24vh);">
 		</div>
 
 		<!-- 그리드 영역 -->

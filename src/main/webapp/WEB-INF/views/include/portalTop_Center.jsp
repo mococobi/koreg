@@ -42,7 +42,7 @@
     			left: 15%;
 				position: fixed;
 				display: block;
-				opacity: 0.7;
+				/* opacity: 0.7; */
 				background-color: #fff;
 				z-index: 9999;
 				text-align: center;
@@ -57,8 +57,8 @@
 				top: 31%;
     			left: 39%;
 				z-index: 100;
-			    width: 150px;
-			}			
+			    width: 100px;
+			}
 		</style>
 	</head>
 <body>
@@ -70,7 +70,7 @@
 				<ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
 					<li>
 						<a class="navbar-brand" href="#">
-							<img id="top_menu_logo" alt="로고 이미지" src="${pageContext.request.contextPath}/image/logo/logo.png?v=20231123001" style="width: 100%; height: 40px; background-color: white;" class="d-inline-block align-top">
+							<img id="top_menu_logo" alt="로고 이미지" src="${pageContext.request.contextPath}/_custom/image/logo/logo.png?v=20231123001" style="width: 100%; height: 40px; background-color: white;" class="d-inline-block align-top">
 						</a>
 					</li>
 				</ul>
@@ -129,10 +129,6 @@
 				</ul>
 			</header>
 		</div>
-	</div>
-	
-	<div id="portal-loading" style="display: none;">
-		<img id="loading-image" src="${pageContext.request.contextPath}/image/main/loading.gif" alt="Loading..." />
 	</div>
 </body>
 <script type="text/javascript">

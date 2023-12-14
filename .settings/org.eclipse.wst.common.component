@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-                        	
+                            	
+    
     
     
     
@@ -12,27 +13,30 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/resources"/>
-        <wb-resource deploy-path="/" source-path="/src/main/resources-mstr"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp-mstr"/>
-                                                		
+                                                        		
+        
         
         
         
         
         
         <property name="java-output-path" value="/koreg/build/classes"/>
-                                
+                                        
+        
         
         
         <property name="context-root" value="koreg"/>
-                                                	
+                                                        	
+    
     
     
     
     
     
     </wb-module>
-                        
+                            
+
 
 
 

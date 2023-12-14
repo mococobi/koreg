@@ -82,7 +82,7 @@
 			let height	= $(window).height();
 			let $report = $('.report-wrapper');
 			
-			$report.height( height - $report.offset().top - 17);
+			$report.height( height - $report.offset().top - 18);
 		});
 		
 		$(window).resize();

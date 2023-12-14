@@ -16,13 +16,21 @@
     <context:property-placeholder location="classpath:/spring/jdbc.properties" />
 
     <!-- properties 값을 이용하여 DB 연동 -->
+    <!-- -->
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${jdbc.driverClassName}" />
         <property name="url" value="${jdbc.url}" />
         <property name="username" value="${jdbc.username}" />
         <property name="password" value="${jdbc.password}" />
     </bean>
-
+ 	
+ 	<!-- server 용 -->
+ 	<!-- 
+ 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="${jndi.name}"/>
+	</bean>
+ 	-->
+ 	 
     <!-- Transaction manager for a single JDBC DataSource (alternative to JTA) -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource" />
 

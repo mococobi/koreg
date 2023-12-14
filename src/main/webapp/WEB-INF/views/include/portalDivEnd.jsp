@@ -3,6 +3,9 @@
 <!DOCTYPE html>
 <html>
 <body>
+			<div id="portal-loading" style="display: none;">
+				<img id="loading-image" src="${pageContext.request.contextPath}/_custom/image/main/loading.gif" alt="Loading..." />
+			</div>
 		</div>
 	</div>
 </body>

@@ -76,7 +76,7 @@
 			.mstrType-55::before {
 			    width: 1.25em;
 			    line-height: 0;
-			    content: url(${pageContext.request.contextPath}/image/bootstrap-icons-1.11.2/file-earmark-bar-graph.svg);
+			    content: url(${pageContext.request.contextPath}/_custom/image/bootstrap-icons-1.11.2/file-earmark-bar-graph.svg);
 			    transition: transform .35s ease;
 			    transform-origin: 0.5em 50%;
 			    margin-right: 5px;
@@ -85,7 +85,7 @@
 			.mstrType-3::before {
 			    width: 1.25em;
 			    line-height: 0;
-			    content: url(${pageContext.request.contextPath}/image/bootstrap-icons-1.11.2/grid-3x3.svg);
+			    content: url(${pageContext.request.contextPath}/_custom/image/bootstrap-icons-1.11.2/grid-3x3.svg);
 			    transition: transform .35s ease;
 			    transform-origin: 0.5em 50%;
 			    margin-right: 5px;
