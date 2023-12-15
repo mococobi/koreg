@@ -4,11 +4,12 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
 	String boardId = (String)request.getParameter("boardId");
-System.out.println("\n\n\n boardPostList.jsp =>>> " + boardId);
-
-System.out.println("USR_ID(SESS) ["+session.getAttribute("mstrUserIdAttr")+"]");
-String sUserId = (String) session.getAttribute("mstrUserIdAttr");
-
+	System.out.println("\n\n\n boardPostList.jsp =>>> " + boardId);
+	
+	System.out.println("USR_ID(SESS) ["+session.getAttribute("mstrUserIdAttr")+"]");
+	String sUserId = (String) session.getAttribute("mstrUserIdAttr");
+	
+	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
 %>
 <c:set var="usrId" value="<%=sUserId%>"/>
 <!DOCTYPE html>
@@ -41,11 +42,12 @@ String sUserId = (String) session.getAttribute("mstrUserIdAttr");
 			<div class="col-md-1">
 				<button class="btn btn-primary btn-sm" onclick="searchBoardPostList()">조회</button>
 			</div>
-			<c:if test="${fn:contains(postData['BRD_ADM_USR'] , usrId)}">
+			<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
+			<!-- 관리자 기능 -->
 			<div class="col text-end">
 				<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
 			</div>
-			</c:if>
+			<% } %>
 	    </div>
 		<div id="boardPostTable_div">
 			<table id="boardPostTable" class="table hover table-striped table-bordered dataTablesCommonStyle">
@@ -90,7 +92,6 @@ String sUserId = (String) session.getAttribute("mstrUserIdAttr");
 		} catch(e) {
 			console.log(e);
 		}
-		
 	});
 	
 	
@@ -217,12 +218,10 @@ String sUserId = (String) session.getAttribute("mstrUserIdAttr");
 	
 	//게시물 작성
 	function writeBoardPost() {
-		/* if(postData['ADM_CD'] == 'PORTAL_SYSTEM_ADMIN'){
-				$('.btn btn-secondary btn-sm').show(); */
-				let pagePrams = [
-					["boardId", boardId]
-				];
-				pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
+		let pagePrams = [
+			["boardId", boardId]
+		];
+		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
 	}
 	
 	

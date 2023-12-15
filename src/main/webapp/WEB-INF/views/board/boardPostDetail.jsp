@@ -32,8 +32,8 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart.jsp" />
 	
 	<div class="container py-4">
-		<p class="h3">${postData['BRD_NM']}</p>
-		<p class="h6">${postData['BRD_DESC']}</p>
+		<p class="h3">${postData['data']['BRD_NM']}</p>
+		<p class="h6">${postData['data']['BRD_DESC']}</p>
 		<div class="row mb-3">
 			<div class="col">
 				<button id="btn_post_modify" class="btn btn-secondary btn-sm" onclick="modifyBoardPost()" style="display: none;">수정</button>
@@ -121,7 +121,6 @@
 							<input type="checkbox" id="post_secret_yn" disabled>
 						</td>
 					</c:if>
-					
 				</tr>
 					<c:if test="${postData['BRD_VIEW_AUTH'] eq 'Y'}">
 						<td>
@@ -139,16 +138,16 @@
 						<div id="post_content" style="min-height: 300px;"></div>
 					</td>
 				</tr>
-				<c:if test="${postData['POST_FILE_YN'] eq 'Y'}">
+				<%-- <c:if test="${postData['POST_FILE_YN'] eq 'Y'}"> --%>
 					<tr id="post_file_yn_div">
 						<td>
-							<span>첨부 파일</span>
-						</td>
-						<td colspan="7">
-							<div id="post_file" style="min-height: 100px;"></div>
-						</td>
+								<span>첨부 파일</span>
+							</td>
+							<td colspan="7">
+							<div id="output"></div>								
+							</td>
 					</tr>
-				</c:if>
+				<%-- </c:if> --%>
 			</tbody>
 		</table>
 		
@@ -178,7 +177,7 @@
 	let searchVal = '';
 	
 	$(function() {
-		fnBoardPostInit(); //로그2번찍힘
+		fnBoardPostInit();
 	});
 	
 	
@@ -190,16 +189,17 @@
 		};
 		callAjaxPost('/board/boardPostDetail.json', callParams, function(data){
 			let postData = data['data'];
+			let postFile = data['file'];
 			
 			//displayCheck(postData);
-			displayContents(postData);
+			displayContents(postData, postFile);
 		});
 		
 	}
 	
 	
 	//기능 숨김 및 표시 처리
-	function displayCheck(postData) {
+	function displayCheck(postData, postFile) {
 		//팝업 여부
 		if(postData['POST_POPUP_YN'] == 'Y') {
 			$('#post_popup_yn_div').show();
@@ -231,7 +231,7 @@
 	
 	
 	//내용 표시
-	function displayContents(postData) {
+	function displayContents(postData, postFile) {
 		
 		if(postData['CRT_USR_ID'] == '${mstrUserIdAttr}') {
 			$('#btn_post_modify').show();
@@ -272,8 +272,9 @@
 		}
 		
 		//TODO 첨부파일 리스트 표시
-		if(postData['file']) {
-			postData.forEach((attachFile, idx) => {
+		if(postFile) {
+			postFile.forEach((attachFile, idx) => {
+				$('#output').append('<p>파일이름 : ' + postFile[idx]['ORG_FILE_NM'] + '</p>');
 				
 			});
 		}

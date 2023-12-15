@@ -33,7 +33,7 @@
 			, MOD_DT_TM
 			, MOD_USR_ID
 		FROM 
-			PORTAL.BOARD <!-- LEFT JOIN PORTAL_ADMIN pa -->
+			PORTAL.BOARD
 		WHERE 1=1
 			AND BOARD.BRD_ID = #{boardId}
 			AND DEL_YN = 'N'
@@ -274,4 +274,32 @@
     		  , #{userId}
     	)
 	</insert>
+	
+	<update id="Board.boardPostUpdate" parameterType="Map"> <!-- keyProperty="keyNum" -->
+		<!-- <selectKey resultType="int" keyProperty="insertKey" order="BEFORE">
+        	SELECT
+        		NVL(MAX(post.POST_ID), 1) AS INSERTKEY
+        	FROM 
+        		PORTAL.BOARD_POST post
+        	WHERE 1=1
+				AND post.BRD_ID = #{BRD_ID}
+    	</selectKey> -->
+    	UPDATE PORTAL.BOARD_POST
+    		SET
+    		    BRD_ID = #{BRD_ID}
+    		  , POST_TITLE = #{POST_TITLE}
+    		  , POST_CONTENT = #{POST_CONTENT}
+    		  , POST_VIEW_AUTH = #{POST_VIEW_AUTH}
+    		  , POPUP_YN = #{POPUP_YN}
+    		  , POPUP_START_DT_TM = #{POPUP_START_DT_TM}
+    		  , POPUP_END_DT_TM = #{POPUP_END_DT_TM}
+    		  , SECRET_YN = #{SECRET_YN}
+    		  , FIX_YN = #{FIX_YN}
+    		  , DEL_YN = 'N'
+    		  , MOD_DT_TM = SYSDATE
+    		  , MOD_USR_ID = #{userId}
+    		WHERE
+    			POST_ID = #{POST_ID}
+	</update>
+	
 </mapper>

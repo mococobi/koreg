@@ -2,6 +2,7 @@ package com.custom.board.controller;
 
 import java.net.FileNameMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.custom.admin.service.AdminService;
 import com.custom.board.service.BoardService;
 import com.microstrategy.web.app.tags.Log;
 import com.mococo.web.util.ControllerUtil;
@@ -32,6 +34,8 @@ public class BoardController {
     
     @Autowired
     BoardService boardService;
+    @Autowired
+    AdminService adminService;
     
     /**
      * 게시판 - 게시물 조회 화면 이동
@@ -141,7 +145,6 @@ public class BoardController {
     		//Map<String, Object> boardMap = boardService.boardList(request, response, params);
         	Map<String, Object> boardMap = boardService.boardPostDetail(request, response, params);
     		view.addObject("postData", boardMap);
-    		
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
 			view.addObject("data", rtnMap);
@@ -181,15 +184,64 @@ public class BoardController {
      * @param params
      * @param request
      * @return
+     * @throws Exception 
      */
     @RequestMapping(value = "/board/boardPostInsert.json", method = {RequestMethod.GET, RequestMethod.POST})
-	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) {
+	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception {
     	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+    	
+    	{
+    		//관리자 권한 체크
+	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
+	    	
+	    	LOGGER.debug("AUTHLIST : [{}]", portalAuthList);
+	    	
+	    	if(params.get("BRD_ID").equals("1")) {
+		    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
+		    		rtnMap = ControllerUtil.getFailMap("portal.admin.auth.error");
+		    		return rtnMap;
+	    		}
+	    	}
+    	}    	
     	
 		try {
 			Map<String, Object> rtnList = new HashMap<String, Object>();
     		rtnList = boardService.boardPostInsert(request, response, params);
+    		rtnMap.putAll(rtnList);
+		} catch (Exception e) {
+			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			LOGGER.error("boardPostDetail Exception", e);
+		}
+		
+		return rtnMap;
+	}
+    
+    
+    @RequestMapping(value = "/board/boardPostUpdate.json", method = {RequestMethod.GET, RequestMethod.POST})
+	public Map<String, Object> boardPostUpdate(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception {
+    	LOGGER.debug("params : [{}]", params);
+    	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+    	
+    	/*
+    	{
+    		//관리자 권한 체크
+	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
+	    	
+	    	LOGGER.debug("AUTHLIST : [{}]", portalAuthList);
+	    	
+	    	if(params.get("BRD_ID").equals("1")) {
+		    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
+		    		rtnMap = ControllerUtil.getFailMap("portal.admin.auth.error");
+		    		return rtnMap;
+	    		}
+	    	}
+    	}
+    	*/
+    	
+		try {
+			Map<String, Object> rtnList = new HashMap<String, Object>();
+    		rtnList = boardService.boardPostUpdate(request, response, params);
     		rtnMap.putAll(rtnList);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
