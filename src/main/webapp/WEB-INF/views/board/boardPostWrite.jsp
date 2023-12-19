@@ -1,12 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
+<%@ page import="com.mococo.web.util.CustomProperties" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%
-String boardId = (String) request.getParameter("boardId");
-String postId = (String) request.getParameter("postId");
-
-List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
+	String boardId = (String)request.getParameter("boardId");
+	String postId = (String)request.getParameter("postId");
+	
+	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
+	
+	
+	String attachBaseFileSize = (String)CustomProperties.getProperty("attach.base.file.size");
+	String attachBaseFileExtension = (String)CustomProperties.getProperty("attach.base.file.extension");
+	
+	pageContext.setAttribute("attachBaseFileSize", attachBaseFileSize);
+	pageContext.setAttribute("attachBaseFileExtension", attachBaseFileExtension);
 %>
 <!DOCTYPE html>
 <html>
@@ -35,7 +43,7 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 		<div class="row mb-3">
 			<div class="col">
 				<button id="btn_post_modify" class="btn btn-secondary btn-sm" onclick="updateBoardPost()" style="display: none;">저장</button>
-				<button id="btn_post_write" type="button" onclick='createBoardPost()'>작성</button>
+				<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick='createBoardPost()'>작성</button>
 			</div>
 			<div class="col text-end">
 				<button class="btn btn-secondary btn-sm" onclick="moveCommunityPage(<%=boardId%>)">목록</button>
@@ -148,9 +156,9 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 							</td>
 							<td colspan="7">
 								<div style="">
-									<input id="post_file" class="form-control" type="file" multiple accept="text/plain, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/html, .pdf, image/*">
+									<input id="post_file" class="form-control" type="file" multiple>
 								</div>
-								<div id="output"></div>
+								<div id="post_file_output" class="list-group"></div>
 							</td>
 						</tr>
 					</c:if>
@@ -165,10 +173,27 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 	let boardId = <%=boardId%>;
 	let postId = <%=postId%>;
 	
+	let editor;
+	let filesObj = {};
+	let fileObjIndex = 0;
+	let deleteFileIds = [];
+	
 	$(function() {
+		fnBoardPostInit();
+		
 		if(postId != null) {
 			//수정
-			fnBoardPostInit();
+			let callParams = {
+				  boardId : boardId
+				, postId : postId
+			};
+				
+			callAjaxPost('/board/boardPostDetail.json', callParams, function(data){
+				let postData = data['data'];
+				let postFile = data['file'];
+				
+				displayContents(postData, postFile);
+			});
 		} else {
 			//신규
 			$('#post_write_not').hide();
@@ -179,18 +204,105 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 	//초기 함수
 	function fnBoardPostInit() {
 		
-		let callParams = {
-				  boardId : boardId
-				, postId : postId
-			};
-			
-		callAjaxPost('/board/boardPostDetail.json', callParams, function(data){
-			let postData = data['data'];
-			let postFile = data['file'];
-			
-			//displayCheck(postData);
-			displayContents(postData, postFile);
+		//에디터 설정
+		editor = new toastui.Editor({
+			  el: document.querySelector('#post_content') // 에디터를 적용할 요소 (컨테이너)
+			, height: '400px' // 에디터 영역의 높이 값 (OOOpx || auto)
+			, initialEditType: 'wysiwyg' // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
+			, initialValue: '' // 내용의 초기 값으로, 반드시 마크다운 문자열 형태여야 함
+			, previewStyle: 'vertical' // 마크다운 프리뷰 스타일 (tab || vertical)
 		});
+		
+		
+		//달력 지우기
+		$('#datefilter').on('cancel.daterangepicker', function(ev, picker) {  
+			$('#startDateInput').val('');
+			$('#endDateInput').val('');
+		});
+		
+		
+		//달력 설정
+		$('#datefilter').daterangepicker({
+				'locale': {
+			         'format': 'YYYY-MM-DD hh:mm A'
+			        , 'separator': ' ~ '
+			        , 'applyLabel': '확인'
+			        , 'cancelLabel': '지우기'
+			        , 'fromLabel': 'From'
+			        , 'toLabel': 'To'
+			        , 'customRangeLabel': 'Custom'
+			        , 'weekLabel': 'W'
+			        , 'daysOfWeek': ['일', '월', '화', '수', '목', '금', '토']
+					, 'monthNames': ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+				}
+				, 'startDate': new Date()
+				, 'endDate': new Date()
+				, 'minDate': moment()
+				, 'drops': 'auto'
+			}
+			, function (start, end, label) {
+				$('#startDateInput').val(start.format('YYYY-MM-DD'));
+				$('#endDateInput').val(end.format('YYYY-MM-DD'));
+			}
+		);
+		
+		
+		//파일 변경
+		$('#post_file').change(function(e) {
+			let files = e.target.files;
+			
+			for (let i=0; i < files.length; i++) {
+				
+				let appendCheck = true;
+				let fileExtension = getExtensionOfFilename(files[i]['name']);
+				if(files[i]['size'] > ${attachBaseFileSize}) {
+					appendCheck = false;
+					alert(files[i]['name'] + '의 크기가 제한에 초과되었습니다.\n제한 용량 : ' + formatFileSize(${attachBaseFileSize}) + '\n현재 용량 : ' + formatFileSize(files[i]['size']));
+				} else if('${attachBaseFileExtension}'.indexOf(fileExtension.toLocaleUpperCase()) == -1) {
+					appendCheck = false;
+					alert(files[i]['name'] + '의 확장자가 지원되지 않습니다.\n현재 확장자 : ' + fileExtension);
+				}
+				
+				if(appendCheck) {
+					filesObj[fileObjIndex++] = files[i];
+					
+					let strongHtml = $('<span>', {
+						  class : 'text-gray-dark'
+						, text : files[i]['name'] + '\t' + formatFileSize(files[i]['size'])
+						, title : files[i]['name']
+					});
+					
+					let aHtml = $('<a>', {
+						  class : 'text-gray-dark'
+						, text : '삭제'
+						, title : '삭제'
+						, style : 'cursor:pointer;'
+						, 'data-index' : fileObjIndex - 1
+						, click : function(e) {
+							delete filesObj[$(this).attr('data-index')];
+							$(this).parent().parent().parent().remove();
+						}
+					});
+					
+					let divHtml1 = $('<div>', {
+						class : 'd-flex justify-content-between'
+					}).append(strongHtml).append(aHtml);
+					
+					let divHtml2 = $('<div>', {
+						class : 'pb-3 mb-0 small lh-sm border-bottom w-100'
+					}).append(divHtml1);
+					
+					let divHtml3 = $('<div>', {
+						class : 'd-flex text-body-secondary pt-3'
+					}).append(divHtml2);
+					
+					$('#post_file_output').append(divHtml3);
+				}
+			}
+			
+			$('#post_file').val('');
+		});
+
 	}
 	
 	
@@ -208,11 +320,7 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);
 		$('#post_create_date').text(changeDisplayDate(postData['CRT_DT_TM'], 'YYYY-MM-DD'));
 		$('#post_count').text(postData['POST_VIEW_COUNT']);
-		//$('#post_content').setHTML(postData['POST_CONTENT']);
 		editor.setHTML(postData['POST_CONTENT']);
-		//$('#post_content').html(postData['POST_CONTENT']);
-		//$('#post_content').getMarkdown(postData['POST_CONTENT']);
-		//editor.setMarkdown(postData['POST_CONTENT']);
 		
 		if(postData['POPUP_YN'] == 'Y') {
 			$('#popup_yn').prop('checked', true);
@@ -240,73 +348,42 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 			$('#post_fix_yn').prop('checked', false);
 		}
 		
-		//TODO 첨부파일 리스트 표시
+		//첨부파일 리스트 표시
 		if(postFile) {
 			postFile.forEach((attachFile, idx) => {
-				$('#output').append('<p>파일이름 : ' + postFile[idx]['ORG_FILE_NM'] + '</p>');
+				let strongHtml = $('<span>', {
+					  class : 'text-gray-dark'
+					, text : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT'] + '\t' + formatFileSize(attachFile['FILE_SIZE'])
+					, title : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT']
+				});
 				
+				let aHtml = $('<a>', {
+					  class : 'text-gray-dark'
+					, text : '삭제'
+					, title : '삭제'
+					, style : 'cursor:pointer;'
+					, click : function(e) {
+						deleteFileIds.push(attachFile['FILE_ID']);
+						$(this).parent().parent().parent().remove();
+					}
+				});
+				
+				let divHtml1 = $('<div>', {
+					class : 'd-flex justify-content-between'
+				}).append(strongHtml).append(aHtml);
+				
+				let divHtml2 = $('<div>', {
+					class : 'pb-3 mb-0 small lh-sm border-bottom w-100'
+				}).append(divHtml1);
+				
+				let divHtml3 = $('<div>', {
+					class : 'd-flex text-body-secondary pt-3'
+				}).append(divHtml2);
+				
+				$('#post_file_output').append(divHtml3);
 			});
 		}
 	}
-	
-	
-	//첨부파일 이름 출력
-	let input = $('#post_file');
-	let output = $('#output');
-
-	input.on('change', (event) => {
-		let files = event.target.files;
-		output.text(Array.from(files).map(file => '파일명 : ' + file.name + '   [크기 : ' + formatFileSize(file.size) + ']').join('\n'));
-	});
-		
-	function formatFileSize(size) {
-		if (size > 9999) {
-			let fileSizeInKB = size / 1024;
-			return Math.round(fileSizeInKB.toFixed(2)) + ' KB';
-		} else {
-			return size + ' Byte';
-		}
-	}
-		
-	let editor = new toastui.Editor({
-		  el: document.querySelector('#post_content') // 에디터를 적용할 요소 (컨테이너)
-		, height: '400px' // 에디터 영역의 높이 값 (OOOpx || auto)
-		, initialEditType: 'wysiwyg' // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
-		, initialValue: '' // 내용의 초기 값으로, 반드시 마크다운 문자열 형태여야 함
-		, previewStyle: 'vertical' // 마크다운 프리뷰 스타일 (tab || vertical)
-	});
-
-	
-	//달력 지우기
-	$('#datefilter').on('cancel.daterangepicker', function(ev, picker) {  
-		$('#startDateInput').val('');
-		$('#endDateInput').val('');
-	});
-	
-	//달력 설정
-	//$('input[name="datefilter"]').daterangepicker({
-	$('#datefilter').daterangepicker({
-	    'locale': {
-	         'format': 'YYYY-MM-DD hh:mm A'
-	        , 'separator': ' ~ '
-	        , 'applyLabel': '확인'
-	        , 'cancelLabel': '지우기'
-	        , 'fromLabel': 'From'
-	        , 'toLabel': 'To'
-	        , 'customRangeLabel': 'Custom'
-	        , 'weekLabel': 'W'
-	        , 'daysOfWeek': ['일', '월', '화', '수', '목', '금', '토']
-			, 'monthNames': ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
-		}
-			, 'startDate': new Date()
-			, 'endDate': new Date()
-			, 'minDate': moment()
-			, 'drops': 'auto'
-		},
-		function (start, end, label) {
-			$('#startDateInput').val(start.format('YYYY-MM-DD'));
-			$('#endDateInput').val(end.format('YYYY-MM-DD'));
-		});
 	
 	
 	//체크박스 달력 설정
@@ -334,7 +411,7 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 	    }
 	}
 	
-
+	
 	//입력 정보 확인 체크
 	function checkPostInput() {
 		let rtnCheck = true;
@@ -348,31 +425,6 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 		if(editor.getHTML() == '') {
 			alert('내용을 입력하세요');
 			editor.getHTML().focus();
-			return false;
-		}
-		
-		// 첨부 파일 유효성(용량) 체크
-		let invalidFiles=[];
-		let invalidExtensions=[];
-		
-		$.each($('#post_file')[0].files, function(idx, item) {
-			let fileExtension = item.name.split('.').pop().toLowerCase();
-			
-			if (item.size > 100000) {
-				invalidFiles.push(item.name);
-			}
-			if (!allowedExtensions.includes(fileExtension)) {
-				invalidExtensions.push(item.name);
-			}
-		});
-		
-		if (invalidFiles.length > 0) {
-			alert("다음 파일의 첨부 허용된 용량을 초과하였습니다.\n확인 후 다시 첨부해 주세요.\n" + invalidFiles.join("\n")) ;
-			return false;
-		}
-		
-		if (invalidExtensions.length > 0) {
-			alert("다음 형식의 파일은 첨부할 수 없습니다.\n확인 후 다시 첨부해 주세요.\n" + invalidExtensions.join("\n")) ;
 			return false;
 		}
 
@@ -396,9 +448,9 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 				formData.append('POPUP_START_DT_TM', $('#startDateInput').val());
 				formData.append('POPUP_END_DT_TM', $('#endDateInput').val());
 				//multiple 파일 갯수에 만큼 저장
-				for(i=0; i<$('#post_file')[0].files.length; i++){
-					formData.append('FILE_'+i, $('#post_file')[0].files[i]);
-				}
+				Object.values(filesObj).forEach((file, idx) => {
+					formData.append('ATTACH_FILE_' + idx, file);
+				});
 				
 				callAjaxForm('/board/boardPostInsert.json', formData, function(data) {
 					console.log(data);
@@ -413,6 +465,7 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 		    }
 		}
 	}
+	
 		
 	//게시글 수정
 	function updateBoardPost() {
@@ -431,9 +484,14 @@ List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH")
 				formData.append('POPUP_START_DT_TM', $('#startDateInput').val());
 				formData.append('POPUP_END_DT_TM', $('#endDateInput').val());
 				//multiple 파일 갯수에 만큼 저장
-				for(i=0; i<$('#post_file')[0].files.length; i++){
-					formData.append('FILE_'+i, $('#post_file')[0].files[i]);
-				}
+				Object.values(filesObj).forEach((file, idx) => {
+					formData.append('ATTACH_FILE_' + idx, file);
+				});
+				
+				//삭제 첨부파일 추가
+				deleteFileIds.forEach(id => {
+					formData.append('deleteFileIds', id);
+				});
 				
 				callAjaxForm('/board/boardPostUpdate.json', formData, function(data) {
 					console.log(data);

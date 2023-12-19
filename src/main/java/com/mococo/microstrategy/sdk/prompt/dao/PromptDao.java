@@ -32,4 +32,8 @@ public interface PromptDao {
 
     public String getControlType();
 
+	int getPromptType();
+
+	int getPromptSubType();
+
 }

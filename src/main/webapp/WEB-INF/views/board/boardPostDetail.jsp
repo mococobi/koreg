@@ -105,7 +105,7 @@
 						</td>
 					</tr>
 				<tr>
-					<c:if test="${postData['POST_FIX_YN'] eq 'Y'}">
+					<c:if test="${postData['data']['POST_FIX_YN'] eq 'Y'}">
 						<td  id="post_fix_yn_div">
 							<span>상단 고정</span>
 						</td>
@@ -113,7 +113,7 @@
 							<input type="checkbox" id="post_fix_yn" disabled>
 						</td>
 					</c:if>
-					<c:if test="${postData['POST_SECRET_YN'] eq 'Y'}">
+					<c:if test="${postData['data']['POST_SECRET_YN'] eq 'Y'}">
 						<td id="post_secret_yn_div">
 							<span>비밀글</span>
 						</td>
@@ -122,7 +122,7 @@
 						</td>
 					</c:if>
 				</tr>
-					<c:if test="${postData['BRD_VIEW_AUTH'] eq 'Y'}">
+					<c:if test="${postData['data']['BRD_VIEW_AUTH'] eq 'Y'}">
 						<td>
 							<span>보기 권한</span>
 						</td>
@@ -138,16 +138,17 @@
 						<div id="post_content" style="min-height: 300px;"></div>
 					</td>
 				</tr>
-				<%-- <c:if test="${postData['POST_FILE_YN'] eq 'Y'}"> --%>
+				<c:if test="${postData['data']['POST_FILE_YN'] eq 'Y'}">
 					<tr id="post_file_yn_div">
 						<td>
-								<span>첨부 파일</span>
-							</td>
-							<td colspan="7">
-							<div id="output"></div>								
-							</td>
+							<span>첨부 파일</span>
+						</td>
+						<td colspan="7">
+							<div id="post_file" class="list-group">
+							</div>								
+						</td>
 					</tr>
-				<%-- </c:if> --%>
+				</c:if>
 			</tbody>
 		</table>
 		
@@ -191,42 +192,9 @@
 			let postData = data['data'];
 			let postFile = data['file'];
 			
-			//displayCheck(postData);
 			displayContents(postData, postFile);
 		});
 		
-	}
-	
-	
-	//기능 숨김 및 표시 처리
-	function displayCheck(postData, postFile) {
-		//팝업 여부
-		if(postData['POST_POPUP_YN'] == 'Y') {
-			$('#post_popup_yn_div').show();
-		} else {
-			$('#post_popup_yn_div').hide();
-		}
-		
-		//비밀글 여부
-		if(postData['POST_SECRET_YN'] == 'Y') {
-			$('#post_secret_yn_div').show();
-		} else {
-			$('#post_secret_yn_div').hide();
-		}
-		
-		//상단 고정 여부
-		if(postData['POST_FIX_YN'] == 'Y') {
-			$('#post_fix_yn_div').show();
-		} else {
-			$('#post_fix_yn_div').hide();
-		}
-		
-		//첨부 파일 여부
-		if(postData['POST_FILE_YN'] == 'Y') {
-			$('#post_file_yn_div').show();
-		} else {
-			$('#post_file_yn_div').hide();
-		}
 	}
 	
 	
@@ -271,11 +239,25 @@
 			$('#post_fix_yn').prop('checked', false);
 		}
 		
-		//TODO 첨부파일 리스트 표시
+		//첨부파일
 		if(postFile) {
 			postFile.forEach((attachFile, idx) => {
-				$('#output').append('<p>파일이름 : ' + postFile[idx]['ORG_FILE_NM'] + '</p>');
+				let fileHtml = $('<a>', {
+					  class : 'list-group-item list-group-item-action list-group-item-secondary'
+					, style : 'cursor:pointer;'
+					, text : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT'] + '\t' + formatFileSize(attachFile['FILE_SIZE'])
+					, title : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT']
+					, click : function(e) {
+						let fileData = {
+							  BRD_ID : boardId
+							, POST_ID : attachFile['POST_ID']
+							, FILE_ID : attachFile['FILE_ID']
+						};
+						downloadAttachFile(fileData);
+					}
+				});
 				
+				$('#post_file').append(fileHtml);
 			});
 		}
 	}

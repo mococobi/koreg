@@ -2,7 +2,6 @@ package com.custom.board.service.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -126,21 +124,18 @@ public class BoardServiceImpl implements BoardService {
     		params.put("POPUP_END_DT_TM", null);
     	}
     	
-    	
 		//게시판 정보 입력
 		int boardinsertCount = simpleBizDao.insert("Board.boardPostInsert", params);
-	
+		
+		//첨부 파일 등록
 		List<Map<String,Object>> lmRstUploadedFile = null;
-	    //params = uploadFile(request, params);
 		lmRstUploadedFile = uploadFile(request, params);
 	    int totalFileInsertCount = 0;
 	    int fileInsertCount = -1;
 	    for (Map<String,Object> tmpFile : lmRstUploadedFile) {
-	    	
 	    	tmpFile.put("POST_ID", params.get("insertKey"));
 	    	tmpFile.put("BRD_ID", params.get("BRD_ID"));
 	    	tmpFile.put("userId", HttpUtil.getLoginUserId(request));
-	    	
 	    	
 	    	fileInsertCount = simpleBizDao.insert("Board.boardPostFileInsert", tmpFile);
 	    	LOGGER.debug("file Insert result : [{}], [{}]", fileInsertCount, (String) tmpFile.get("orgFileName"));
@@ -149,11 +144,11 @@ public class BoardServiceImpl implements BoardService {
 	    }
 	    LOGGER.debug("total file Insert result : [{}]", fileInsertCount);
 	    
+	    rtnMap.put("BRD_ID", params.get("BRD_ID"));
 		rtnMap.put("POST_ID", params.get("insertKey"));
 		rtnMap.put("INSERT_POST_CNT", boardinsertCount);
 		rtnMap.put("INSERT_FILE_CNT", totalFileInsertCount);
-		rtnMap.put("BRD_ID", params.get("BRD_ID"));
-		rtnMap.put("params", params);
+//		rtnMap.put("params", params);
 	    
 		Map<String, Object> logParams = new HashMap<String, Object>();
 		
@@ -162,8 +157,6 @@ public class BoardServiceImpl implements BoardService {
 		logParams.put("POST_TITLE", params.get("POST_TITLE"));
 		logParams.put("CRT_USR_ID", params.get("userId"));
 		logParams.put("INSERT_FILE_CNT", totalFileInsertCount);
-		
-		
 		
 		//포탈 로그 기록(게시물 + 파일 등록)
 		logService.addPortalLog(request, params.get("BRD_ID").toString(), params.get("insertKey").toString(), "CREATE", logParams);
@@ -182,7 +175,6 @@ public class BoardServiceImpl implements BoardService {
     	int boardinsertFileCount = 0;
 		long atchFileId = -1;
 		
-		
 		List<Map<String,Object>> lmRstUploadedFile = new ArrayList<Map<String,Object>>();
 		Map<String,Object> mRstUploadedFile = null;
 		
@@ -192,6 +184,12 @@ public class BoardServiceImpl implements BoardService {
 			
 			mRstUploadedFile = new HashMap<String, Object>();
 			try {
+				if(fileId.indexOf("ATTACH_FILE") > -1) {
+					mRstUploadedFile.put("fileType", "ATTACH_FILE");
+				} else {
+					mRstUploadedFile.put("fileType", "OTHER");
+				}
+				
 				String orgFileName = URLDecoder.decode(FilenameUtils.getBaseName(file.getOriginalFilename()), "utf-8");
 				
 				//파일 확인
@@ -235,16 +233,6 @@ public class BoardServiceImpl implements BoardService {
 					mRstUploadedFile.put("orgFileType", "");
 				}
 				
-				/*if(!orgFileName.equals("")) {
-					
-					Map<String, Object> mapFile = simpleBizDao.select("bulletin.select-max-index-AttachFileList", params);
-					atchFileId = ((BigDecimal)mapFile.get("TOTAL")).longValue() + 1;
-					mRstUploadedFile.put("atchFileId", atchFileId);
-					mRstUploadedFile.put("fileSize", file.getSize());
-					
-					boardinsertFileCount += simpleBizDao.insert("bulletin.insert-AttachFileList", params);
-				}*/
-				
 				lmRstUploadedFile.add(mRstUploadedFile);
 			} catch (IllegalStateException | IOException e) {
 				LOGGER.error("!!! error", e);
@@ -270,34 +258,44 @@ public class BoardServiceImpl implements BoardService {
     		params.put("POPUP_END_DT_TM", null);
     	}
     	
-    	
 		//게시판 정보 수정
 		int boardUpdateCount = simpleBizDao.update("Board.boardPostUpdate", params);
 		
+		//첨부 파일 등록
 		List<Map<String,Object>> lmRstUploadedFile = null;
-	    //params = uploadFile(request, params);
 		lmRstUploadedFile = uploadFile(request, params);
 	    int totalFileUpdateCount = 0;
-	    int fileUpdateCount = -1;
+	    int fileInsertCount = -1;
 	    for (Map<String,Object> tmpFile : lmRstUploadedFile) {
-	    	
 	    	tmpFile.put("POST_ID", params.get("POST_ID"));
 	    	tmpFile.put("BRD_ID", params.get("BRD_ID"));
 	    	tmpFile.put("userId", HttpUtil.getLoginUserId(request));
 	    	
+	    	fileInsertCount = simpleBizDao.update("Board.boardPostFileInsert", tmpFile);
+	    	LOGGER.debug("file Update result : [{}], [{}]", fileInsertCount, (String) tmpFile.get("orgFileName"));
 	    	
-	    	fileUpdateCount = simpleBizDao.update("Board.boardPostFileInsert", tmpFile);
-	    	LOGGER.debug("file Update result : [{}], [{}]", fileUpdateCount, (String) tmpFile.get("orgFileName"));
-	    	
-	    	totalFileUpdateCount += fileUpdateCount;
+	    	totalFileUpdateCount += fileInsertCount;
 	    }
-	    LOGGER.debug("total file Update result : [{}]", fileUpdateCount);
+	    LOGGER.debug("total file Update result : [{}]", fileInsertCount);
 	    
-		rtnMap.put("POST_ID", params.get("POST_ID"));
-		rtnMap.put("INSERT_POST_CNT", fileUpdateCount);
-		rtnMap.put("INSERT_FILE_CNT", totalFileUpdateCount);
+	    //첨부 파일 삭제
+	    String[] delete_file_ids = request.getParameterValues("deleteFileIds");
+	    List<String> deleteFileList = new ArrayList<String>();
+		if (delete_file_ids != null) {
+			for (int i = 0; i < delete_file_ids.length; i++) {
+				deleteFileList.add(delete_file_ids[i]);
+	        }
+			
+			params.put("deleteFileList", deleteFileList);
+			int fileDeleteCount = simpleBizDao.update("Board.boardPostFileDelete", params);
+		}
+	    
 		rtnMap.put("BRD_ID", params.get("BRD_ID"));
-		rtnMap.put("params", params);
+		rtnMap.put("POST_ID", params.get("POST_ID"));
+		rtnMap.put("INSERT_POST_CNT", boardUpdateCount);
+		rtnMap.put("INSERT_FILE_CNT", totalFileUpdateCount);
+		rtnMap.put("DELETE_FILE_CNT", totalFileUpdateCount);
+//		rtnMap.put("params", params);
 	    
 		Map<String, Object> logParams = new HashMap<String, Object>();
 		
@@ -306,79 +304,26 @@ public class BoardServiceImpl implements BoardService {
 		logParams.put("POST_TITLE", params.get("POST_TITLE"));
 		logParams.put("MOD_USR_ID", params.get("userId"));
 		logParams.put("INSERT_FILE_CNT", totalFileUpdateCount);
+		logParams.put("DELETE_FILE_CNT", deleteFileList.size());
 		
 		//포탈 로그 기록(게시물 + 파일 등록)
 		logService.addPortalLog(request, params.get("BRD_ID").toString(), params.get("POST_ID").toString(), "UPDATE", logParams);
 			
 		return rtnMap;
     }
+    
+    
+    @Override
+    public Map<String, Object> boardPostFileSelect(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception{
+    	Map<String, Object> rtnMap = new HashMap<String, Object>();
+    	
+    	params.put("userId", HttpUtil.getLoginUserId(request));
+    	
+    	rtnMap = simpleBizDao.select("Board.boardPostFileSelect", params);
+        
+        return rtnMap;
+    }
+    
 	
 }
-//private Map<String, Object> uploadFile(MultipartHttpServletRequest request, Map<String, Object> params) {
-//int boardinsertFileCount = 0;
-//long atchFileId = -1;
-//List<Map<String,Object>> lmRstUploadedFile = new ArrayList<Map<String,Object>>();
-//
-//for (Iterator<String> i = request.getFileNames(); i.hasNext(); ) {
-//	String fileId = i.next();
-//	MultipartFile file = request.getFile(fileId);
-//	
-//	try {
-//		String orgFileName = URLDecoder.decode(FilenameUtils.getBaseName(file.getOriginalFilename()), "utf-8");
-//		
-//		//파일 확인
-//		if(!orgFileName.equals("")) {
-//			SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmssSSS_");
-//			String currentTime = timeFormat.format(new Date());
-//			String newFileName = currentTime + HttpUtil.replaceFilePath(RandomStringUtils.randomAlphanumeric(32));
-//			
-//			params.put("newFileName", newFileName);
-//			params.put("orgFileName", orgFileName);
-//			params.put("orgFileType", FilenameUtils.getExtension(file.getOriginalFilename()));
-//			
-//			String filePath = CustomProperties.getProperty("attach.base.location");//\mococo\portal\
-//			String uploadFilePath = filePath + (String)params.get("BRD_ID") + File.separator;
-//			params.put("uploadFilePath", uploadFilePath);
-//			
-//			uploadFilePath += newFileName + '.' + FilenameUtils.getExtension(file.getOriginalFilename());
-//			File uploadFile = new File(uploadFilePath);
-//			file.transferTo(uploadFile);
-//			
-//			/*
-//			SLBsUtil sUtil = new SLBsUtil();
-//			int encrypted = sUtil.isEncryptFile(uploadFilePath);
-//			
-//			if(encrypted == 1) {
-//				//암호화 파일 처리
-//				File rtnDecDrmFile = DrmUtil.decDrm(uploadFile);
-//				uploadFile.delete();
-//				FileUtils.moveFile(rtnDecDrmFile, new File(uploadFilePath.replace("tmp_", "")));
-//			} else if(encrypted == 0) {
-//				//일반파일 처리
-//				FileUtils.moveFile(uploadFile, new File(uploadFilePath.replace("tmp_", "")));
-//			}
-//			*/
-//			
-//		} else {
-//			params.put("newFileName", "");
-//			params.put("orgFileName", "");
-//			params.put("orgFileType", "");
-//		}
-//		
-//		if(!orgFileName.equals("")) {
-//			
-//			Map<String, Object> mapFile = simpleBizDao.select("bulletin.select-max-index-AttachFileList", params);
-//			atchFileId = ((BigDecimal)mapFile.get("TOTAL")).longValue() + 1;
-//			params.put("atchFileId", atchFileId);
-//			params.put("fileSize", file.getSize());
-//			
-//			boardinsertFileCount += simpleBizDao.insert("bulletin.insert-AttachFileList", params);
-//		}
-//		
-//	} catch (IllegalStateException | IOException e) {
-//		LOGGER.error("!!! error", e);
-//	}
-//}
-//
-//return params;
-//}
+

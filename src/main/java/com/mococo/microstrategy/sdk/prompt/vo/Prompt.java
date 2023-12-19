@@ -23,6 +23,9 @@ public class Prompt {
     private Object exValidation = null;
 
     private String daoClassName = null;
+    
+    private int promptType = -1;
+	private int promptSubType = -1;
 
     public Prompt(String id, String title) {
         this.id = id;
@@ -161,16 +164,45 @@ public class Prompt {
     public void setDaoClassName(String daoClassName) {
         this.daoClassName = daoClassName;
     }
+    
+    public int getPromptType() {
+		return promptType;
+	}
+
+	public void setPromptType(int promptType) {
+		this.promptType = promptType;
+	}
+
+	public int getPromptSubType() {
+		return promptSubType;
+	}
+
+	public void setPromptSubType(int promptSubType) {
+		this.promptSubType = promptSubType;
+	}
 
     @Override
     public String toString() {
-        return new StringBuilder().append("{ id: ").append(id).append(", title: ").append(title).append(", type: ")
-                .append(type).append(", pin: ").append(pin).append(", min: ").append(min).append(", max: ").append(max)
-                .append(", defaultAnswer: ").append(defaultAnswer).append(", defaultAnswers: ").append(defaultAnswers)
-                .append(", suggestedAnswers: ").append(suggestedAnswers).append(", required: ").append(required)
-                .append(", controlType: ").append(controlType).append(", exUiType: ").append(exUiType)
-                .append(", exExtUiType: ").append(exExtUiType).append(", exAction: ").append(exAction)
-                .append(", exValidation: ").append(exValidation).append("}").toString();
+        return new StringBuilder()
+        	.append("{")
+			.append("  id: ").append(id)
+			.append(", title: ").append(title)
+			.append(", type: ").append(type)
+			.append(", pin: ").append(pin)
+			.append(", min: ").append(min)
+			.append(", max: ").append(max)
+	        .append(", defaultAnswer: ").append(defaultAnswer)
+	        .append(", defaultAnswers: ").append(defaultAnswers)
+	        .append(", suggestedAnswers: ").append(suggestedAnswers)
+	        .append(", required: ").append(required)
+	        .append(", controlType: ").append(controlType)
+	        .append(", exUiType: ").append(exUiType)
+	        .append(", exExtUiType: ").append(exExtUiType)
+	        .append(", exAction: ").append(exAction)
+	        .append(", exValidation: ").append(exValidation)
+	        .append(", promptType: ").append(promptType)
+	        .append(", promptSubType: ").append(promptSubType)
+	        .append("}").toString();
     }
 
 }

@@ -89,25 +89,6 @@ function pageGoPost(target, url, params) {
 }
 
 
-//파라메터에 포함된 정보로 ajax 호출
-function _submit(action, target, inputs) {
-    var $form = $("#__term_form");
-    if ($form.length != 0) { $form.remove(); }
-    
-    $form = $("<form id='__temp_form' action='" + action + "' target='" + target + "' method='post'></form>"); 
-    $("body").append($form);
-
-    $.each(inputs || [], function(i, v) {
-        // $form.append("<input type='hidden' name='" + i + "' value='" + v + "'/>");
-        var $input = $("<input type='hidden' name='" + i + "' value=''/>");
-        $input.val(v);
-        $form.append($input);
-    });
-    
-    $form.submit();
-}
-
-
 //XSS 방지 코드
 function XSSCheck(str, level) {
 	//숫자형 패스
@@ -140,6 +121,7 @@ function callAjaxPost(url, params, callFunction) {
 				callFunction(data);
 			} else {
 				alert(data['errorMessage']);
+				$('#portal-loading').hide();
 			}
 		}
 		, error : function(jqXHR, textStatus, errorThrown) { 
@@ -164,12 +146,34 @@ function callAjaxForm(url, params, callFunction) {
 				callFunction(data);
 			} else {
 				alert(data['errorMessage']);
+				$('#portal-loading').hide();
 			}
 		}
 		, error : function(jqXHR, textStatus, errorThrown) {
             errorProcess(jqXHR, textStatus, errorThrown);
 		}
 	});
+}
+
+
+//파라메터에 포함된 정보로 ajax 호출
+function _submit(action, target, inputs) {
+    var $form = $('[name="__temp_form"]');
+    if ($form.length != 0) {
+		$form.remove(); 
+	}
+    
+    $form = $("<form id='__temp_form' name='__temp_form' action='" + action + "' target='" + target + "' method='post'></form>"); 
+    $("body").append($form);
+
+    $.each(inputs || [], function(i, v) {
+        // $form.append("<input type='hidden' name='" + i + "' value='" + v + "'/>");
+        var $input = $("<input type='hidden' name='" + i + "' value=''/>");
+        $input.val(v);
+        $form.append($input);
+    });
+    
+    $form.submit();
 }
 
 
@@ -180,8 +184,15 @@ function errorProcess(jqXHR, textStatus, errorThrown) {
 	} else {
 		alert('에러 처리 필요');
 	}
+	
+	$('#portal-loading').hide();
 }
 
+
+//파일 다운로드
+function downloadAttachFile(fileData) {
+	_submit(__contextPath + '/app/board/downloadAttachFile.do', 'downloadTarget', fileData);
+}
 
 //날짜 타입 표시
 function changeDisplayDate(orgDate, changeType) {
@@ -354,4 +365,29 @@ function getMstrFormDefinition(type) {
 	}
 	
 	return rtnInput;
+}
+
+
+//사이즈 포맷 변경
+function formatFileSize(filesize) {
+	/*
+	if (size > 9999) {
+		let fileSizeInKB = size / 1024;
+		return Math.round(fileSizeInKB.toFixed(2)) + ' KB';
+	} else {
+		return size + ' Byte';
+	}
+	*/
+	let text = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    let e = Math.floor(Math.log(filesize) / Math.log(1024));
+    return (filesize / Math.pow(1024, e)).toFixed(2) + " " + text[e];
+}
+
+
+//확장자 추출
+function getExtensionOfFilename(filename) {
+	let _fileLen = filename.length;     /**      * lastIndexOf('.')      * 뒤에서부터 '.'의 위치를 찾기위한 함수     * 검색 문자의 위치를 반환한다.     * 파일 이름에 '.'이 포함되는 경우가 있기 때문에 lastIndexOf() 사용     */    
+	let _lastDot = filename.lastIndexOf('.');     // 확장자 명만 추출한 후 소문자로 변경    
+	let _fileExt = filename.substring(_lastDot, _fileLen).toLowerCase();     
+	return _fileExt;
 }

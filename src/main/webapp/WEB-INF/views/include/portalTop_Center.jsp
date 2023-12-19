@@ -70,26 +70,32 @@
 				<ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
 					<li>
 						<a class="navbar-brand" href="#">
-							<img id="top_menu_logo" alt="로고 이미지" src="${pageContext.request.contextPath}/_custom/image/logo/logo.png?v=20231123001" style="width: 100%; height: 40px; background-color: white;" class="d-inline-block align-top">
+							<img id="top_menu_logo" alt="로고 이미지" src="${pageContext.request.contextPath}/_custom/image/logo/gcgf/logo.png?v=20231218001" style="width: 100%; height: 40px;" class="d-inline-block align-top">
 						</a>
 					</li>
 				</ul>
 				<div class="col-md-3 text-end">
-					 <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+					<ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
 				        <li>
 				        	<button class="btn" style="cursor: default;">
 								<i class="bi bi-person-circle" style="color: white; font-size: 1.2rem;"></i>
 							</button>
 						</li>
 				        <li>
-				        	<span class="nav-link link-body-emphasis px-2" style="color: white !important;">${mstrUserNameAttr}(${mstrUserIdAttr})님 환영합니다</span>
+				        	<span class="nav-link link-body-emphasis px-2" style="color: white !important;">${mstrUserNameAttr} 님 환영합니다</span>
 				        </li>
 				        <li>
+				        	<span class="nav-link link-body-emphasis px-2" style="color: white !important;">|</span>
+				        </li>
+				        <li>
+				        	<!-- 
 							<button id="top_menu_logout" class="btn" title="로그아웃">
 								<i class="bi bi-box-arrow-right" style="color: white; font-size: 1.2rem;"></i>
 							</button>
+							-->
+							<span id="top_menu_logout" class="nav-link link-body-emphasis px-2" style="color: white !important;">로그아웃</span>
 						</li>
-				      </ul>
+					</ul>
 				</div>
 			</header>
 		</div>

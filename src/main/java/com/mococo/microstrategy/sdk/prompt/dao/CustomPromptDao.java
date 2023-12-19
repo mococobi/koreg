@@ -82,4 +82,14 @@ public class CustomPromptDao<P1, P2> implements PromptDao {
         return null;
     }
 
+	@Override
+	public int getPromptType() {
+		return -1;
+	}
+
+	@Override
+	public int getPromptSubType() {
+		return -1;
+	}
+
 }

@@ -1,10 +1,17 @@
 package com.custom.board.controller;
 
-import java.net.FileNameMap;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,14 +24,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.custom.admin.service.AdminService;
 import com.custom.board.service.BoardService;
-import com.microstrategy.web.app.tags.Log;
+import com.custom.log.service.LogService;
 import com.mococo.web.util.ControllerUtil;
+import com.mococo.web.util.CustomProperties;
+import com.mococo.web.util.HttpUtil;
 
 @Controller
 @RequestMapping("/board/*")
@@ -32,10 +40,16 @@ public class BoardController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BoardController.class);
     
+    private enum Status {OK, FILE_NOT_FOUND, EXCEPTION};
+    
     @Autowired
     BoardService boardService;
+    
     @Autowired
     AdminService adminService;
+    
+    @Autowired
+    LogService logService;
     
     /**
      * 게시판 - 게시물 조회 화면 이동
@@ -188,7 +202,7 @@ public class BoardController {
      */
     @RequestMapping(value = "/board/boardPostInsert.json", method = {RequestMethod.GET, RequestMethod.POST})
 	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception {
-    	LOGGER.debug("params : [{}]", params);
+//    	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	{
@@ -220,7 +234,7 @@ public class BoardController {
     
     @RequestMapping(value = "/board/boardPostUpdate.json", method = {RequestMethod.GET, RequestMethod.POST})
 	public Map<String, Object> boardPostUpdate(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception {
-    	LOGGER.debug("params : [{}]", params);
+//    	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	/*
@@ -251,4 +265,171 @@ public class BoardController {
 		return rtnMap;
 	}
     
+    
+	/**
+	 * 첨부파일 다운로드
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "/board/downloadAttachFile.do", method = {RequestMethod.GET, RequestMethod.POST})
+	public void download(final HttpServletRequest request, final HttpServletResponse response, @RequestParam Map<String, Object> params) throws IOException {
+		Status state = Status.OK;
+		String errorMsg = "";
+
+		FileInputStream fileInputStream = null;
+		BufferedInputStream bufferedInputStream = null;
+		ServletOutputStream servletOutputStream = null;
+		BufferedOutputStream bufferedOutputStream = null;
+		File rtnEncDrmFile = null;
+		
+		try {
+			String boardId = HttpUtil.replaceFilePath(request.getParameter("BRD_ID"));
+			String postId = HttpUtil.replaceFilePath(request.getParameter("POST_ID"));
+//			String fileId = HttpUtil.replaceFilePath(request.getParameter("FILE_ID"));
+			
+			Map<String, Object> fileMap = boardService.boardPostFileSelect(request, response, params);
+			
+			String serverFileName = fileMap.get("SRV_FILE_NM").toString();
+			String orgFileName = fileMap.get("ORG_FILE_NM").toString();
+			String fileExtension = "." + fileMap.get("FILE_EXT").toString();
+			
+			String downFilePath = CustomProperties.getProperty("attach.base.location") + boardId + "/";
+			String downFileName = HttpUtil.getDownloadFileName(orgFileName, request) + fileExtension;
+			
+			//DRM 영역
+			/*
+			SLDsFile sFile = new SLDsFile();
+			SLBsUtil sUtil = new SLBsUtil();
+			
+			int isSupportFile = sFile.DSIsSupportFile(downFilePath + downFileName);
+			int isEncrypted = sUtil.isEncryptFile(downFilePath + downFileName);
+			
+			System.out.println("지원가능 여부 : " + isSupportFile);	//0 : 지원 X, 	1 : 지원되는
+			System.out.println("암호화 여부 : " + isEncrypted);		//0 : 일반 파일, 	1 : 암호화파일
+			
+			rtnEncDrmFile = DrmUtil.encDrm(downFilePath, downFileName);
+			*/
+			
+			rtnEncDrmFile = new File(downFilePath + serverFileName);
+			fileInputStream = new FileInputStream(rtnEncDrmFile);
+			bufferedInputStream = new BufferedInputStream(fileInputStream);
+			
+			response.reset();
+			
+			/* 전송방식이 'file'일 경우, browser 별 설정도 추가하여야 한다 */
+		    response.setHeader("Content-type", "application/octet-stream");
+		    response.setHeader("Content-Disposition", "attachment; filename=" + downFileName);
+		    response.setHeader("Content-Length", Long.toString(rtnEncDrmFile.length()) );
+
+		    response.setHeader("Content-Transfer-Encoding", "binary");
+		    response.setHeader("Pragma", "no-cache");
+		    response.setHeader("Cache-Control", "private");
+		    response.setHeader("Expires", "0");
+
+			int nReadSize = 0;
+			final int BUFFER_CAPACITY = 1024;
+			
+			byte[] buf = null;
+			buf = new byte[BUFFER_CAPACITY];
+			
+			servletOutputStream = response.getOutputStream();
+			bufferedOutputStream = new BufferedOutputStream(servletOutputStream);
+
+			nReadSize = bufferedInputStream.read(buf);
+			while (nReadSize != -1) {
+				bufferedOutputStream.write(buf, 0, nReadSize);
+				nReadSize = bufferedInputStream.read(buf);				
+			}
+			
+			bufferedOutputStream.flush();
+			servletOutputStream.flush();
+			
+			/*
+			//포탈 이력
+			if(bulletinId.equals("99999")) {
+				params.put("historyAction", "download_bdp");
+			} else {
+				params.put("historyAction", "download1");
+			}
+			bulletinService.insertProtalHistory(params);
+			*/
+			
+			//포탈 로그 기록(게시물 + 파일 등록)
+			logService.addPortalLog(request, boardId, postId, "DOWNLOAD", params);
+			
+		} catch (FileNotFoundException e) {
+			LOGGER.error("error", e);
+			
+			errorMsg = e.getMessage();
+			state = Status.FILE_NOT_FOUND;
+		} catch (Exception e) {
+			LOGGER.error("error", e);
+			
+			errorMsg = e.getMessage();
+			state = Status.EXCEPTION;
+		} finally {
+			if (fileInputStream != null) {
+				try {
+					fileInputStream.close();
+				} catch (IOException e) {
+					LOGGER.error("!!! error", e);
+				}
+			}
+			if (bufferedInputStream != null) {
+				try {
+					bufferedInputStream.close();
+				} catch (IOException e) {
+					LOGGER.error("!!! error", e);
+				}
+			}
+			if (bufferedOutputStream != null) {
+				try {
+					bufferedOutputStream.close();
+				} catch (IOException e) {
+					LOGGER.error("!!! error", e);
+				}
+			}
+			if (bufferedOutputStream != null) {
+				try {
+					bufferedOutputStream.close();
+				} catch (IOException e) {
+					LOGGER.error("!!! error", e);
+				}
+			}
+			if (servletOutputStream != null) {
+				try {
+					servletOutputStream.close();
+				} catch (IOException e) {
+					LOGGER.error("!!! error", e);
+				}
+			}
+			
+			/*
+			if(rtnEncDrmFile != null) {
+				boolean isDeleteFile = rtnEncDrmFile.delete();
+				LOGGER.debug("DRM Finish. temp isDeleteFile [{}]", isDeleteFile);
+			}
+			*/
+		}
+		
+		if (state != Status.OK) {
+			LOGGER.debug("!!! 오류가 발생하였습니다.");
+			
+			if(response != null) {
+				response.reset();
+				response.setHeader("Content-type", "text/html;charset=UTF-8");
+				response.setHeader("Content-Transfer-Encoding", "chunked");
+				
+				final StringBuffer BUF = new StringBuffer(100);
+				BUF.append("<script type='text/javascript'>alert('" + errorMsg + "')</script>");
+				
+				final PrintWriter WRITER = response.getWriter();
+				if(WRITER != null) {
+					WRITER.print(BUF.toString());
+				}
+			}
+		}				
+	}
 }

@@ -55,7 +55,7 @@
 				, post.CRT_USR_ID
 				, post.CRT_USR_ID AS CRT_USR_NM
 				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
-				, (SELECT COUNT(post_file.FILE_ID) FROM PORTAL.BOARD_POST_FILE post_file WHERE post.POST_ID = post_file.POST_ID) AS POST_FILE_COUNT
+				, (SELECT COUNT(post_file.FILE_ID) FROM PORTAL.BOARD_POST_FILE post_file WHERE post_file.DEL_YN = 'N' AND post.POST_ID = post_file.POST_ID) AS POST_FILE_COUNT
 			FROM 
 				PORTAL.BOARD_POST post 
 			WHERE 1=1
@@ -203,7 +203,7 @@
         	WHERE 1=1
 				AND post.BRD_ID = #{BRD_ID}
     	</selectKey>
-    	INSERT INTO
+    	INSERT INTO /* Board.boardPostInsert */ 
     		PORTAL.BOARD_POST(
     			POST_ID
     		  , BRD_ID
@@ -236,6 +236,7 @@
     		)
 	</insert>
 	
+	
 	<insert id="Board.boardPostFileInsert" parameterType="Map" useGeneratedKeys="true" keyColumn="POST_ID" keyProperty="keyNum">
 		<selectKey resultType="int" keyProperty="insertFileKey" order="BEFORE">
 			SELECT
@@ -244,7 +245,7 @@
 				PORTAL.BOARD_POST_FILE post_file
 			WHERE 1=1
 		</selectKey>
-		INSERT INTO 
+		INSERT INTO /* Board.boardPostFileInsert */ 
 			PORTAL.BOARD_POST_FILE(
     			FILE_ID
     		  , POST_ID
@@ -262,7 +263,7 @@
     		VALUES(
     			#{insertFileKey}
     		  , #{POST_ID}
-    		  , #{orgFileType}
+    		  , #{fileType}
     		  , #{PARENT_CMNT_ID} 
     		  , #{uploadFilePath}
     		  , #{newFileName}
@@ -275,17 +276,11 @@
     	)
 	</insert>
 	
+	
 	<update id="Board.boardPostUpdate" parameterType="Map"> <!-- keyProperty="keyNum" -->
-		<!-- <selectKey resultType="int" keyProperty="insertKey" order="BEFORE">
-        	SELECT
-        		NVL(MAX(post.POST_ID), 1) AS INSERTKEY
-        	FROM 
-        		PORTAL.BOARD_POST post
-        	WHERE 1=1
-				AND post.BRD_ID = #{BRD_ID}
-    	</selectKey> -->
-    	UPDATE PORTAL.BOARD_POST
-    		SET
+    	UPDATE /* Board.boardPostUpdate */
+    		PORTAL.BOARD_POST
+    	SET
     		    BRD_ID = #{BRD_ID}
     		  , POST_TITLE = #{POST_TITLE}
     		  , POST_CONTENT = #{POST_CONTENT}
@@ -298,8 +293,51 @@
     		  , DEL_YN = 'N'
     		  , MOD_DT_TM = SYSDATE
     		  , MOD_USR_ID = #{userId}
-    		WHERE
-    			POST_ID = #{POST_ID}
+    		WHERE 1=1
+    			AND POST_ID = #{POST_ID}
 	</update>
+	
+	
+	<select id="Board.boardPostFileSelect" resultType="HashMap" parameterType="Map">
+		SELECT /* Board.boardPostFileSelect */
+			  FILE_ID
+			, POST_ID
+			, FILE_TYPE
+			, PARENT_CMNT_ID
+			, SRV_FILE_PATH
+			, SRV_FILE_NM
+			, ORG_FILE_NM
+			, FILE_EXT
+			, FILE_SIZE
+			, DEL_YN
+			, CRT_DT_TM
+			, CRT_USR_ID
+			, MOD_DT_TM
+			, MOD_USR_ID
+		FROM
+			PORTAL.BOARD_POST_FILE
+		WHERE 1=1
+			AND FILE_ID = #{FILE_ID}
+			AND POST_ID = #{POST_ID}
+	</select>
+	
+	
+	<update id="Board.boardPostFileDelete" parameterType="Map"> <!-- keyProperty="keyNum" -->
+    	UPDATE /* Board.boardPostFileDelete */
+    		PORTAL.BOARD_POST_FILE
+    	SET
+   		    DEL_YN = 'Y'
+   		  , MOD_DT_TM = SYSDATE
+   		  , MOD_USR_ID = #{userId}
+   		WHERE 1=1
+   			AND POST_ID = #{POST_ID}
+   			AND FILE_ID IN (
+   				<foreach collection="deleteFileList" item="item" separator=",">
+   					#{item}
+   				</foreach>
+   			)
+   			
+	</update>
+	
 	
 </mapper>

@@ -115,5 +115,16 @@ public class MstrPromptDao<T extends WebPrompt> implements PromptDao {
 
         return controlType;
     }
+    
+    
+    @Override
+    public int getPromptType() {
+        return webPrompt.getType();
+    }
+    
+    @Override
+    public int getPromptSubType() {
+        return webPrompt.getSubType();
+    }
 
 }

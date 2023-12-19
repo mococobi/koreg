@@ -5,14 +5,16 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -175,7 +177,7 @@ public class HttpUtil {
 	 */
 	public static String getLoginUserId(HttpServletRequest request) {
 		String resultUserId = null;
-		String resultUserVo = null;
+//		String resultUserVo = null;
 		/*
         */
 
@@ -213,6 +215,8 @@ public class HttpUtil {
 			return "";
 		}
 		
+		sValid = sValid.replaceAll("\r", "");
+		sValid = sValid.replaceAll("\n", "");
 		sValid = sValid.replaceAll("/", "");
 		sValid = sValid.replaceAll("\\\\", "");
 		sValid = sValid.replaceAll("\\.", "");
@@ -220,5 +224,57 @@ public class HttpUtil {
 		
 		return sValid;
 		
+	}
+	
+	
+	/**
+	 * <pre>
+	 * 목적 : 다운로드 파일 이름을 가지고 옴
+	 * 매개변수 : 
+	 * 	String oriFileName
+	 * 	HttpServletRequest request
+	 * 반환값 : java.lang.String
+	 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
+	 * </pre>
+	 */
+	public static String getDownloadFileName(String oriFileName, HttpServletRequest request) {
+		String agent = request.getHeader("User-Agent");
+		
+		LOGGER.debug("=> agent:[{}], fileName:[{}]", agent, oriFileName);
+		
+		/* 2019-11-01, 소스코드취약점점검대응(D020) */
+		String fileName = StringUtils.defaultString(oriFileName).replaceAll("\r", "").replaceAll("\n", "");
+		
+		String result = null;
+		
+		try {
+			if (agent.indexOf("MSIE") > -1 || agent.indexOf("Trident") > -1) {
+				result = URLEncoder.encode(fileName, "utf-8").replaceAll("\\+", "%20");
+				LOGGER.debug("=> MSIE:[{}]", result);
+			} else
+			if (agent.indexOf("Chrome") > -1) {
+				StringBuffer buffer = new StringBuffer();
+				for (int i = 0; i < fileName.length(); i++) {
+					char c = fileName.charAt(i);
+					if (c > '~') {
+						buffer.append(URLEncoder.encode(Character.toString(c), "utf-8"));
+					} else {
+						buffer.append(c);
+					}
+				}
+				result = buffer.toString();
+				LOGGER.debug("=> Chrome:[{}]", result);
+			} else
+			if (agent.indexOf("Firefox") > -1 || agent.indexOf("Opera") > -1) {
+				result = "\"" + new String(fileName.getBytes("utf-8"), "8859_1") + "\"";
+				LOGGER.debug("=> Firefox, Opera:[{}]", result);
+			} else {
+				result = fileName;
+			}
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.error("!!! error", e);
+		}
+		
+		return result;
 	}
 }

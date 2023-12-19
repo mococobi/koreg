@@ -151,6 +151,7 @@
 	
 	//리포트정보 및 프롬프트정보의 조회
 	function getPromptInfo() {
+		$('#portal-loading').show();
 		$('.prompt-wrapper').html('');
 		
 		let callParams = {
@@ -162,7 +163,8 @@
     			reportInfo = data.report;
 	    		renderPrompt();
     		} else {
-    		    alert('리포트정보를 가져올 수 없습니다.');	    			
+    		    alert('리포트정보를 가져올 수 없습니다.');
+    		    $('#portal-loading').show();
     		}
 			
 			$(window).resize(); // 프롬프트 랜더링이 종료되고 iframe 높이 조정

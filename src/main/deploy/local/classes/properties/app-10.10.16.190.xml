@@ -21,6 +21,8 @@
 	<entry key="mstr.menu.folder.id">032A5E114A59D28267BDD8B6D9E58B22</entry><!-- 왼쪽 메뉴 폴더 ID -->
 	
 	<entry key="attach.base.location">/mococo/portal/</entry>
+	<entry key="attach.base.file.size">104857600</entry>
+	<entry key="attach.base.file.extension">.DOC,.DOCX,.PPTX,.PPT,.XLS,.XLSX,.PDF,.PNG,.GIF,.JPG,.JPEG</entry>
 	
 	<entry key="portal.main.display">MAIN</entry><!-- MSTR_DASHBOARD, MAIN -->
 	<entry key="portal.main.dashboard.id">4DBD67E243DB89B5B9BCC3BEB8FE2CFF</entry><!-- 메인화면 표시 대표 대시보드 -->

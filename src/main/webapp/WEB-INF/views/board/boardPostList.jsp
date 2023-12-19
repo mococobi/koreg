@@ -87,11 +87,6 @@
 			}
 		});
 		
-		try {
-			console.log("PostData[%s]", '${postData}');
-		} catch(e) {
-			console.log(e);
-		}
 	});
 	
 	
@@ -163,7 +158,7 @@
 							rtnData = XSSCheck(data, 0);
 						}
 						if(row['POST_FILE_COUNT'] > 0) {
-							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '<i class="bi bi-paperclip"></i>' + '</a>';
+							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '<i class="bi bi-paperclip"></i>(' + row['POST_FILE_COUNT'] + ')' + '</a>';
 						} else {
 							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
 						}

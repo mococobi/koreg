@@ -22,4 +22,6 @@ public interface BoardService {
 	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception;
 	
 	public Map<String, Object> boardPostUpdate(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception;
+	
+	public Map<String, Object> boardPostFileSelect(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
 }

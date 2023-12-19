@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Application context definition for Spring JDBC Introduction.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+        xmlns:context="http://www.springframework.org/schema/context" xmlns:jee="http://www.springframework.org/schema/jee"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+        xsi:schemaLocation="
+            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		">
+
+    <context:property-placeholder location="classpath:spring/batch-jdbc-10.10.16.190.properties"/>
+    <bean id="dataSourceUserBatch" class="com.mococo.web.util.SecureBasicDataSource">
+        <property name="driverClassName" value="${jdbc.portal.driverClassName}" />
+        <property name="url" value="${jdbc.portal.url}" />
+        <property name="username" value="${jdbc.portal.username}" />
+        <property name="password" value="${jdbc.portal.password}" />
+    </bean>
+    
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSourceUserBatch"/>
+    
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSourceUserBatch"/>
+    </bean>
+    
+    <context:component-scan base-package="com.batch.JdbcTemplate">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>    
+	
+
+</beans>

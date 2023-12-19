@@ -153,6 +153,7 @@ var promptRenderer = {
 		, 'body' : function($wrapper, data) {
 			var $day = $('<input class="form-control" ui-type="date" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
 			+ 'prompt-title="' + data['title'] + '" prompt-min="' + data['min'] + '" prompt-max="' + data['max'] + '" prompt-required="' + data['required'] + '" '
+			+ 'prompt-promptType="' + data['promptType'] + '" prompt-promptSubType="' + data['promptSubType'] + '"'
 			+ 'style="cursor:pointer; width: 50%;"/>');
 			$wrapper.append($day);
 		    let selectDate = new AirDatepicker('input[prompt-id="'+ data['id'] +'"]', {
@@ -164,20 +165,32 @@ var promptRenderer = {
 				, selectedDates : [new Date()]
 //				, buttons: ['today', 'clear']
 			    , autoClose : true
-				, maxDate : new Date()
+			    , minDate : (data['promptSubType'] == 2565 && data['min']) ? new Date(data['min']) : false
+				, maxDate : (data['promptSubType'] == 2565 && data['max']) ? new Date(data['max']) : new Date()
 			});
 			
 			//기본 값 설정
 			if(data['defaultAnswer']) {
-				selectDate.selectDate(new Date(changeStringToDate(data['defaultAnswer'])));
+				if(data['promptSubType'] == 2565) {
+					//날짜 프롬프트일 경우
+					selectDate.selectDate(new Date(data['defaultAnswer']));
+				} else {
+					selectDate.selectDate(new Date(changeStringToDate(data['defaultAnswer'])));
+				}
 			}
 		}
 		, 'selected' : function($elem) {
 			let promptVal = '';
-			if($elem.val().indexOf('-') > -1) {
-				promptVal = $.datepicker.formatDate('yymmdd', new Date($elem.val()));
-			} else {
+			
+			if($elem.attr('prompt-promptSubType') == 2565) {
+				//날짜 프롬프트일 경우
 				promptVal = $elem.val();
+			} else {
+				if($elem.val().indexOf('-') > -1) {
+					promptVal = $.datepicker.formatDate('yymmdd', new Date($elem.val()));
+				} else {
+					promptVal = $elem.val();
+				}
 			}
 			
 			return [promptVal];
@@ -205,16 +218,30 @@ var promptRenderer = {
 			//최소 값 체크
 			let promptMinLength = $elem.attr('prompt-min');
 			if(promptMinLength) {
-				if(promptLength < promptMinLength) {
-					return '[' + $elem.attr('prompt-title') + ']의 최소 길이는 ' + promptMinLength + '입니다';
+				if($elem.attr('prompt-promptSubType') == 2565) {
+					//날짜 프롬프트일 경우
+					if(new Date($elem.val()) < new Date(promptMinLength)) {
+						return '[' + $elem.attr('prompt-title') + ']의 최소 날짜는 ' + promptMinLength + '입니다';
+					}
+				} else {
+					if(promptLength < promptMinLength) {
+						return '[' + $elem.attr('prompt-title') + ']의 최소 길이는 ' + promptMinLength + '입니다';
+					}
 				}
 			}
 			
 			//최대 값 체크
 			let promptMaxLength = $elem.attr('prompt-max');
 			if(promptMaxLength) {
-				if(promptLength > promptMaxLength) {
-					return '[' + $elem.attr('prompt-title') + ']의 최대 길이는 ' + promptMaxLength + '입니다';
+				if($elem.attr('prompt-promptSubType') == 2565) {
+					//날짜 프롬프트일 경우
+					if(new Date($elem.val()) > new Date(promptMaxLength)) {
+						return '[' + $elem.attr('prompt-title') + ']의 최대 날짜는 ' + promptMaxLength + '입니다';
+					}
+				} else {
+					if(promptLength > promptMaxLength) {
+						return '[' + $elem.attr('prompt-title') + ']의 최대 길이는 ' + promptMaxLength + '입니다';
+					}
 				}
 			}
 			

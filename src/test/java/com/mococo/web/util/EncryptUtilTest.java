@@ -12,7 +12,7 @@ public class EncryptUtilTest {
 	
 	@Test
 	public void testEncrypt() throws WebObjectsException {
-		String testVal = "";
+		String testVal = "1";
 		
 		String testEnc = EncryptUtil.encrypt(testVal);
 		LOGGER.debug("String encrypt : [{}]", testEnc);
