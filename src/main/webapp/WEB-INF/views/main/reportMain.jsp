@@ -31,78 +31,8 @@
 	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/prompt-renderer.js?v=20231128001"></script>
 	
 	<style type="text/css">
-		.wrapper {
-			font-family: "Malgun Gothic";
-			font-size: 12px;
-			padding: 10px;
-			margin: 0px;
-		}
-		
-		button#run {
-			float: right;
-			margin-bottom: 10px;
-			padding: 5px 10px;
-			background-color: #0078D4;
-			border: 0;
-			color: #ffffff;
-		}
-		
-		.wrapper {
-			width: 100%;
-			height: 100%;
-		}
-		
-		.top-wrapper {
-			display: flex;
-		}
-		
-		.prompt-wrapper {
-			width: calc(100% - 100px);
-		}
-		
-		.run-wrapper {
-			width: 100px;
-		}
-		
-		.elem-wrapper {
-			display: inline-flex;
-			align-items: center;
-			margin: 0px 7px;
-			height: 30px;
-		}
-		
-		.elem-wrapper .elem-label {
-			padding: 0 10px 0 0;
-		}
-		
-		.elem-wrapper select {
-			width: 120px;
-		}
-		
-		.elem-wrapper input[type=text] {
-			height: 30px;
-			width: 150px;
-		}
-		
-		.ms-options-wrap button {
-			font-size: 1rem;
-			width: 150px !important;
-		}
-		
 		#mstrReport {
 			height: 100%;
-		}
-		
-		.ms-options-wrap > button:focus, .ms-options-wrap > button,
-		.ms-options-wrap {
-			font-size: 1rem;
-		}
-		
-		.ms-options-wrap > .ms-options > ul input[type="checkbox"] {
-		    margin: 0 5px 0 0;
-		    position: absolute;
-		    left: 4px;
-		    top: 11px;
 		}
 	</style>
 <script type="text/javascript">
@@ -139,10 +69,10 @@
 			var height	= $(window).height();
 			var $report = $('.report-wrapper');
 			
-			$report.height( height - $report.offset().top - 18);
+// 			$report.height( height - $report.offset().top - 18);
 		});
 		
-		$(window).resize();
+// 		$(window).resize();
 		
 		getPromptInfo();
 		$('#run').click(getAnswerXML);
@@ -152,7 +82,7 @@
 	//리포트정보 및 프롬프트정보의 조회
 	function getPromptInfo() {
 		$('#portal-loading').show();
-		$('.prompt-wrapper').html('');
+		$('.run-setting-box').html('');
 		
 		let callParams = {
 			  objectId : objectId
@@ -195,7 +125,7 @@
 		            case 4:
 		            	uiType = 'list-default';
 		            	if ((v['max'] && Number(v['max']) > 1) || !v['max']) {
-		            	    uiType = 'multiSelect-default';		            		
+		            	    uiType = 'multiSelect-default';
 		            	}
 		                break;
 		            default:
@@ -203,8 +133,8 @@
         	}
         	
         	if (promptRenderer[uiType]) {
-        		var $wrapper = $('<span class="elem-wrapper"></span>'); 
-        		$('.prompt-wrapper').append($wrapper);
+        		var $wrapper = $('<li>', {class : 'flex'});
+        		$('.run-setting-box').append($wrapper);
         		promptRenderer[uiType]['label']($wrapper, v);
         		promptRenderer[uiType]['body']($wrapper, v);
         	}
@@ -287,18 +217,17 @@
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart.jsp" />
 	
-	<div class="wrapper">
-		<div class="top-wrapper" style="display: none;">
-			<div class="prompt-wrapper"></div>
-			<div class="run-wrapper">
-				<button type="button" id="run">리포트 조회</button>
-			</div>
-		</div>
-		<div class="report-wrapper">
-			<iframe name="mstrReport" id="mstrReport" src=""
+	<div class="run-box flex">
+		<!-- 프롬프트 영역 -->
+	    <ul class="run-setting-box flex"></ul>
+	    <button id="run" class="btn-run blue">실행</button>
+	</div>
+	
+	<div class="top cont-wrap flex" style="height: calc(100vh - 275px);">
+	    <iframe name="mstrReport" id="mstrReport" src=""
 				style="width: 100%; border: 1px solid silver; margin: 0px;"
-				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto"></iframe>
-		</div>
+				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto">
+		</iframe>
 	</div>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />

@@ -62,7 +62,7 @@ public class BoardController {
         
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         try {
-    		Map<String, Object> boardMap = boardService.boardList(request, response, params);
+    		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
     		view.addObject("postData", boardMap);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
@@ -132,7 +132,7 @@ public class BoardController {
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         
         try {
-    		Map<String, Object> boardMap = boardService.boardList(request, response, params);
+    		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
     		view.addObject("postData", boardMap);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
@@ -156,7 +156,6 @@ public class BoardController {
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         
         try {
-    		//Map<String, Object> boardMap = boardService.boardList(request, response, params);
         	Map<String, Object> boardMap = boardService.boardPostDetail(request, response, params);
     		view.addObject("postData", boardMap);
 		} catch (Exception e) {
@@ -177,6 +176,9 @@ public class BoardController {
     @ResponseBody
     public Map<String, Object> boardPostDetail(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
     	params.put("PORTAL_LOG", true);
+    	params.put("CHECK_POST_FILE", true);
+    	params.put("CHECK_POST_LOCATION", true);
+    	
     	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
@@ -194,30 +196,38 @@ public class BoardController {
     
     
     /**
-     * 게시판 - 등록
+     * 게시판 - 게시물 등록
      * @param params
      * @param request
      * @return
      * @throws Exception 
      */
     @RequestMapping(value = "/board/boardPostInsert.json", method = {RequestMethod.GET, RequestMethod.POST})
-	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception {
+	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) {
 //    	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	{
-    		//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
-	    	
-	    	LOGGER.debug("AUTHLIST : [{}]", portalAuthList);
-	    	
+    		//기본 권한 설정
+    		Boolean boardPostInsertCheck = true;
 	    	if(params.get("BRD_ID").equals("1")) {
-		    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-		    		rtnMap = ControllerUtil.getFailMap("portal.admin.auth.error");
-		    		return rtnMap;
-	    		}
+	    		boardPostInsertCheck = false;
+	    	} else {
+	    		boardPostInsertCheck = true;
 	    	}
-    	}    	
+	    	
+	    	//관리자 권한 체크
+	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
+	    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
+	    		boardPostInsertCheck = true;
+	    	}
+	    	
+	    	//최종 권한 판단
+	    	if(!boardPostInsertCheck) {
+	    		rtnMap = ControllerUtil.getFailMap("portal.board.insert.auth.error");
+	    		return rtnMap;
+	    	}
+    	}
     	
 		try {
 			Map<String, Object> rtnList = new HashMap<String, Object>();
@@ -232,30 +242,94 @@ public class BoardController {
 	}
     
     
+    /**
+     * 게시판 - 게시물 리스트 수정
+     * @param request
+     * @param hrequest
+     * @param response
+     * @param params
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/board/boardPostUpdate.json", method = {RequestMethod.GET, RequestMethod.POST})
-	public Map<String, Object> boardPostUpdate(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception {
+	public Map<String, Object> boardPostUpdate(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) {
 //    	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
-    	/*
-    	{
-    		//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
-	    	
-	    	LOGGER.debug("AUTHLIST : [{}]", portalAuthList);
-	    	
-	    	if(params.get("BRD_ID").equals("1")) {
-		    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-		    		rtnMap = ControllerUtil.getFailMap("portal.admin.auth.error");
-		    		return rtnMap;
-	    		}
-	    	}
-    	}
-    	*/
-    	
 		try {
+			{
+	    		//기본 권한 설정
+	    		Boolean boardPostInsertCheck = false;
+	    		
+	    		//작성자 권한 체크
+	    		Map<String, Object> boardPostCheckData = (Map<String, Object>)boardService.boardPostDetail(hrequest, response, params).get("data");
+	    		if(boardPostCheckData.get("CRT_USR_ID").toString().equals(HttpUtil.getLoginUserId(request))) {
+	    			boardPostInsertCheck = true;
+	    		}
+	    		
+		    	//관리자 권한 체크
+		    	List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
+		    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
+		    		boardPostInsertCheck = true;
+		    	}
+		    	
+		    	//최종 권한 판단
+		    	if(!boardPostInsertCheck) {
+		    		rtnMap = ControllerUtil.getFailMap("portal.board.update.auth.error");
+		    		return rtnMap;
+		    	}
+	    	}
+			
 			Map<String, Object> rtnList = new HashMap<String, Object>();
     		rtnList = boardService.boardPostUpdate(request, response, params);
+    		rtnMap.putAll(rtnList);
+		} catch (Exception e) {
+			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			LOGGER.error("boardPostDetail Exception", e);
+		}
+		
+		return rtnMap;
+	}
+    
+    
+	/**
+	 * 게시판 - 게시물 삭제
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 */
+    @RequestMapping(value = "/board/boardPostDelete.json", method = {RequestMethod.GET, RequestMethod.POST})
+	public Map<String, Object> boardPostDelete(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+    	LOGGER.debug("params : [{}]", params);
+    	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+    	
+		try {
+	    	{
+	    		//기본 권한 설정
+	    		Boolean boardPostInsertCheck = false;
+		    	
+	    		//작성자 권한 체크
+	    		Map<String, Object> boardPostCheckData = (Map<String, Object>)boardService.boardPostDetail(request, response, params).get("data");
+	    		if(boardPostCheckData.get("CRT_USR_ID").toString().equals(HttpUtil.getLoginUserId(request))) {
+	    			boardPostInsertCheck = true;
+	    		}
+	    		
+		    	//관리자 권한 체크
+		    	List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
+		    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
+		    		boardPostInsertCheck = true;
+		    	}
+		    	
+		    	//최종 권한 판단
+		    	if(!boardPostInsertCheck) {
+		    		rtnMap = ControllerUtil.getFailMap("portal.board.delete.auth.error");
+		    		return rtnMap;
+		    	}
+	    	}
+			
+			Map<String, Object> rtnList = new HashMap<String, Object>();
+    		rtnList = boardService.boardPostDelete(request, response, params);
     		rtnMap.putAll(rtnList);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
@@ -289,7 +363,7 @@ public class BoardController {
 			String postId = HttpUtil.replaceFilePath(request.getParameter("POST_ID"));
 //			String fileId = HttpUtil.replaceFilePath(request.getParameter("FILE_ID"));
 			
-			Map<String, Object> fileMap = boardService.boardPostFileSelect(request, response, params);
+			Map<String, Object> fileMap = boardService.boardPostFileDetail(request, response, params);
 			
 			String serverFileName = fileMap.get("SRV_FILE_NM").toString();
 			String orgFileName = fileMap.get("ORG_FILE_NM").toString();
@@ -430,6 +504,6 @@ public class BoardController {
 					WRITER.print(BUF.toString());
 				}
 			}
-		}				
+		}
 	}
 }

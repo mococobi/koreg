@@ -10,7 +10,10 @@
  */
 var _defaultElemRenderer = {
     'label' : function($wrapper, data) {
-		$wrapper.append('<span class="elem-label" style="font-size: 1rem;">&bull;&nbsp;' + data['title'] + '</span>');
+		let lableHtml = $('<label>', {
+			text : data['title']
+		});
+		$wrapper.append(lableHtml);
     }		
 };
 

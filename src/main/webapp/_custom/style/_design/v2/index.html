@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <title>경기신용보증재단</title>
+    <script>
+        $(function(){
+            /* 메뉴 */
+            $('.dep2').on('mouseenter', function(){
+                $(this).find('.dep3-wrap').addClass('on');
+            });
+            $('.dep2').on('mouseleave', function(){
+                $(this).find('.dep3-wrap').removeClass('on');
+            });
+
+            /* 컨텐츠 탭 */
+            $('.tab-btn-wrap button').each(function(index, item){
+                $(item).on('click', function(){
+                    $('.tab-btn-wrap button').removeClass('active');
+                    $(this).addClass('active');
+
+                    var idx = index
+                    var showCont = $('.cont-tab')[idx];
+                    $('.cont-tab').removeClass('on');
+                    $(showCont).addClass('on');
+                });
+            });
+
+            /* box1 탭 */
+            $('.box-btn-wrap button').each(function(index, item){
+                $(item).on('click', function(){
+                    $('.box-btn-wrap button').removeClass('active');
+                    $(this).addClass('active');
+
+                    var idx = index
+                    var showCont = $('.box-tab')[idx];
+                    $('.box-tab').removeClass('on');
+                    $(showCont).addClass('on');
+                });
+            });
+            
+        })
+    </script>
+</head>
+<body>
+    <div class="wrap"> <!-- 페이지 전체를 감싸는 wrap -->
+
+        <!-- pop -->
+        <div class="pop"> <!-- 팝업 영역 (배경) -->
+
+            <div class="pop-inner"><!-- 팝업 내용이 들어가는 부분 -->
+            </div>
+
+        </div>
+        <!-- //pop -->
+
+        <!-- header -->
+        <header class="header"> <!-- 헤더 영역 -->
+
+            <div class="logo">
+                <a href="#">
+                    <img src="./images/logo.png" alt="경기신용보증재단">
+                </a>
+            </div>
+
+            <div class="util flex">
+                <p class="welcome-text"><span class="user-id">Administrator</span> &nbsp;님 환영합니다.</p>
+                <a href="#">로그아웃</a>
+            </div>
+            
+        </header>
+        <!-- //header -->
+
+        <!-- contents -->
+        <div class="contents"> <!-- 본문 영역 -->
+
+            <div class="bg sky"> <!-- 본문 배경색 -->
+
+                <div class="inner flex">
+                    <nav class="lnb"> 
+                        <ul class="dep1-ul">
+                            <li class="dep1"><a href="javascript:void(0)">경영실적</a>
+                                <ul class="dep2-ul">
+                                    <li class="dep2"><a href="#">총괄표</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">1</a></li>
+                                                <li class="dep3"><a href="#">2</a></li>
+                                                <li class="dep3"><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li class="dep2"><a href="#">조직성과평가</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">종합순위(상반기)</a></li>
+                                                <li class="dep3"><a href="#">고객관점(상반기)</a></li>
+                                                <li class="dep3"><a href="#">성과관점(상반기)</a></li>
+                                                <li class="dep3"><a href="#">활동관점(상반기)</a></li>
+                                                <li class="dep3"><a href="#">학습과성장관점(상반기)</a></li>
+                                                <li class="dep3"><a href="#">성과관점(출장소)</a></li>
+                                                <li class="dep3"><a href="#">모바일앱 보증신청 현황(KPI)</a></li>
+                                                <li class="dep3"><a href="#">2023년도 상반기 지점별 관리업무평가</a></li>
+                                                <li class="dep3"><a href="#">순부실률 관리노력도</a></li>
+                                                <li class="dep3"><a href="#">본부점별 회수목표 달성현황</a></li>
+                                                <li class="dep3"><a href="#">개인성과평가(보증)</a></li>
+                                                <li class="dep3"><a href="#">관리직원평가</a></li>
+                                                <li class="dep3"><a href="#">출장 및 상담실적(경영지도 위원)</a></li>
+                                                <li class="dep3"><a href="#">MBO 청량지표 종합점수</a></li>
+                                                <li class="dep3"><a href="#">MBO 전자승인 결재내역 조회(보증이력제)</a></li>
+    
+                                                <li class="dep3"><a href="#">종합순위(상반기)</a></li>
+                                                <li class="dep3"><a href="#">고객관점(상반기)</a></li>
+                                                <li class="dep3"><a href="#">성과관점(상반기)</a></li>
+                                                <li class="dep3"><a href="#">활동관점(상반기)</a></li>
+                                                <li class="dep3"><a href="#">학습과성장관점(상반기)</a></li>
+                                                <li class="dep3"><a href="#">성과관점(출장소)</a></li>
+                                                <li class="dep3"><a href="#">모바일앱 보증신청 현황(KPI)</a></li>
+                                                <li class="dep3"><a href="#">2023년도 상반기 지점별 관리업무평가</a></li>
+                                                <li class="dep3"><a href="#">순부실률 관리노력도</a></li>
+                                                <li class="dep3"><a href="#">본부점별 회수목표 달성현황</a></li>
+                                                <li class="dep3"><a href="#">개인성과평가(보증)</a></li>
+                                                <li class="dep3"><a href="#">관리직원평가</a></li>
+                                                <li class="dep3"><a href="#">출장 및 상담실적(경영지도 위원)</a></li>
+                                                <li class="dep3"><a href="#">MBO 청량지표 종합점수</a></li>
+                                                <li class="dep3"><a href="#">MBO 전자승인 결재내역 조회(보증이력제)</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li class="dep2"><a href="#">개인성과평가</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">1</a></li>
+                                                <li class="dep3"><a href="#">2</a></li>
+                                                <li class="dep3"><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="dep1"><a href="javascript:void(0)">영업실적</a>
+                                <ul class="dep2-ul">
+                                    <li class="dep2"><a href="#">보증</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">1</a></li>
+                                                <li class="dep3"><a href="#">2</a></li>
+                                                <li class="dep3"><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li class="dep2"><a href="#">비대면</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">1</a></li>
+                                                <li class="dep3"><a href="#">2</a></li>
+                                                <li class="dep3"><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li class="dep2"><a href="#">도자금</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">1</a></li>
+                                                <li class="dep3"><a href="#">2</a></li>
+                                                <li class="dep3"><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li class="dep2"><a href="#">관리</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">1</a></li>
+                                                <li class="dep3"><a href="#">2</a></li>
+                                                <li class="dep3"><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="dep1"><a href="javascript:void(0)">부서별 요청통계</a>
+                                <ul class="dep2-ul">
+                                    <li class="dep2"><a href="#">2차메뉴 1</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">1</a></li>
+                                                <li class="dep3"><a href="#">2</a></li>
+                                                <li class="dep3"><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li class="dep2"><a href="#">2차메뉴 2</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">1</a></li>
+                                                <li class="dep3"><a href="#">2</a></li>
+                                                <li class="dep3"><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li class="dep2"><a href="#">2차메뉴 3</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">1</a></li>
+                                                <li class="dep3"><a href="#">2</a></li>
+                                                <li class="dep3"><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li class="dep2"><a href="#">2차메뉴 4</a>
+                                        <div class="dep3-wrap">
+                                            <ul class="dep3-ul">
+                                                <li class="dep3"><a href="#">1</a></li>
+                                                <li class="dep3"><a href="#">2</a></li>
+                                                <li class="dep3"><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div class="content flex">
+                        <div class="cont-area">
+                            <div class="tab-btn-wrap flex">
+                                <button class="tab-btn active">부서 공유 리포트</button>
+                                <button class="tab-btn">내 리포트</button>
+                                <button class="tab-btn">비정형 분석</button>
+                                <button class="tab-btn">새 대시보드</button>
+                            </div>
+
+                            <div class="tab-cont-wrap">
+                                <div class="cont-tab cont-tab1 on">
+                                    <div class="run-box flex">
+                                        <ul class="run-setting-box flex">
+                                            <li class="flex">
+                                                <label for="year">년도</label>
+                                                <select id="year">
+                                                    <option>2023</option>
+                                                </select>
+                                            </li>
+                                            <li class="flex">
+                                                <label for="date">일자</label>
+                                                <select id="date">
+                                                    <option>06-24</option>
+                                                </select>
+                                            </li>
+                                            <li class="flex">
+                                                <label for="area">지역</label>
+                                                <select id="area">
+                                                    <option>군포시</option>
+                                                </select>
+                                            </li>
+                                            <li class="flex">
+                                                <label for="spot">지역</label>
+                                                <select id="spot">
+                                                    <option>남부지점</option>
+                                                </select>
+                                            </li>
+                                        </ul>
+                                        <button class="btn-run blue">실행</button>
+                                    </div>
+    
+                                    <div class="top cont-wrap flex">
+                                        <div class="flex2 box box1">
+                                            <div class="tit-wrap flex">
+                                                <h3 class="box-tit">신용보증공급목표</h3>
+                                            </div>
+                                            <div class="box-btn-wrap">
+                                                <button class="active">금액</button>
+                                                <button class="">건수</button>
+                                            </div>
+                                            <div class="box-tab-wrap">
+                                                <div class="box-tab on box-tab1 flex">
+                                                    <div class="left-chart">
+                                                        <p class="chart-tit">하반기</p>
+                                                        <div class="chart-p">
+                                                            <ul class="chart-data-y">
+                                                                <li>140%</li>
+                                                                <li>120%</li>
+                                                                <li>100%</li>
+                                                                <li>80%</li>
+                                                                <li>60%</li>
+                                                                <li>40%</li>
+                                                                <li>20%</li>
+                                                            </ul>
+                                                            <img class="chart" src="./images/chart1.png" alt="">
+                                                            <ul class="chart-data-x flex">
+                                                                <li>7월</li>
+                                                                <li>8월</li>
+                                                                <li>9월</li>
+                                                                <li>10월</li>
+                                                                <li>11월</li>
+                                                                <li>12월</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="right-chart">
+                                                        <div class="chart-p">
+                                                            <ul class="chart-data num">
+                                                                <li class="f">
+                                                                    <p>115.09%</p>
+                                                                    <p class="sm">(31.49%)</p>
+                                                                </li>
+                                                                <li class="s">
+                                                                    <p>126.94%</p>
+                                                                    <p class="sm">(34.73%)</p>
+                                                                </li>
+                                                                <li class="b t">
+                                                                    <p>123.44%</p>
+                                                                    <p class="sm">(33.78%)</p>
+                                                                </li>
+                                                            </ul>
+                                                            <ul class="chart-data text">
+                                                                <li class="f">중부</li>
+                                                                <li class="s">남부</li>
+                                                                <li class="t">북부</li>
+                                                            </ul>
+                                                            <img class="chart" src="./images/chart2.png" alt="">
+                                                        </div>
+                                                        <div class="chart-result-wrap">
+                                                            <p class="tit">보증금액 목표달성률</p>
+                                                            <ul class="result-cont">
+                                                                <li class="flex">
+                                                                    <p class="tit up">남양주</p>
+                                                                    <p class="cont">134.54%</p>
+                                                                </li>
+                                                                <li class="flex">
+                                                                    <p class="tit down">안양</p>
+                                                                    <p class="cont">103.12%</p>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="box-tab box-tab2 flex">
+                                                    건수
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex1 flex">
+                                            <div class="box box2">
+                                                <div class="tit-wrap flex">
+                                                    <h3 class="box-tit">도자금지원</h3>
+                                                    <p class="sub-tit">목표달성률 (%)</p>
+                                                </div>
+
+                                                <div class="chart-p">
+                                                    <div class="chart-tit-box">G-Money</div>
+                                                    <ul class="chart-data-x top flex">
+                                                        <li>101.03%</li>
+                                                        <li>151.43%</li>
+                                                    </ul>
+                                                    <img class="chart" src="./images/chart3.png" alt="">
+                                                    <ul class="chart-data-x bottom flex">
+                                                        <li>운전</li>
+                                                        <li>창경</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <div class="box box3">
+                                                <div class="tit-wrap flex">
+                                                    <h3 class="box-tit">실적</h3>
+                                                    <p class="sub-tit">단위 : 건, 백만원</p>
+                                                </div>
+                                                
+                                                <ul class="chart-result">
+                                                    <li>
+                                                        <p class="tit">일 보증금액</p>
+                                                        <p class="result">9,226</p>
+                                                    </li>
+                                                    <li>
+                                                        <p class="tit">주 누적보증금액</p>
+                                                        <p class="result">9,226</p>
+                                                    </li>
+                                                    <li>
+                                                        <p class="tit">월 누적보증금액</p>
+                                                        <p class="result">9,226</p>
+                                                    </li>
+                                                    <li class="result-y">
+                                                        <p class="tit">년 누적보증금액</p>
+                                                        <p class="result">3,586,467</p>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bottom  cont-wrap flex">
+                                        <div class="flex2 flex">
+                                            <div class="box box4">
+                                                <div class="tit-wrap flex">
+                                                    <h3 class="box-tit">구상채권회수금액</h3>
+                                                    <p class="sub-tit">단위 : 건, 백만원</p>
+                                                </div>
+                                            
+                                                <div class="chart-p">
+                                                    <div class="chart-tit-box">남양주점</div>
+
+                                                    <div class="chart-p">
+                                                        <ul class="chart-data-y">
+                                                            <li>100,000</li>
+                                                            <li>80,000</li>
+                                                            <li>60,000</li>
+                                                            <li>40,000</li>
+                                                            <li>20,000</li>
+                                                        </ul>
+                                                        <img class="chart" src="./images/chart4.png" alt="">
+                                                        <ul class="chart-data-x flex">
+                                                            <li>1월</li>
+                                                            <li>2월</li>
+                                                            <li>3월</li>
+                                                            <li>4월</li>
+                                                            <li>5월</li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="chart-result-wrap">
+                                                        <p class="tit">회수금액 목표달성률</p>
+                                                        <ul class="result-cont">
+                                                            <li class="flex">
+                                                                <p class="tit up">남양주</p>
+                                                                <p class="cont">134.54%</p>
+                                                            </li>
+                                                            <li class="flex">
+                                                                <p class="tit down">안양</p>
+                                                                <p class="cont">103.12%</p>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <ul class="chart-label flex">
+                                                    <li>월별회수금액</li>
+                                                    <li>누적회수금액</li>
+                                                    <li>회수목표</li>
+                                                    <li>누적이행금액</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="box box5">
+                                                <div class="tit-wrap flex">
+                                                    <h3 class="box-tit">순부실율</h3>
+                                                    <p class="sub-tit">단위 : %</p>
+                                                </div>
+
+                                                <div class="chart-p">
+                                                    <ul class="chart-data-y">
+                                                        <li>200%</li>
+                                                        <li>180%</li>
+                                                        <li>160%</li>
+                                                        <li>140%</li>
+                                                        <li>120%</li>
+                                                        <li>100%</li>
+                                                        <li>80%</li>
+                                                        <li>60%</li>
+                                                        <li>40%</li>
+                                                        <li>20%</li>
+                                                    </ul>
+                                                    <ul class="chart-data">
+                                                        <li>78%</li>
+                                                        <li>89%</li>
+                                                        <li>132%</li>
+                                                        <li>98%</li>
+                                                        <li>116%</li>
+                                                        <li>107%</li>
+                                                    </ul>
+                                                    <img class="chart" src="./images/chart5.png" alt="">
+                                                    <ul class="chart-data-x flex">
+                                                        <li>1월</li>
+                                                        <li>2월</li>
+                                                        <li>3월</li>
+                                                        <li>4월</li>
+                                                        <li>5월</li>
+                                                        <li>6월</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex1">
+                                            <div class="box box6">
+                                                <div class="tit-wrap flex">
+                                                    <h3 class="box-tit">출연금 확보</h3>
+                                                    <p class="sub-tit">단위 : 건, 백만원</p>
+                                                </div>
+
+                                                <table class="chart-tb border">
+                                                    <colgroup>
+                                                        <col class="w-110px">
+                                                        <col class="w-130px">
+                                                        <col class="w-110px">
+                                                        <col class="w-130px">
+                                                        <col>
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>관할지점</th>
+                                                            <th>시군</th>
+                                                            <th>출연금액</th>
+                                                            <th>달성률</th>
+                                                            <th>달성률</th>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="scroll-tb-wrap">
+                                                    <table class="chart-tb scroll-tb">
+                                                        <colgroup>
+                                                            <col class="w-110px">
+                                                            <col class="w-130px">
+                                                            <col class="w-110px">
+                                                            <col class="w-130px">
+                                                            <col>
+                                                        </colgroup>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>가평</td>
+                                                                <td>가평군</td>
+                                                                <td>300</td>
+                                                                <td>150.00%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>고양</td>
+                                                                <td>고양시</td>
+                                                                <td>4,000</td>
+                                                                <td>74.07%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>고양</td>
+                                                                <td>파주시(고양고양)</td>
+                                                                <td>2,500</td>
+                                                                <td>46.30%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>과천</td>
+                                                                <td>과천시</td>
+                                                                <td>200</td>
+                                                                <td>200.00%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>광명</td>
+                                                                <td>광명시</td>
+                                                                <td>1,700</td>
+                                                                <td>121.43%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>광주</td>
+                                                                <td>광주시</td>
+                                                                <td>2,400</td>
+                                                                <td>68.57%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>구리</td>
+                                                                <td>구리시</td>
+                                                                <td>1,600</td>
+                                                                <td>106.67%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>가평</td>
+                                                                <td>가평군</td>
+                                                                <td>300</td>
+                                                                <td>150.00%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>고양</td>
+                                                                <td>고양시</td>
+                                                                <td>4,000</td>
+                                                                <td>74.07%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>고양</td>
+                                                                <td>파주시(고양고양)</td>
+                                                                <td>2,500</td>
+                                                                <td>46.30%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>과천</td>
+                                                                <td>과천시</td>
+                                                                <td>200</td>
+                                                                <td>200.00%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>광명</td>
+                                                                <td>광명시</td>
+                                                                <td>1,700</td>
+                                                                <td>121.43%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>광주</td>
+                                                                <td>광주시</td>
+                                                                <td>2,400</td>
+                                                                <td>68.57%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>구리</td>
+                                                                <td>구리시</td>
+                                                                <td>1,600</td>
+                                                                <td>106.67%</td>
+                                                                <td><img class="chart" src="./images/chart6.png" alt=""></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cont-tab cont-tab2">내 리포트</div>
+                                <div class="cont-tab cont-tab3">비정형 분석</div>
+                                <div class="cont-tab cont-tab4">새 대시보드</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- contents -->
+
+    </div>
+</body>
+</html>

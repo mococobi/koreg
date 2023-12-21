@@ -29,18 +29,6 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 	
 	<style type="text/css">
-		.wrapper {
-			font-family: "Malgun Gothic";
-			font-size: 12px;
-			padding: 10px;
-			margin: 0px;
-		}
-		
-		.wrapper {
-			width: 100%;
-			height: 100%;
-		}
-		
 		#mainReport {
 			height: 100%;
 		}
@@ -49,12 +37,11 @@
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart.jsp" />
 	
-	<div class="wrapper">
-		<div class="report-wrapper">
-			<iframe name="mainReport" id="mainReport" src=""
+	<div class="top cont-wrap flex" style="height: calc(100vh - 198px);">
+	    <iframe name="mainReport" id="mainReport" src=""
 				style="width: 100%; border: 1px solid silver; margin: 0px;"
-				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto"></iframe>
-		</div>
+				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto">
+		</iframe>
 	</div>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
@@ -80,12 +67,11 @@
 		
 		$(window).resize(function() {
 			let height	= $(window).height();
-			let $report = $('.report-wrapper');
-			
-			$report.height( height - $report.offset().top - 18);
+// 			let $report = $('.report-wrapper');
+// 			$report.height( height - $report.offset().top - 18);
 		});
 		
-		$(window).resize();
+// 		$(window).resize();
 		
 		//메인 대시보드 실행
 		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mainReport', getMstrFormDefinition(type));

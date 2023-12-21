@@ -4,8 +4,8 @@
 <%@ page import="com.mococo.web.util.CustomProperties" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%
-	String boardId = (String)request.getParameter("boardId");
-	String postId = (String)request.getParameter("postId");
+	String boardId = (String)request.getParameter("BRD_ID");
+	String postId = (String)request.getParameter("POST_ID");
 	
 	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
 	
@@ -22,7 +22,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>게시판 - 글쓰기</title>
+<title>${postData['BRD_NM']} - 작성</title>
 
 <jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 <jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
@@ -184,8 +184,8 @@
 		if(postId != null) {
 			//수정
 			let callParams = {
-				  boardId : boardId
-				, postId : postId
+				  BRD_ID : boardId
+				, POST_ID : postId
 			};
 				
 			callAjaxPost('/board/boardPostDetail.json', callParams, function(data){
@@ -453,10 +453,8 @@
 				});
 				
 				callAjaxForm('/board/boardPostInsert.json', formData, function(data) {
-					console.log(data);
 					alert('게시글이 등록되었습니다.');
-					//moveCommunityPage(boardId);
-					if (data.POST_ID) {
+					if (data['POST_ID']) {
 						detailBoardPost(boardId, data.POST_ID);//POST_ID 받아오는 값
 					} else {
 						console.log('Undefined. post id [%s]', data.POST_ID);
@@ -494,10 +492,8 @@
 				});
 				
 				callAjaxForm('/board/boardPostUpdate.json', formData, function(data) {
-					console.log(data);
 					alert('게시글이 수정되었습니다.');
-					//moveCommunityPage(boardId);
-					if (data.POST_ID) {
+					if (data['POST_ID']) {
 						detailBoardPost(boardId, data.POST_ID);//POST_ID 받아오는 값으로 변경
 					} else {
 						console.log('Undefined. post id [%s]', data.POST_ID);

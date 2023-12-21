@@ -2,8 +2,10 @@
 <%@ page import="java.util.*" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
-	String boardId = (String)request.getParameter("boardId");
-	String postId = (String)request.getParameter("postId");
+	String boardId = (String)request.getParameter("BRD_ID");
+	String postId = (String)request.getParameter("POST_ID");
+	
+	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
 %>
 <!DOCTYPE html>
 <html>
@@ -11,7 +13,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>${postData['BRD_NM']}</title>
+	<title>${postData['data']['BRD_NM']} - 상세</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
@@ -156,14 +158,14 @@
 			<div class="col-1">
 				<span>이전글</span>
 			</div>
-			<div class="col-1">
+			<div id="post_befoe" class="col-11">
 			</div>
 	    </div>
 	    <div class="row">
 			<div class="col-1">
 				<span>다음글</span>
 			</div>
-			<div class="col-1">
+			<div id="post_next" class="col-11">
 			</div>
 	    </div>
 	</div>
@@ -185,23 +187,24 @@
 	//초기 함수
 	function fnBoardPostInit() {
 		let callParams = {
-			  boardId : boardId
-			, postId : postId
+			  BRD_ID : boardId
+			, POST_ID : postId
 		};
 		callAjaxPost('/board/boardPostDetail.json', callParams, function(data){
 			let postData = data['data'];
 			let postFile = data['file'];
+			let postLocation = data['location'];
 			
-			displayContents(postData, postFile);
+			displayContents(postData, postFile, postLocation);
 		});
 		
 	}
 	
 	
 	//내용 표시
-	function displayContents(postData, postFile) {
+	function displayContents(postData, postFile, postLocation) {
 		
-		if(postData['CRT_USR_ID'] == '${mstrUserIdAttr}') {
+		if(postData['CRT_USR_ID'] == '${mstrUserIdAttr}' || <%= PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN") == true %>) {
 			$('#btn_post_modify').show();
 			$('#btn_post_delete').show();
 		}
@@ -260,14 +263,49 @@
 				$('#post_file').append(fileHtml);
 			});
 		}
+		
+		//이전글,다음글
+		postLocation.forEach((location, idx) => {
+			if(location['POST_LOCATION'] == 'BEFORE') {
+				let beforeHtml = $('<span>', {
+					  text : location['POST_TITLE']
+					, title : location['POST_TITLE']
+					, style : 'cursor:pointer;'
+					, click : function(e) {
+						detailBoardPost(location['BRD_ID'], location['POST_ID']);
+					}
+				});
+				
+				$('#post_befoe').append(beforeHtml);
+			} else if(location['POST_LOCATION'] == 'NEXT') {
+				let nextHtml = $('<span>', {
+					  text : location['POST_TITLE']
+					, title : location['POST_TITLE']
+					, style : 'cursor:pointer;'
+					, click : function(e) {
+						detailBoardPost(location['BRD_ID'], location['POST_ID']);
+					}
+				});
+				
+				$('#post_next').append(nextHtml);
+			}
+		});
+		
+		if($('#post_befoe').find('span').length == 0) {
+			$('#post_befoe').parent().remove();
+		}
+		
+		if($('#post_next').find('span').length == 0) {
+			$('#post_next').parent().remove();
+		}
 	}
 	
 	
 	//게시물 수정
 	function modifyBoardPost() {
 		let pagePrams = [
-			  ["boardId", boardId]
-			, ["postId", postId]
+			  ['BRD_ID', boardId]
+			, ['POST_ID', postId]
 		];
 		
 		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
@@ -277,13 +315,20 @@
 	//게시물 삭제
 	function deleteBoardPost() {
 		let pagePrams = [
-			  ["boardId", boardId]
-			, ["postId", postId]
+			  ['BRD_ID', boardId]
+			, ['POST_ID', postId]
 		];
 		
 		let msg = '게시글을 삭제하시겠습니까?';
 		if (confirm(msg)) {
-			
+			let callParams = {
+				  BRD_ID : boardId
+				, POST_ID : postId
+			};
+			callAjaxPost('/board/boardPostDelete.json', callParams, function(data) {
+				alert('게시글이 삭제되었습니다.');
+				moveCommunityPage(boardId);
+			});
 		}
 	}
 	

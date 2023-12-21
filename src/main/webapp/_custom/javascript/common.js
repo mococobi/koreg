@@ -5,7 +5,7 @@ function wait() {
 	$.blockUI({ 
         theme: true, 
         // title: "알림", 
-        message: "<p><b>잠시 기다려 주세요...<b></p>" 
+        message: '<p><b>잠시 기다려 주세요...<b></p>' 
     }); 	
 }
 
@@ -44,7 +44,7 @@ function popupMstrPage(popupName) {
 //커뮤니티 - 리스트 화면 이동
 function moveCommunityPage(moveBoardId) {
 	let pagePrams = [
-		["boardId", moveBoardId]
+		['BRD_ID', moveBoardId]
 	];
 	pageGoPost('_self', __contextPath + '/app/board/boardPostListView.do', pagePrams);
 }
@@ -53,8 +53,8 @@ function moveCommunityPage(moveBoardId) {
 //커뮤니티 - 게시물 상세 화면 이동
 function detailBoardPost(moveBoardId, movePostId) {
 	let pagePrams = [
-		  ["boardId", moveBoardId]
-		, ["postId", movePostId]
+		  ['BRD_ID', moveBoardId]
+		, ['POST_ID', movePostId]
 		
 	];
 	pageGoPost('_self', __contextPath + '/app/board/boardPostDetailView.do', pagePrams);
@@ -64,7 +64,7 @@ function detailBoardPost(moveBoardId, movePostId) {
 //관리자 화면 이동
 function moveAdminPage(moveAdminPage) {
 	let pagePrams = [
-		["page", moveAdminPage]
+		['page', moveAdminPage]
 	];
 	pageGoPost('_self', __contextPath + '/app/admin/adminPage.do', pagePrams);
 }
@@ -72,18 +72,18 @@ function moveAdminPage(moveAdminPage) {
 
 //POST 페이지 이동
 function pageGoPost(target, url, params) {
-	var insdoc = "";
+	let insdoc = '';
     
-	for (var i = 0; i < params.length; i++) {
-		insdoc+= "<input type='hidden' name='"+ XSSCheck(params[i][0]) +"' value='"+ XSSCheck(params[i][1], 0) +"'>";
+	for (let i = 0; i < params.length; i++) {
+		insdoc += "<input type='hidden' name='"+ XSSCheck(params[i][0]) +"' value='"+ XSSCheck(params[i][1], 0) +"'>";
 	}
     
-	var goform = $("<form>", {
-		  method: "post"
+	let goform = $('<form>', {
+		  method: 'post'
 		, action: url
 		, target: target
 		, html: insdoc
-	}).appendTo("body");
+	}).appendTo('body');
     
 	goform.submit();
 }
@@ -112,7 +112,7 @@ function callAjaxPost(url, params, callFunction) {
 		  type : 'post'
 		, url : __contextPath + '/app' + url
 		, data : JSON.stringify(params)
-   		, dataType : "json"
+   		, dataType : 'json'
    		, async : true
     	, contentType : "application/json;charset=UTF-8"
 		, success : function(data, text, request) {
@@ -136,8 +136,8 @@ function callAjaxForm(url, params, callFunction) {
 		  type : 'post'
 		, url : __contextPath + '/app' + url
 		, data : params
-		, dataType : "json"
-    	, enctype : "multipart/form-data"
+		, dataType : 'json'
+    	, enctype : 'multipart/form-data'
    		, processData : false
     	, contentType : false
 		, success : function(data, text, request) {
@@ -335,14 +335,14 @@ function getMstrFormDefinition(type) {
 	        , src: 'mstrWeb.2048001'
 	        , documentID: objectId
 	        , share: '1'
-	    	, hiddenSections: 'dockTop'
+	    	, hiddenSections: 'dockTop,path,header,footer'
 		}
 		, dossier: {
 	          evt: '3140'
 	        , src: 'mstrWeb.3140'
 	        , documentID: objectId
 	        , share: '1'
-	    	, hiddenSections: 'dockTop'
+	    	, hiddenSections: 'dockTop,path,header,footer'
 		}
 	}
 	
@@ -370,14 +370,6 @@ function getMstrFormDefinition(type) {
 
 //사이즈 포맷 변경
 function formatFileSize(filesize) {
-	/*
-	if (size > 9999) {
-		let fileSizeInKB = size / 1024;
-		return Math.round(fileSizeInKB.toFixed(2)) + ' KB';
-	} else {
-		return size + ' Byte';
-	}
-	*/
 	let text = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
     let e = Math.floor(Math.log(filesize) / Math.log(1024));
     return (filesize / Math.pow(1024, e)).toFixed(2) + " " + text[e];

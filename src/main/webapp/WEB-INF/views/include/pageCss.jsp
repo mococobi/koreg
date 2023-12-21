@@ -15,6 +15,10 @@
 <!-- Air Datepicker -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/air-datepicker-3/dist/air-datepicker.css?v=20231006001"></script>
 
+<!-- Portal Css -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/gcgf/layout.css?v=20231006001" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/gcgf/style.css?v=20231006001" />
+
 <!-- Application Css -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/common.css?v=20231006001" />
 

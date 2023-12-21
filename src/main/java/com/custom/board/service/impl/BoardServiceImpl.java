@@ -40,20 +40,16 @@ public class BoardServiceImpl implements BoardService {
     
     @Autowired
     LogService logService;
- 
-    @Override
-	public List<String> getSessionPortalAuthList(MultipartHttpServletRequest request) {
-		List<String> rtnList = (List<String>) request.getSession().getAttribute("PORTAL_AUTH");
-		return null;
-	}
     
+    
+    //게시판 상세
     @Override
-    public Map<String, Object> boardList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception{
+    public Map<String, Object> boardDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception{
     	Map<String, Object> rtnMap = new HashMap<String, Object>();
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
     	
-    	rtnMap = simpleBizDao.select("Board.boardList", params);
+    	rtnMap = simpleBizDao.select("Board.boardDetail", params);
         
         rtnMap.put("data", rtnMap);
         rtnMap.put("params", params);
@@ -62,6 +58,7 @@ public class BoardServiceImpl implements BoardService {
     }
     
     
+    //게시판 - 게시물 목록 조회
     @Override
     public Map<String, Object> boardPostList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception {
     	Map<String, Object> rtnMap = new HashMap<String, Object>();
@@ -76,7 +73,7 @@ public class BoardServiceImpl implements BoardService {
     	
     	if((Boolean)params.get("PORTAL_LOG") == true) {
     		//포탈 로그 기록(조회)
-    		logService.addPortalLog(request, params.get("boardId").toString(), "", "READ", params);
+    		logService.addPortalLog(request, params.get("BRD_ID").toString(), "", "READ", params);
     	}
         
         rtnMap.put("data", rtnList);
@@ -87,28 +84,41 @@ public class BoardServiceImpl implements BoardService {
     }
     
     
+    //게시판 - 게시물 상세
     @Override
     public Map<String, Object> boardPostDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception {
     	Map<String, Object> rtnMap = new HashMap<String, Object>();
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
     	
-    	Map<String, Object> rtnPostMap = simpleBizDao.select("Board.boardPostDetail", params);
-    	List<Map<String, Object>> rtnPostFileList = simpleBizDao.list("Board.boardPostFileList", params);
+    	if(params.get("PORTAL_LOG") != null && (Boolean)params.get("PORTAL_LOG") == true) {
+	    	//포탈 로그 기록(상세 조회)
+	    	logService.addPortalLog(request, params.get("BRD_ID").toString(), params.get("POST_ID").toString(), "DETAIL", params);
+    	}
     	
-    	if((Boolean)params.get("PORTAL_LOG") == true) {
-    	//포탈 로그 기록(상세 조회)
-    	logService.addPortalLog(request, params.get("boardId").toString(), params.get("postId").toString(), "DETAIL", params);
+    	//게시물
+    	Map<String, Object> rtnPostMap = simpleBizDao.select("Board.boardPostDetail", params);
+    	
+    	//첨부파일
+    	if(params.get("CHECK_POST_FILE") != null && (Boolean)params.get("CHECK_POST_FILE") == true) {
+    		List<Map<String, Object>> rtnPostFileList = simpleBizDao.list("Board.boardPostFileList", params);
+    		rtnMap.put("file", rtnPostFileList);
+    	}
+    	
+    	//이전글, 다음글
+    	if(params.get("CHECK_POST_LOCATION") != null && (Boolean)params.get("CHECK_POST_LOCATION") == true) {
+    		List<Map<String, Object>> rtnPostLocationList = simpleBizDao.list("Board.boardPostBeforeNext", params);
+    		rtnMap.put("location", rtnPostLocationList);
     	}
     	
         rtnMap.put("data", rtnPostMap);
-        rtnMap.put("file", rtnPostFileList);
         rtnMap.put("params", params);
         
         return rtnMap;
     }
     
     
+    //게시판 - 게시물 추가
     @Override
     @Transactional("transactionManager")
     public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception{
@@ -165,12 +175,7 @@ public class BoardServiceImpl implements BoardService {
     }
     
     
-    /**
-     * 첨부파일 처리 - 등록
-     * @param request
-     * @param params
-     * @return
-     */
+    //첨부파일 처리
     private List<Map<String, Object>> uploadFile(MultipartHttpServletRequest request, Map<String, Object> params) {
     	int boardinsertFileCount = 0;
 		long atchFileId = -1;
@@ -243,6 +248,7 @@ public class BoardServiceImpl implements BoardService {
     }
     
     
+    //게시판 - 게시물 수정
     @Override
     @Transactional("transactionManager")
     public Map<String, Object> boardPostUpdate(MultipartHttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception{
@@ -313,17 +319,38 @@ public class BoardServiceImpl implements BoardService {
     }
     
     
+    //게시판 - 게시물 삭제
     @Override
-    public Map<String, Object> boardPostFileSelect(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception{
+    public Map<String, Object> boardPostDelete(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception {
     	Map<String, Object> rtnMap = new HashMap<String, Object>();
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
     	
-    	rtnMap = simpleBizDao.select("Board.boardPostFileSelect", params);
+    	int postDeleteCnt = simpleBizDao.update("Board.boardPostDelete", params);
+    	
+    	//포탈 로그 기록(삭제)
+    	logService.addPortalLog(request, params.get("BRD_ID").toString(), params.get("POST_ID").toString(), "DELETE", params);
+    	
+        rtnMap.put("data", postDeleteCnt);
+        rtnMap.put("BRD_ID", params.get("BRD_ID"));
+        rtnMap.put("POST_ID", params.get("POST_ID"));
+        rtnMap.put("POST_DELETE_CNT", postDeleteCnt);
+        rtnMap.put("params", params);
         
         return rtnMap;
     }
     
-	
+    
+    //게시판 - 게시물 - 파일 상세
+    @Override
+    public Map<String, Object> boardPostFileDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception{
+    	Map<String, Object> rtnMap = new HashMap<String, Object>();
+    	
+    	params.put("userId", HttpUtil.getLoginUserId(request));
+    	
+    	rtnMap = simpleBizDao.select("Board.boardPostFileDetail", params);
+        
+        return rtnMap;
+    }
 }
 

@@ -5,6 +5,7 @@
 <mapper namespace="Board">
 	<!-- <cache /> -->
 	
+	<!-- 게시판 Oralce 변환 맵 -->
 	<resultMap id="oracleBoardMap" type="HashMap">
 		<result property="POST_CONTENT" column="POST_CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
 		<result property="CRT_DT_TM" column="CRT_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
@@ -13,7 +14,9 @@
 		<result property="POPUP_END_DT_TM" column="POPUP_END_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
 	</resultMap>
 	
-	<select id="Board.boardList" resultType="HashMap" parameterType="Map">
+	
+	<!-- 게시판 목록 조회 -->
+	<select id="Board.boardDetail" resultType="HashMap" parameterType="Map">
 		SELECT /* Board.boardList */
 			  BRD_ID
 			, BRD_NM
@@ -35,13 +38,14 @@
 		FROM 
 			PORTAL.BOARD
 		WHERE 1=1
-			AND BOARD.BRD_ID = #{boardId}
+			AND BOARD.BRD_ID = #{BRD_ID}
 			AND DEL_YN = 'N'
 		ORDER BY
 			CRT_DT_TM DESC
 	</select>
 	
 	
+	<!-- 게시판 - 게시물 목록 조회 -->
 	<select id="Board.boardPostList" parameterType="Map" resultMap="oracleBoardMap">
 		WITH /* Board.BoardPostList */
 		POST_LIST AS (
@@ -59,7 +63,7 @@
 			FROM 
 				PORTAL.BOARD_POST post 
 			WHERE 1=1
-				AND post.BRD_ID = #{boardId}
+				AND post.BRD_ID = #{BRD_ID}
 				AND post.DEL_YN = 'N'
 				<if test="searchKey != null and !searchKey.equals('') and searchVal != null and !searchVal.equals('')">
 					<choose>
@@ -131,6 +135,7 @@
 	</select>
 	
 	
+	<!-- 게시판 - 게시물 상세 -->
 	<select id="Board.boardPostDetail" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
 		SELECT /* Board.boardPostDetail */
 		 	  post.POST_ID
@@ -165,35 +170,57 @@
 				ON (post.BRD_ID = board.BRD_ID) 
 		WHERE 1=1
 			AND post.DEL_YN = 'N'
-			AND post.POST_ID = #{postId}
-			AND post.BRD_ID = #{boardId}
+			AND post.POST_ID = #{POST_ID}
+			AND post.BRD_ID = #{BRD_ID}
 	</select>
 	
 	
-	<select id="Board.boardPostFileList" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
-		SELECT /* Board.boardPostFileList */
-			  post_file.FILE_ID
-			, post_file.POST_ID
-			, post_file.FILE_TYPE
-			, post_file.PARENT_CMNT_ID
-			, post_file.SRV_FILE_PATH
-			, post_file.SRV_FILE_NM
-			, post_file.ORG_FILE_NM
-			, post_file.FILE_EXT
-			, post_file.FILE_SIZE
-			, post_file.DEL_YN
-			, post_file.CRT_DT_TM
-			, post_file.CRT_USR_ID
-			, post_file.MOD_DT_TM
-			, post_file.MOD_USR_ID
-		FROM
-			PORTAL.BOARD_POST_FILE post_file
-		WHERE 1=1
-			AND post_file.DEL_YN = 'N'
-			AND post_file.POST_ID = #{postId}
+	<!-- 게시판 - 게시물 이전글,다음글 -->
+	<select id="Board.boardPostBeforeNext" parameterType="Map" resultMap="oracleBoardMap">
+			WITH /* Board.boardPostBeforeNext */
+			POST_BEFORE AS (
+				SELECT
+					'BEFORE' AS POST_LOCATION
+					, post.BRD_ID 
+					, post.POST_ID
+					, post.POST_TITLE 
+				FROM 
+					PORTAL.BOARD_POST post
+				WHERE 1=1
+					AND post.DEL_YN = 'N'
+					AND post.POST_ID <![CDATA[<]]> #{POST_ID}
+					AND post.BRD_ID = #{BRD_ID}
+					AND ROWNUM = 1
+				ORDER BY 
+					post.POST_ID DESC
+			)
+			, POST_NEXT AS (
+				SELECT
+					'NEXT' AS POST_LOCATION
+					, post.BRD_ID 
+					, post.POST_ID
+					, post.POST_TITLE 
+				FROM 
+					PORTAL.BOARD_POST post
+				WHERE 1=1
+					AND post.DEL_YN = 'N'
+					AND post.POST_ID <![CDATA[>]]> #{POST_ID}
+					AND post.BRD_ID = #{BRD_ID}
+					AND ROWNUM = 1
+				ORDER BY 
+					post.POST_ID ASC
+			)
+			SELECT 
+				*
+			FROM (
+				SELECT * FROM POST_BEFORE
+				UNION ALL 
+				SELECT * FROM POST_NEXT
+			)
 	</select>
 	
 	
+	<!-- 게시판 - 게시물 추가 -->
 	<insert id="Board.boardPostInsert" parameterType="Map" useGeneratedKeys="true" keyColumn="POST_ID" keyProperty="keyNum">
 		<selectKey resultType="int" keyProperty="insertKey" order="BEFORE">
         	SELECT
@@ -237,6 +264,94 @@
 	</insert>
 	
 	
+	<!-- 게시판 - 게시물 수정 -->
+	<update id="Board.boardPostUpdate" parameterType="Map"> <!-- keyProperty="keyNum" -->
+    	UPDATE /* Board.boardPostUpdate */
+    		PORTAL.BOARD_POST
+    	SET
+    		    BRD_ID = #{BRD_ID}
+    		  , POST_TITLE = #{POST_TITLE}
+    		  , POST_CONTENT = #{POST_CONTENT}
+    		  , POST_VIEW_AUTH = #{POST_VIEW_AUTH}
+    		  , POPUP_YN = #{POPUP_YN}
+    		  , POPUP_START_DT_TM = #{POPUP_START_DT_TM}
+    		  , POPUP_END_DT_TM = #{POPUP_END_DT_TM}
+    		  , SECRET_YN = #{SECRET_YN}
+    		  , FIX_YN = #{FIX_YN}
+    		  , DEL_YN = 'N'
+    		  , MOD_DT_TM = SYSDATE
+    		  , MOD_USR_ID = #{userId}
+    		WHERE 1=1
+    			AND POST_ID = #{POST_ID}
+	</update>
+	
+	
+	<!-- 게시판 - 게시물 삭제 -->
+	<update id="Board.boardPostDelete" parameterType="Map">
+    	UPDATE /* Board.boardPostDelete */
+    		PORTAL.BOARD_POST
+    	SET
+   		    DEL_YN = 'Y'
+   		  , MOD_DT_TM = SYSDATE
+   		  , MOD_USR_ID = #{userId}
+   		WHERE 1=1
+   			AND POST_ID = #{POST_ID}
+   			AND BRD_ID = #{BRD_ID}
+	</update>
+	
+	
+	<!-- 게시판 - 게시물 - 파일 목록 조회 -->
+	<select id="Board.boardPostFileList" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
+		SELECT /* Board.boardPostFileList */
+			  post_file.FILE_ID
+			, post_file.POST_ID
+			, post_file.FILE_TYPE
+			, post_file.PARENT_CMNT_ID
+			, post_file.SRV_FILE_PATH
+			, post_file.SRV_FILE_NM
+			, post_file.ORG_FILE_NM
+			, post_file.FILE_EXT
+			, post_file.FILE_SIZE
+			, post_file.DEL_YN
+			, post_file.CRT_DT_TM
+			, post_file.CRT_USR_ID
+			, post_file.MOD_DT_TM
+			, post_file.MOD_USR_ID
+		FROM
+			PORTAL.BOARD_POST_FILE post_file
+		WHERE 1=1
+			AND post_file.DEL_YN = 'N'
+			AND post_file.POST_ID = #{POST_ID}
+	</select>
+	
+	
+	<!-- 게시판 - 게시물 - 파일 상세 -->
+	<select id="Board.boardPostFileDetail" resultType="HashMap" parameterType="Map">
+		SELECT /* Board.boardPostFileSelect */
+			  FILE_ID
+			, POST_ID
+			, FILE_TYPE
+			, PARENT_CMNT_ID
+			, SRV_FILE_PATH
+			, SRV_FILE_NM
+			, ORG_FILE_NM
+			, FILE_EXT
+			, FILE_SIZE
+			, DEL_YN
+			, CRT_DT_TM
+			, CRT_USR_ID
+			, MOD_DT_TM
+			, MOD_USR_ID
+		FROM
+			PORTAL.BOARD_POST_FILE
+		WHERE 1=1
+			AND FILE_ID = #{FILE_ID}
+			AND POST_ID = #{POST_ID}
+			AND DEL_YN = 'N'
+	</select>
+	
+	
+	<!-- 게시판 - 게시물 - 파일 추가 -->
 	<insert id="Board.boardPostFileInsert" parameterType="Map" useGeneratedKeys="true" keyColumn="POST_ID" keyProperty="keyNum">
 		<selectKey resultType="int" keyProperty="insertFileKey" order="BEFORE">
 			SELECT
@@ -277,52 +392,8 @@
 	</insert>
 	
 	
-	<update id="Board.boardPostUpdate" parameterType="Map"> <!-- keyProperty="keyNum" -->
-    	UPDATE /* Board.boardPostUpdate */
-    		PORTAL.BOARD_POST
-    	SET
-    		    BRD_ID = #{BRD_ID}
-    		  , POST_TITLE = #{POST_TITLE}
-    		  , POST_CONTENT = #{POST_CONTENT}
-    		  , POST_VIEW_AUTH = #{POST_VIEW_AUTH}
-    		  , POPUP_YN = #{POPUP_YN}
-    		  , POPUP_START_DT_TM = #{POPUP_START_DT_TM}
-    		  , POPUP_END_DT_TM = #{POPUP_END_DT_TM}
-    		  , SECRET_YN = #{SECRET_YN}
-    		  , FIX_YN = #{FIX_YN}
-    		  , DEL_YN = 'N'
-    		  , MOD_DT_TM = SYSDATE
-    		  , MOD_USR_ID = #{userId}
-    		WHERE 1=1
-    			AND POST_ID = #{POST_ID}
-	</update>
-	
-	
-	<select id="Board.boardPostFileSelect" resultType="HashMap" parameterType="Map">
-		SELECT /* Board.boardPostFileSelect */
-			  FILE_ID
-			, POST_ID
-			, FILE_TYPE
-			, PARENT_CMNT_ID
-			, SRV_FILE_PATH
-			, SRV_FILE_NM
-			, ORG_FILE_NM
-			, FILE_EXT
-			, FILE_SIZE
-			, DEL_YN
-			, CRT_DT_TM
-			, CRT_USR_ID
-			, MOD_DT_TM
-			, MOD_USR_ID
-		FROM
-			PORTAL.BOARD_POST_FILE
-		WHERE 1=1
-			AND FILE_ID = #{FILE_ID}
-			AND POST_ID = #{POST_ID}
-	</select>
-	
-	
-	<update id="Board.boardPostFileDelete" parameterType="Map"> <!-- keyProperty="keyNum" -->
+	<!-- 게시판 - 게시물 - 파일 삭제 -->
+	<update id="Board.boardPostFileDelete" parameterType="Map">
     	UPDATE /* Board.boardPostFileDelete */
     		PORTAL.BOARD_POST_FILE
     	SET
@@ -336,7 +407,6 @@
    					#{item}
    				</foreach>
    			)
-   			
 	</update>
 	
 	

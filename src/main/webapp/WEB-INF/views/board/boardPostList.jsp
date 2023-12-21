@@ -3,15 +3,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
-	String boardId = (String)request.getParameter("boardId");
-	System.out.println("\n\n\n boardPostList.jsp =>>> " + boardId);
-	
-	System.out.println("USR_ID(SESS) ["+session.getAttribute("mstrUserIdAttr")+"]");
-	String sUserId = (String) session.getAttribute("mstrUserIdAttr");
+	String boardId = (String)request.getParameter("BRD_ID");
 	
 	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
 %>
-<c:set var="usrId" value="<%=sUserId%>"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,7 +37,10 @@
 			<div class="col-md-1">
 				<button class="btn btn-primary btn-sm" onclick="searchBoardPostList()">조회</button>
 			</div>
-			<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
+			<% if(
+				(boardId.equals("1") && PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN"))
+				|| !boardId.equals("1")					
+			) { %>
 			<!-- 관리자 기능 -->
 			<div class="col text-end">
 				<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
@@ -106,7 +104,7 @@
 				  url : '${pageContext.request.contextPath}/app/board/boardPostListGrid.json'
 				, type : 'POST'
 				, data : function(data) {
-					data['boardId'] = boardId;
+					data['BRD_ID'] = boardId;
 					data['listViewCount'] = listViewCount;
 					data['searchKey'] = searchKey;
 					data['searchVal'] = searchVal;
@@ -214,7 +212,7 @@
 	//게시물 작성
 	function writeBoardPost() {
 		let pagePrams = [
-			["boardId", boardId]
+			['BRD_ID', boardId]
 		];
 		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
 	}

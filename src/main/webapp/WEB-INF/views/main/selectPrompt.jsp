@@ -10,7 +10,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>프롬프트 선택</title>
 	
-	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/bootstrap-5.3.2-dist/css/bootstrap.min.css?v=20231006001" >
+<%-- 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" /> --%>
 </head>
 <body>
 	<div class="d-flex align-items-center justify-content-center vh-100">
