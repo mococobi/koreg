@@ -46,8 +46,8 @@
 .content .run-setting-box li:not(:last-child){margin-right: 32px; padding-right: 32px;}
 .content .run-setting-box li:not(:last-child)::after{content: ''; position: absolute; width: 1px; height: 20px; background: #dbdbdb; right: 0;}
 .content .run-setting-box label{font-size: 1.6rem; margin-right: 8px; font-weight: 500;}
-.content .run-setting-box select{border-radius: 6px; border: 0; width: 128px; padding: 10px 12px;}
-.content .run-setting-box input{border-radius: 6px; border: 0; width: 128px; padding: 10px 12px;}
+.content .run-setting-box_select{border-radius: 6px; border: 0; width: 128px; padding: 10px 12px;}
+.content .run-setting-box_input{border-radius: 6px; border: 0; width: 128px; padding: 10px 12px;}
 .content .run-box .btn-run{margin-left: 20px; font-size: 1.6rem; color: #fff; font-weight: 500; padding: 8px 0; background: #307fe2; border-radius: 6px; width: 100px;}
 
 .content {width: calc(100% - 210px);}
