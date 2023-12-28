@@ -28,7 +28,7 @@ var promptRenderer = {
 	'value-default': {
 		  'label' : _defaultElemRenderer['label']
 		, 'body' : function($wrapper, data) {
-			var $input = $('<input ui-type="value-default" type="text" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" value="' + (data['defaultAnswer'] ? data['defaultAnswer'] : '') + '"/>');
+			var $input = $('<input class="run-setting-box_input" ui-type="value-default" type="text" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" value="' + (data['defaultAnswer'] ? data['defaultAnswer'] : '') + '"/>');
 			$wrapper.append($input);
 		}
 		, 'selected': function($elem) {
@@ -41,7 +41,7 @@ var promptRenderer = {
 	, 'list-default' : {
 		  'label' : _defaultElemRenderer['label']
 		, 'body' : function($wrapper, data) {
-			var $select = $('<select class="form-select" ui-type="list-default" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '"></select>');
+			var $select = $('<select class="run-setting-box_select form-select" ui-type="list-default" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '"></select>');
 			$wrapper.append($select);
 			if (data['suggestedAnswers']) {
 				var selectedId = undefined;
@@ -77,7 +77,7 @@ var promptRenderer = {
 	, 'multiSelect-default': {
 		  'label': _defaultElemRenderer['label']
 		, 'body': function($wrapper, data) {
-			var $select = $('<select class="form-select" ui-type="multiSelect-default" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
+			var $select = $('<select class="run-setting-box_select form-select" ui-type="multiSelect-default" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
 			+ 'prompt-title="' + data['title'] + '" prompt-min="' + data['min'] + '" prompt-max="' + data['max'] + '" prompt-required="' + data['required'] + '" '
 			+ 'multiple="multiple"></select>');
 			$wrapper.append($select);
@@ -104,7 +104,7 @@ var promptRenderer = {
 					, selectAll : true
 					, maxHeight : 300
 					, maxWidth : 800
-					, maxPlaceholderOpts : 1
+					, maxPlaceholderOpts : 3
 					, checkboxAutoFit : true
 				});
 			}
@@ -154,10 +154,10 @@ var promptRenderer = {
 	, 'date': {
 		  'label' : _defaultElemRenderer['label']
 		, 'body' : function($wrapper, data) {
-			var $day = $('<input class="form-control" ui-type="date" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
+			var $day = $('<input class="run-setting-box_input" class="form-control" ui-type="date" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
 			+ 'prompt-title="' + data['title'] + '" prompt-min="' + data['min'] + '" prompt-max="' + data['max'] + '" prompt-required="' + data['required'] + '" '
 			+ 'prompt-promptType="' + data['promptType'] + '" prompt-promptSubType="' + data['promptSubType'] + '"'
-			+ 'style="cursor:pointer; width: 50%;"/>');
+			+ 'style="cursor:pointer;"/>');
 			$wrapper.append($day);
 			
 			//전일자 기본
@@ -259,9 +259,9 @@ var promptRenderer = {
 	, 'month': {
 		  'label' : _defaultElemRenderer['label']
 		, 'body' : function($wrapper, data) {
-			var $month = $('<input class="form-control" ui-type="month" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
+			var $month = $('<input class="run-setting-box_input" class="form-control" ui-type="month" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
 			+ 'prompt-title="' + data['title'] + '" prompt-min="' + data['min'] + '" prompt-max="' + data['max'] + '" prompt-required="' + data['required'] + '" '
-			+ 'style="cursor:pointer; width: 50%;"/>');
+			+ 'style="cursor:pointer;"/>');
 			$wrapper.append($month);
 		    let selectDate = new AirDatepicker('input[prompt-id="'+ data['id'] +'"]', {
 				  locale : commonAirDatepickerLanguage()
@@ -336,9 +336,9 @@ var promptRenderer = {
 	, 'year': {
 		  'label': _defaultElemRenderer['label']
 		, 'body': function($wrapper, data) {
-			var $year = $('<input class="form-control" ui-type="year" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
+			var $year = $('<input class="run-setting-box_input" class="form-control" ui-type="year" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
 			+ 'prompt-title="' + data['title'] + '" prompt-min="' + data['min'] + '" prompt-max="' + data['max'] + '" prompt-required="' + data['required'] + '" '
-			+ 'style="cursor:pointer; width: 50%;"/>');
+			+ 'style="cursor:pointer;"/>');
 			$wrapper.append($year);
 			
 			let selectDate = new AirDatepicker('input[prompt-id="'+ data['id'] +'"]', {
