@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+	<entry key="portal.application.file.name">Koreg</entry> <!-- Gcgf, Koreg -->
 	<entry key="enc.token">mococoportal2023</entry>
 	
 	<entry key="mstr.server.name">WIN-QS3VSHTT7D7</entry>
@@ -24,10 +25,13 @@
 	<entry key="attach.base.file.size">104857600</entry>
 	<entry key="attach.base.file.extension">.DOC,.DOCX,.PPTX,.PPT,.XLS,.XLSX,.PDF,.PNG,.GIF,.JPG,.JPEG</entry>
 	
-	<entry key="portal.main.display">MSTR_DASHBOARD</entry><!-- MSTR_DASHBOARD, MAIN -->
+	<entry key="portal.main.display">MAIN</entry><!-- MSTR_DASHBOARD, MAIN -->
 	<entry key="portal.main.dashboard.id">4DBD67E243DB89B5B9BCC3BEB8FE2CFF</entry><!-- 메인화면 표시 대표 대시보드 -->
-	<entry key="portal.main.dashboard.type">55</entry><!-- 메인화면 표시 대표 대시보드 타입 -->
+	<entry key="portal.main.dashboard.type">56</entry><!-- 메인화면 표시 대표 대시보드 타입 -->
 	
 	<entry key="portal.iframe.page.move.yn">N</entry><!-- 리포트 클릭시 화면 전환 -->
+	
+	<entry key="portal.sso.token.api.key">N</entry><!-- 포탈 SSO 토큰 키 -->
+	
 	
 </properties>
