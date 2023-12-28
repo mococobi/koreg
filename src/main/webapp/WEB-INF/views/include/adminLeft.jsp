@@ -69,6 +69,15 @@
 			  overflow-y: auto;
 			}
 			
+			  #left_menu_tree
+			, #left_menu_tree a
+			, #left_menu_tree input
+			, #left_menu_tree span
+			, #left_menu_tree select
+			, #left_menu_tree button {
+				font-size: 1.5rem;
+			}
+			
 		</style>
 	</head>
 <body>

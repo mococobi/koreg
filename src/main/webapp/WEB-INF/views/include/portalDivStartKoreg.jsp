@@ -1,8 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
 <%@ page import="com.mococo.web.util.CustomProperties" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <% 
 	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
+
+	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
+	pageContext.setAttribute("portalAppName", portalAppName);
 %>
 <!DOCTYPE html>
 <html>
@@ -16,14 +20,14 @@
 	    <!-- //pop -->
 	    
 	    <!-- header -->
-	    <jsp:include flush="true" page="/WEB-INF/views/include/portalTop_Center.jsp" />
+	    <jsp:include flush="true" page="/WEB-INF/views/include/portalTop_Center${portalAppName}.jsp" />
 	   
 		<!-- contents -->
         <div class="contents"> <!-- 본문 영역 -->
             <div class="bg sky"> <!-- 본문 배경색 -->
                 <div class="inner flex">
                 	<!-- Left Menu -->
-                	<jsp:include flush="true" page="/WEB-INF/views/include/portalLeft.jsp" />
+                	<jsp:include flush="true" page="/WEB-INF/views/include/portalLeft${portalAppName}.jsp" />
                 	
                     <div class="content flex2">
                         <div class="cont-area">

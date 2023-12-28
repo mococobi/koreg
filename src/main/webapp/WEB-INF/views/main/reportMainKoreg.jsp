@@ -17,6 +17,9 @@
     	type = ((Integer)request.getAttribute("type")).toString();
     	isvi = (Boolean)request.getAttribute("isvi");
     }
+    
+    String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
+    pageContext.setAttribute("portalAppName", portalAppName);
 %>
 <!DOCTYPE html>
 <html>
@@ -215,7 +218,7 @@
 </script>
 </head>
 <body>
-	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart.jsp" />
+	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 	
 	<div class="run-box flex">
 		<!-- 프롬프트 영역 -->
@@ -225,7 +228,7 @@
 	
 	<div class="top cont-wrap flex" style="height: calc(100vh - 275px);">
 	    <iframe name="mstrReport" id="mstrReport" src=""
-				style="width: 100%; border: 1px solid silver; margin: 0px;"
+				style="width: 100%; border: 1px solid silver; margin: 0px; background: #fff; border-radius: 8px; border: 1px solid #c8d8ec;"
 				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto">
 		</iframe>
 	</div>

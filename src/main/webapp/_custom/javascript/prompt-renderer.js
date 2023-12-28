@@ -159,13 +159,18 @@ var promptRenderer = {
 			+ 'prompt-promptType="' + data['promptType'] + '" prompt-promptSubType="' + data['promptSubType'] + '"'
 			+ 'style="cursor:pointer; width: 50%;"/>');
 			$wrapper.append($day);
+			
+			//전일자 기본
+			let currentDate = new Date();
+			currentDate.setDate(currentDate.getDate() - 1);
+			
 		    let selectDate = new AirDatepicker('input[prompt-id="'+ data['id'] +'"]', {
 				  locale : commonAirDatepickerLanguage()
 				, navTitles: {
 			          days: '<strong>yyyy</strong> <i>MMMM</i>'
 			        , months: '<strong>yyyy</strong>'
 			    }
-				, selectedDates : [new Date()]
+				, selectedDates : [currentDate]
 //				, buttons: ['today', 'clear']
 			    , autoClose : true
 			    , minDate : (data['promptSubType'] == 2565 && data['min']) ? new Date(data['min']) : false

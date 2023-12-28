@@ -15,11 +15,40 @@
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
+	
+	<style type="text/css">
+		#board_table th, #board_table td {
+		    border: 1px solid;
+		}
+		.themed-grid-col {
+		  padding-top: .75rem;
+		  padding-bottom: .75rem;
+/* 		  background-color: rgba(112.520718, 44.062154, 249.437846, .15); */
+		  border: 1px solid rgba(112.520718, 44.062154, 249.437846, .3);
+		}
+		
+		  #board_div
+		, #board_div a
+		, #board_div input
+		, #board_div span
+		, #board_div select
+		, #board_div button {
+			font-size: 1.5rem;
+		}
+		
+		#board_div .h3 {
+			font-size: 4rem;
+		}
+		
+		#board_div .h6 {
+			font-size: 2.5rem;
+		}
+	</style>
 </head>
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/adminDivStart.jsp" />
 	
-	<div class="container py-4">
+	<div id="board_div" class="container py-4" style="max-width: 100%;">
 		<p class="h3">게시판 관리</p>
 		<p class="h6">게시판을 관리할 수 있습니다.</p>
 		<div class="row mb-3">

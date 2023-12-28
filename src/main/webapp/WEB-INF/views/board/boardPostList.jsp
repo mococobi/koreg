@@ -1,11 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
+<%@ page import="com.mococo.web.util.CustomProperties" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
 	String boardId = (String)request.getParameter("BRD_ID");
 	
 	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
+	
+	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
+	pageContext.setAttribute("portalAppName", portalAppName);
 %>
 <!DOCTYPE html>
 <html>
@@ -17,11 +21,30 @@
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
+	
+	<style type="text/css">
+		  #boardPost_div
+		, #boardPost_div a
+		, #boardPost_div input
+		, #boardPost_div span
+		, #boardPost_div select
+		, #boardPost_div button {
+			font-size: 1.5rem;
+		}
+		
+		#boardPost_div .h3 {
+			font-size: 4rem;
+		}
+		
+		#boardPost_div .h6 {
+			font-size: 2.5rem;
+		}
+	</style>
 </head>
 <body>
-	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart.jsp" />
+	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 	
-	<div class="container py-4">
+	<div id="boardPost_div" class="container py-4" style="max-width: 100%;">
 		<p class="h3">${postData['BRD_NM']}</p>
 		<p class="h6">${postData['BRD_DESC']}</p>
 		<div class="row mb-3">

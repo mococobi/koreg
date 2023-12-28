@@ -15,29 +15,54 @@
 	
 	pageContext.setAttribute("attachBaseFileSize", attachBaseFileSize);
 	pageContext.setAttribute("attachBaseFileExtension", attachBaseFileExtension);
+	
+	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
+	pageContext.setAttribute("portalAppName", portalAppName);
 %>
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${postData['BRD_NM']} - 작성</title>
-
-<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
-<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
-<link rel="stylesheet" href="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/daterangepicker.css"/>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/_custom/javascript/toastui-editor/toastui-editor.min.css" />
-
-<script src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/daterangepicker.js"></script>
-<script src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/moment.min.js"></script>
-<script src="${pageContext.request.contextPath}/_custom/javascript/toastui-editor/toastui-editor-all.min.js"></script>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>${postData['BRD_NM']} - 작성</title>
+	
+	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
+	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/daterangepicker.css"/>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/_custom/javascript/toastui-editor/toastui-editor.min.css" />
+	
+	<script src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/daterangepicker.js"></script>
+	<script src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/moment.min.js"></script>
+	<script src="${pageContext.request.contextPath}/_custom/javascript/toastui-editor/toastui-editor-all.min.js"></script>
+	
+	<style type="text/css">
+		#board_table th, #board_table td {
+		    border: 1px solid;
+		}
+		  #boardPost_div
+		, #boardPost_div a
+		, #boardPost_div input
+		, #boardPost_div span
+		, #boardPost_div select
+		, #boardPost_div button {
+			font-size: 1.5rem;
+		}
+		
+		#boardPost_div .h3 {
+			font-size: 4rem;
+		}
+		
+		#boardPost_div .h6 {
+			font-size: 2.5rem;
+		}
+	</style>
 
 </head>
 <body>
-	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart.jsp" />
+	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 
-	<div class="container py-4">
+	<div id="boardPost_div" class="container py-4" style="max-width: 100%;">
 		<p class="h3">${postData['BRD_NM']}</p>
 		<p class="h6">${postData['BRD_DESC']}</p>
 		<div class="row mb-3">

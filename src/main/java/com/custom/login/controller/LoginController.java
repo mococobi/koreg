@@ -67,6 +67,18 @@ public class LoginController {
     
     
     /**
+     * SSO 로그인 화면 이동
+     * @return
+     */
+    @RequestMapping(value = "/login/ssoUserView.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView ssoUserView(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView view = new ModelAndView("login/ssoUser");
+        
+        return view;
+    }
+    
+    
+    /**
      * 로그인 화면 이동
      * @return
      */

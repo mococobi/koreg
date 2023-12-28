@@ -318,31 +318,55 @@ function getMstrFormDefinition(type) {
 	let rtnInput;
 	
 	let formDefs = {
-		common: {
+		common : {
 			  server: __mstrServerName
 			, port: __mstrServerPort
 			, project: __mstrDefaultProjectName
 			, hiddenSections: 'path,header,footer,dockLeft'
 			, promptAnswerMode: '2'
 		}
-		, report: {
+		, report : {
 			  evt: '4001'
 			, src: 'mstrWeb.4001'
 			, reportID: objectId
 		}
-		, document: {
+		/*
+		, document : {
 	          evt: '2048001'
 	        , src: 'mstrWeb.2048001'
 	        , documentID: objectId
 	        , share: '1'
 	    	, hiddenSections: 'dockTop,path,header,footer'
 		}
+		*/
+		, document : {
+	          evt: '2048001'
+	        , src: 'mstrWeb.2048001'
+	        , documentID: objectId
+	        , share: '1'
+	    	, hiddenSections: 'header,footer'
+		}
+		/*
 		, dossier: {
 	          evt: '3140'
 	        , src: 'mstrWeb.3140'
 	        , documentID: objectId
 	        , share: '1'
 	    	, hiddenSections: 'dockTop,path,header,footer'
+		}
+		*/
+		, dossier : {
+	          evt: '3140'
+	        , src: 'mstrWeb.3140'
+	        , documentID: objectId
+	    	, hiddenSections: 'path,header,footer'
+		}
+		, dossier_main : {
+	          evt: '3140'
+	        , src: 'mstrWeb.3140'
+	        , documentID: objectId
+	        , share: '1'
+	    	, hiddenSections: 'path,header,footer'
 		}
 	}
 	
@@ -355,6 +379,13 @@ function getMstrFormDefinition(type) {
 		case 55:
 	        if (isvi == true) {
 	        	$.extend(rtnInput, formDefs['dossier']);
+	        } else {
+	        	$.extend(rtnInput, formDefs['document']);
+	        }
+			break;
+		case 56:
+	        if (isvi == true) {
+	        	$.extend(rtnInput, formDefs['dossier_main']);
 	        } else {
 	        	$.extend(rtnInput, formDefs['document']);
 	        }

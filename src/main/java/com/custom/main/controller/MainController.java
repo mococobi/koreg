@@ -75,7 +75,7 @@ public class MainController {
      */
     @RequestMapping(value = "/main/reportMainView.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView reportMainView() {
-        ModelAndView view = new ModelAndView("main/reportMain");
+        ModelAndView view = new ModelAndView("main/reportMain" + CustomProperties.getProperty("portal.application.file.name"));
         
         return view;
     }

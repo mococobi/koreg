@@ -5,17 +5,22 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
 	String objectId = "";
-    String type = "";
+    String tmpType = "";
     boolean isvi = StringUtils.equalsIgnoreCase("y", request.getParameter("isvi"));
     
     if(request.getParameter("objectId") != null) {
     	objectId = StringUtils.defaultString(request.getParameter("objectId"));
-    	type = StringUtils.defaultString(request.getParameter("type"));
+    	tmpType = StringUtils.defaultString(request.getParameter("type"));
     } else if(request.getAttribute("portalMainDashboardId") != null) {
     	objectId = StringUtils.defaultString((String)request.getAttribute("portalMainDashboardId"));
-    	type = StringUtils.defaultString((String)request.getAttribute("type"));
+    	tmpType = StringUtils.defaultString((String)request.getAttribute("type"));
     	isvi = (Boolean)request.getAttribute("isvi");
     }
+    
+    int type = Integer.parseInt(tmpType);
+    
+    String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
+    pageContext.setAttribute("portalAppName", portalAppName);
 %>
 <!DOCTYPE html>
 <html>
@@ -35,11 +40,11 @@
 	</style>
 </head>
 <body>
-	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart.jsp" />
+	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 	
-	<div class="top cont-wrap flex" style="height: calc(100vh - 198px);">
+	<div class="top cont-wrap flex" style="height: calc(100vh - 122px);">
 	    <iframe name="mainReport" id="mainReport" src=""
-				style="width: 100%; border: 1px solid silver; margin: 0px;"
+				style="width: 100%; border: 1px solid silver; margin: 0px; background: #fff; border-radius: 8px; border: 1px solid #c8d8ec;"
 				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto">
 		</iframe>
 	</div>
@@ -48,7 +53,7 @@
 	
 <script type="text/javascript">
 	var objectId = "<%= objectId %>";
-	var type = "<%= type %>";
+	var type = <%= type %>;
 	var isvi = <%= isvi %>;
 	
 

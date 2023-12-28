@@ -20,7 +20,7 @@
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/moment.min.js?v=20231006001"></script>
 
 <!-- 공통 CSS -->
-<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/common.js?v=20231006001"></script>
+<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/common.js?v=20231228001"></script>
 
 <script type="text/javascript">
 	var __contextPath = "${pageContext.request.contextPath}";
