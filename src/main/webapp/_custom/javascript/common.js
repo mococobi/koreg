@@ -330,7 +330,6 @@ function getMstrFormDefinition(type) {
 			, src: 'mstrWeb.4001'
 			, reportID: objectId
 		}
-		/*
 		, document : {
 	          evt: '2048001'
 	        , src: 'mstrWeb.2048001'
@@ -338,15 +337,20 @@ function getMstrFormDefinition(type) {
 	        , share: '1'
 	    	, hiddenSections: 'dockTop,path,header,footer'
 		}
-		*/
-		, document : {
+		, Gcgf_document : {
 	          evt: '2048001'
 	        , src: 'mstrWeb.2048001'
 	        , documentID: objectId
 	        , share: '1'
 	    	, hiddenSections: 'header,footer'
 		}
-		/*
+		, Koreg_document : {
+	          evt: '2048001'
+	        , src: 'mstrWeb.2048001'
+	        , documentID: objectId
+	        , share: '1'
+	    	, hiddenSections: 'dockTop,path,header,footer'
+		}
 		, dossier: {
 	          evt: '3140'
 	        , src: 'mstrWeb.3140'
@@ -354,14 +358,20 @@ function getMstrFormDefinition(type) {
 	        , share: '1'
 	    	, hiddenSections: 'dockTop,path,header,footer'
 		}
-		*/
-		, dossier : {
+		, Gcgf_dossier : {
 	          evt: '3140'
 	        , src: 'mstrWeb.3140'
 	        , documentID: objectId
 	    	, hiddenSections: 'path,header,footer'
 		}
-		, dossier_main : {
+		, Gcgf_dossier_main : {
+	          evt: '3140'
+	        , src: 'mstrWeb.3140'
+	        , documentID: objectId
+	        , share: '1'
+	    	, hiddenSections: 'path,header,footer'
+		}
+		, Koreg_dossier: {
 	          evt: '3140'
 	        , src: 'mstrWeb.3140'
 	        , documentID: objectId
@@ -378,16 +388,16 @@ function getMstrFormDefinition(type) {
 			break;
 		case 55:
 	        if (isvi == true) {
-	        	$.extend(rtnInput, formDefs['dossier']);
+	        	$.extend(rtnInput, formDefs[__portalAppName + '_dossier']);
 	        } else {
-	        	$.extend(rtnInput, formDefs['document']);
+	        	$.extend(rtnInput, formDefs[__portalAppName + '_document']);
 	        }
 			break;
-		case 56:
+		case 551:
 	        if (isvi == true) {
-	        	$.extend(rtnInput, formDefs['dossier_main']);
+	        	$.extend(rtnInput, formDefs[__portalAppName + '_dossier_main']);
 	        } else {
-	        	$.extend(rtnInput, formDefs['document']);
+	        	$.extend(rtnInput, formDefs[__portalAppName + '_document']);
 	        }
 			break;
 		default:

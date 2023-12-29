@@ -27,7 +27,7 @@
 	
 	<entry key="portal.main.display">MAIN</entry><!-- MSTR_DASHBOARD, MAIN -->
 	<entry key="portal.main.dashboard.id">4DBD67E243DB89B5B9BCC3BEB8FE2CFF</entry><!-- 메인화면 표시 대표 대시보드 -->
-	<entry key="portal.main.dashboard.type">56</entry><!-- 메인화면 표시 대표 대시보드 타입 -->
+	<entry key="portal.main.dashboard.type">551</entry><!-- 메인화면 표시 대표 대시보드 타입 -->
 	
 	<entry key="portal.iframe.page.move.yn">N</entry><!-- 리포트 클릭시 화면 전환 -->
 	

@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
-
+<%@ page import="com.mococo.web.util.CustomProperties" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<% 
+	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
+	pageContext.setAttribute("portalAppName", portalAppName);
+%>
 <!-- Bootstrap JS -->
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/style/bootstrap-5.3.2-dist/js/bootstrap.bundle.min.js?v=20231006001"></script>
 
@@ -23,5 +27,6 @@
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/common.js?v=20231228001"></script>
 
 <script type="text/javascript">
-	var __contextPath = "${pageContext.request.contextPath}";
+	var __contextPath = '${pageContext.request.contextPath}';
+	var __portalAppName = '${portalAppName}';
 </script>
