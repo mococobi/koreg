@@ -20,13 +20,32 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 	
 	<style type="text/css">
+		  #main_div
+		, #main_div a
+		, #main_div input
+		, #main_div span
+		, #main_div select
+		, #main_div button {
+			font-size: 1.5rem;
+			font-family: 맑은 고딕;
+		}
+		
+		#main_div .h3 {
+			font-size: 3rem;
+			font-family: 맑은 고딕;
+		}
+		
+		#main_div .h6 {
+			font-size: 2rem;
+			font-family: 맑은 고딕;
+		}
 	</style>
 </head>
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 
 <div>
-	<div class="container py-1" style="max-width: 100%;">
+	<div id="main_div" class="container py-1" style="max-width: 100%;">
 		<!-- 이미지 영역 -->
 		<div class="mb-4 bg-body-tertiary rounded-3">
 			<img alt="메인 이미지" src="${pageContext.request.contextPath}/_custom/image/main/mainImage.png?v=20231123001" style="width: 100%; height: calc(23vh);">

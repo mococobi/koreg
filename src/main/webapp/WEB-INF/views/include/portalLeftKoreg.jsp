@@ -185,13 +185,14 @@
 				, ["type", menu['type']]
 				, ["subType", menu['subType']]
 			  	, ["isvi", menu['isVI']]
+				, ["title", encodeURI(menu['name'])]
 			];
 			
 			if('${portalIframePageMoveYn}' == 'Y') {
-				pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams);
+				pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams, 1);
 			} else {
 				if($('#mstrReport').length == 0) {
-					pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams);
+					pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams, 1);
 				} else {
 					objectId = menu['id'];
 					type = menu['type'];

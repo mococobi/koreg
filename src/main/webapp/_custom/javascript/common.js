@@ -71,11 +71,11 @@ function moveAdminPage(moveAdminPage) {
 
 
 //POST 페이지 이동
-function pageGoPost(target, url, params) {
+function pageGoPost(target, url, params, level) {
 	let insdoc = '';
     
 	for (let i = 0; i < params.length; i++) {
-		insdoc += "<input type='hidden' name='"+ XSSCheck(params[i][0]) +"' value='"+ XSSCheck(params[i][1], 0) +"'>";
+		insdoc += "<input type='hidden' name='"+ XSSCheck(params[i][0]) +"' value='"+ XSSCheck(params[i][1], level) +"'>";
 	}
     
 	let goform = $('<form>', {

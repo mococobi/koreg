@@ -97,6 +97,7 @@ var promptRenderer = {
 					}
 					$select.append('<option value="' + v['id'] + '" ' + (selected ? ' selected="selected"' : '') + '>' + v['displayName'] + '</option>');
 				});
+				
 				$select.multiselect({
 					  columns : 1
 //					, search : true
@@ -186,6 +187,13 @@ var promptRenderer = {
 					selectDate.selectDate(new Date(changeStringToDate(data['defaultAnswer'])));
 				}
 			}
+			
+			//엔터키 이벤트
+			$day.on('keyup', function(e) {
+				if(e.keyCode==13) {
+					$('#run').trigger('click');
+				}
+			});
 		}
 		, 'selected' : function($elem) {
 			let promptVal = '';
@@ -283,6 +291,13 @@ var promptRenderer = {
 				selectDate.setViewDate(new Date(changeStringToDate(data['defaultAnswer'])));
 				selectDate.selectDate(new Date(changeStringToDate(data['defaultAnswer'])));
 			}
+			
+			//엔터키 이벤트
+			$month.on('keyup', function(e) {
+				if(e.keyCode==13) {
+					$('#run').trigger('click');
+				}
+			});
 		}
 		, 'selected' : function($elem) {
 			let promptVal = '';
@@ -333,9 +348,9 @@ var promptRenderer = {
 			return null;
 		}
 	}
-	, 'year': {
-		  'label': _defaultElemRenderer['label']
-		, 'body': function($wrapper, data) {
+	, 'year' : {
+		  'label' : _defaultElemRenderer['label']
+		, 'body' : function($wrapper, data) {
 			var $year = $('<input class="run-setting-box_input" class="form-control" ui-type="year" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
 			+ 'prompt-title="' + data['title'] + '" prompt-min="' + data['min'] + '" prompt-max="' + data['max'] + '" prompt-required="' + data['required'] + '" '
 			+ 'style="cursor:pointer;"/>');
@@ -360,6 +375,13 @@ var promptRenderer = {
 			if(data['defaultAnswer']) {
 				selectDate.selectDate(new Date(changeStringToDate(data['defaultAnswer'])));
 			}
+			
+			//엔터키 이벤트
+			$year.on('keyup', function(e) {
+				if(e.keyCode==13) {
+					$('#run').trigger('click');
+				}
+			});
 		}
 		, 'selected': function($elem) {
 			var selected = [];

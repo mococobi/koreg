@@ -26,12 +26,6 @@
 		#board_table th, #board_table td {
 		    border: 1px solid;
 		}
-		.themed-grid-col {
-		  padding-top: .75rem;
-		  padding-bottom: .75rem;
-/* 		  background-color: rgba(112.520718, 44.062154, 249.437846, .15); */
-		  border: 1px solid rgba(112.520718, 44.062154, 249.437846, .3);
-		}
 		
 		  #boardPost_div
 		, #boardPost_div a
@@ -40,14 +34,17 @@
 		, #boardPost_div select
 		, #boardPost_div button {
 			font-size: 1.5rem;
+			font-family: 맑은 고딕;
 		}
 		
 		#boardPost_div .h3 {
-			font-size: 4rem;
+			font-size: 3rem;
+			font-family: 맑은 고딕;
 		}
 		
 		#boardPost_div .h6 {
-			font-size: 2.5rem;
+			font-size: 2rem;
+			font-family: 맑은 고딕;
 		}
 	</style>
 </head>

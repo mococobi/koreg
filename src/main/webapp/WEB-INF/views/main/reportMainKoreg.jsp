@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="org.apache.commons.lang3.StringUtils"%>
+<%@ page import="java.net.URLDecoder"%>
 <%@ page import="com.microstrategy.web.objects.WebIServerSession"%>
 <%@ page import="com.microstrategy.web.objects.WebObjectsFactory"%>
 <%@ page import="com.mococo.web.util.CustomProperties"%>
@@ -8,6 +9,8 @@
 	String objectId = "";
     String type = "";
     boolean isvi = StringUtils.equalsIgnoreCase("y", request.getParameter("isvi"));
+    String title = StringUtils.defaultString(request.getParameter("title"));
+    title = URLDecoder.decode(title, "UTF-8");
     
     if(request.getParameter("objectId") != null) {
     	objectId = StringUtils.defaultString(request.getParameter("objectId"));
@@ -20,11 +23,12 @@
     
     String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
     pageContext.setAttribute("portalAppName", portalAppName);
+    pageContext.setAttribute("title", title);
 %>
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>${title}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/jquery-multiselect/jquery.multiselect.css?v=20231006001" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
@@ -44,6 +48,25 @@
 		    content: none !important;
 		}
 	</style>
+</head>
+<body>
+	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
+	
+	<div class="run-box flex">
+		<!-- 프롬프트 영역 -->
+	    <ul class="run-setting-box flex"></ul>
+	    <button id="run" class="btn-run blue">실행</button>
+	</div>
+	
+	<div class="top cont-wrap flex" style="height: calc(100vh - 275px);">
+	    <iframe name="mstrReport" id="mstrReport" src=""
+				style="width: 100%; border: 1px solid silver; margin: 0px; background: #fff; border-radius: 8px; border: 1px solid #c8d8ec;"
+				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto">
+		</iframe>
+	</div>
+	
+	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
+	
 <script type="text/javascript">
 	var objectId = "<%= objectId %>";
 	var type = <%= type %>;
@@ -63,28 +86,17 @@
 			$('#portal-loading').hide();
 		});
 		
+		$('#run').on('click', function() {
+			getAnswerXML();
+		})
+		
 		fnReportInit();
 	});
 	
 	
-    function popupCallback(promptId) {
-        console.log('=> promptId', promptId);
-    }
-    
-    
     //초기 실행 함수
 	function fnReportInit() {
-		$(window).resize(function() {
-			var height	= $(window).height();
-			var $report = $('.report-wrapper');
-			
-// 			$report.height( height - $report.offset().top - 18);
-		});
-		
-// 		$(window).resize();
-		
 		getPromptInfo();
-		$('#run').click(getAnswerXML);
 	}
 	
 	
@@ -97,16 +109,18 @@
 			  objectId : objectId
 			, type : type
 		};
-		callAjaxPost('/mstr/getReportInfo.json', callParams, function(data){
+		callAjaxPost('/mstr/getReportInfo.json', callParams, function(data) {
 			if (data) {
     			reportInfo = data.report;
+    			document.title = reportInfo['title'];
 	    		renderPrompt();
+	    		setTimeout(() => {
+	    			$('#run').trigger('click');
+	    		}, 100);
     		} else {
     		    alert('리포트정보를 가져올 수 없습니다.');
-    		    $('#portal-loading').show();
+    		    $('#portal-loading').hide();
     		}
-			
-			$(window).resize(); // 프롬프트 랜더링이 종료되고 iframe 높이 조정
 		});
 	}
 	
@@ -116,7 +130,7 @@
 		
 		if (reportInfo == undefined || reportInfo.promptList == undefined) {
 			//자동실행
-			$('#run').trigger('click');
+// 			$('#run').trigger('click');
         	return; 
         }
         	
@@ -151,9 +165,9 @@
         
         if(reportInfo.promptList.length == 0) {
 			//자동실행
-			$('#run').trigger('click');
+// 			$('#run').trigger('click');
         } else {
-        	$('#mstrReport').attr('src', '${pageContext.request.contextPath}/app/main/selectPrompt.do');
+//         	$('#mstrReport').attr('src', '${pageContext.request.contextPath}/app/main/selectPrompt.do');
         }
 	}
 	
@@ -168,6 +182,7 @@
 		
 		return elemVal;
 	}
+	
 	
 	//프롬프트 값 세팅
 	function getPromptVal() {
@@ -219,26 +234,14 @@
 	    		$('#portal-loading').hide();
 	    		errorProcess(jqXHR, textStatus, errorThrown);
 	    	}
-	    });	
+	    });
 	}
+	
+	
+	//팝업 콜백
+    function popupCallback(promptId) {
+        console.log('=> promptId', promptId);
+    }
 </script>
-</head>
-<body>
-	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
-	
-	<div class="run-box flex">
-		<!-- 프롬프트 영역 -->
-	    <ul class="run-setting-box flex"></ul>
-	    <button id="run" class="btn-run blue">실행</button>
-	</div>
-	
-	<div class="top cont-wrap flex" style="height: calc(100vh - 275px);">
-	    <iframe name="mstrReport" id="mstrReport" src=""
-				style="width: 100%; border: 1px solid silver; margin: 0px; background: #fff; border-radius: 8px; border: 1px solid #c8d8ec;"
-				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto">
-		</iframe>
-	</div>
-	
-	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
 </body>
 </html>

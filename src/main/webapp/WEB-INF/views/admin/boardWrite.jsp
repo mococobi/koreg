@@ -34,14 +34,17 @@
 		, #board_div select
 		, #board_div button {
 			font-size: 1.5rem;
+			font-family: 맑은 고딕;
 		}
 		
 		#board_div .h3 {
-			font-size: 4rem;
+			font-size: 3rem;
+			font-family: 맑은 고딕;
 		}
 		
 		#board_div .h6 {
-			font-size: 2.5rem;
+			font-size: 2rem;
+			font-family: 맑은 고딕;
 		}
 	</style>
 </head>
