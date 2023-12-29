@@ -352,5 +352,26 @@ public class BoardServiceImpl implements BoardService {
         
         return rtnMap;
     }
-}
 
+
+    //팝업 - 게시물 목록 조회
+    @Override
+    public Map<String, Object> boardPostPopupList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception {
+    	Map<String, Object> rtnMap = new HashMap<String, Object>();
+    	
+    	params.put("userId", HttpUtil.getLoginUserId(request));
+    	
+        List<Map<String, Object>> rtnList = simpleBizDao.list("Board.boardPostPopupList", params);
+    	
+    	//첨부파일
+    	if(params.get("CHECK_POST_FILE") != null && (Boolean)params.get("CHECK_POST_FILE") == true) {
+    		List<Map<String, Object>> rtnPostFileList = simpleBizDao.list("Board.boardPostFileList", params);
+    		rtnMap.put("file", rtnPostFileList);
+    	}
+        
+        rtnMap.put("data", rtnList);
+        rtnMap.put("params", params);
+        
+        return rtnMap;
+    }
+}

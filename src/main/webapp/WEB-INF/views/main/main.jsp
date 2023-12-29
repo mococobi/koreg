@@ -166,6 +166,7 @@
 	function fnMainInit() {
 		getBoardList('1', 'board_div_1');
 		getBoardList('2', 'board_div_2');
+		getPopupList();
 	}
 	
 	
@@ -222,6 +223,39 @@
 			});
 		});
 	}
+	
+	
+	function getPopupList() {
+		let callParams = {};
+		callAjaxPost('/board/boardPostPopupList.json', callParams, function(data) {
+			let postData = data['data'];
+			let postFile = data['file'];
+			
+			let w = 750;
+			let h = 600;
+			
+			let xPos = (document.body.offsetWidth/2) - (w/2); // 가운데 정렬
+			xPos += window.screenLeft; // 듀얼 모니터일 때
+			let yPos = (document.body.offsetHeight/2) - (h/2);
+			
+			$.each(postData, function(idx, item) {
+				let isPopup = handleCookie.getCookie('PopUp'+item['POST_ID'])
+				if (isPopup == 'false'){
+					// 게시글에대한 쿠키가 있고 그 설정 값이 표시 안함일때
+				}else{
+					//0.5초 정도 딜레이 주는거
+					setTimeout(function() {
+						let popup = window.open('${pageContext.request.contextPath}/app/board/boardPostPopupView.do'+'?BRD_ID='+item['BRD_ID'] + '&POST_ID='+item['POST_ID'], idx, "width="+w+", height="+h+", left="+(xPos + (idx*30))+", top="+(yPos + (idx*30))+",resizable=yes");
+						popup.focus();
+					},500);
+				}
+			});
+		});
+		
+	}
+	
+	
+	
 </script>
 </body>
 </html>

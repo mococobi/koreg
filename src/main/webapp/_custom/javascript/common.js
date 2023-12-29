@@ -424,3 +424,23 @@ function getExtensionOfFilename(filename) {
 	let _fileExt = filename.substring(_lastDot, _fileLen).toLowerCase();     
 	return _fileExt;
 }
+
+
+//팝업 쿠키
+let handleCookie = {
+	setCookie: function (name, val, exp) {
+		let date = new Date();
+					      
+		// 만료 시간 구하기(exp를 ms단위로 변경)
+		date.setDate(date.getDate() + exp);
+		date.setHours(23,59,59);
+		
+		// 실제로 쿠키 작성하기
+		document.cookie = name + '=' + val + ';expires=' + date.toUTCString() + ';path=/'+__contextPath+'/app/main/';
+	},
+	// 쿠키 읽어오기(정규식 이용해서 가져오기)
+	getCookie: function (name) {
+		let value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+		return value ? value[2] : null;
+	}
+};

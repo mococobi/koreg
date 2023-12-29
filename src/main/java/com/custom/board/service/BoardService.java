@@ -80,4 +80,14 @@ public interface BoardService {
 	 */
 	public Map<String, Object> boardPostFileDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
 	
+	/**
+	 * 팝업 - 게시물 목록 조회
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String, Object> boardPostPopupList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
+
 }

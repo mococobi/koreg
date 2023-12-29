@@ -506,4 +506,82 @@ public class BoardController {
 			}
 		}
 	}
+
+	/**
+     * 팝업 - 게시물 리스트 조회
+     * @return
+     */
+    @RequestMapping(value = "/board/boardPostPopupList.json", method = {RequestMethod.GET, RequestMethod.POST })
+    @ResponseBody
+    public Map<String, Object> boardPostListPopup(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	params.put("PORTAL_LOG", true);
+    	params.put("CHECK_POST_FILE", true);
+    	
+    	LOGGER.debug("params : [{}]", params);
+    	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+    	
+    	try {
+    		Map<String, Object> rtnList = new HashMap<String, Object>();
+    		rtnList = boardService.boardPostPopupList(request, response, params);
+    		rtnMap.putAll(rtnList);
+		} catch (Exception e) {
+			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			LOGGER.error("boardPostList Exception", e);
+		}
+    	
+    	return rtnMap;
+    }
+    
+    
+    /**
+     * 팝업 - 게시물 상세 화면 이동
+     * @return
+     */
+    @RequestMapping(value = "/board/boardPostPopupView.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView boardPostPopupView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	params.put("PORTAL_LOG", false);//값을 불러오는게 아닌 화면 이동에선 로그처리 필요X
+    	params.put("CHECK_POST_LOCATION", false);//값을 불러오는게 아닌 화면 이동에선 로그처리 필요X
+    	LOGGER.debug("params : [{}]", params);
+        ModelAndView view = new ModelAndView("board/boardPostPopup");
+        Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+        
+        try {
+        	Map<String, Object> boardMap = boardService.boardPostDetail(request, response, params);
+    		view.addObject("postData", boardMap);
+		} catch (Exception e) {
+			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			view.addObject("data", rtnMap);
+			LOGGER.error("boardPostWriteView Exception", e);
+		}
+        
+        return view;
+    }
+    
+    
+    /**
+     * 팝업 - 팝업 게시글 조회
+     * @return
+     */
+    @RequestMapping(value = "/board/boardPostPopupDetail.json", method = { RequestMethod.GET, RequestMethod.POST })
+    @ResponseBody
+    public Map<String, Object> boardPostPopupDetail(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+    	params.put("PORTAL_LOG", true);
+    	params.put("CHECK_POST_FILE", true);
+    	params.put("CHECK_POST_LOCATION", false);
+    	
+    	LOGGER.debug("params : [{}]", params);
+    	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+    	
+    	try {
+    		Map<String, Object> rtnList = new HashMap<String, Object>();
+    		rtnList = boardService.boardPostDetail(request, response, params);
+    		rtnMap.putAll(rtnList);
+		} catch (Exception e) {
+			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			LOGGER.error("boardPostDetail Exception", e);
+		}
+    	
+    	return rtnMap;
+    }
+	
 }
