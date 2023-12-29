@@ -128,6 +128,10 @@
 		  }
 		}
 
+		html, body {
+		  height: 100%;
+		  font-size: 1rem;
+		}
 	</style>
 </head>
 <body>

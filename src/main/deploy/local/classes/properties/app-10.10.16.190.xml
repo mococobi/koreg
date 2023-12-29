@@ -16,7 +16,7 @@
 	<entry key="mstr.trust.token">TokenC3FF8829403B168F274C9CA0D6937131</entry>
 	<entry key="mstr.esm.fail.url">/app/login/logoutUser.do</entry>
 	
-	<entry key="portal.login.page">/app/login/loginUserView.do</entry>
+	<entry key="portal.login.page">/app/error/noSessionView.do</entry>
 	<entry key="eis.login.page">/app/login/loginUserEisView.do</entry>
 	
 	<entry key="mstr.menu.folder.id">032A5E114A59D28267BDD8B6D9E58B22</entry><!-- 왼쪽 메뉴 폴더 ID -->

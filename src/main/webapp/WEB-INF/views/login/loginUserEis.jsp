@@ -16,9 +16,10 @@
 	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/rsa/prng4.min.js"></script>
 	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/rsa/rng.min.js"></script>
 	
-		<style type="text/css">
+	<style type="text/css">
 		html, body {
 		  height: 100%;
+		  font-size: 1rem;
 		}
 		
 		.form-signin {
@@ -42,9 +43,6 @@
 		  border-top-right-radius: 0;
 		}
 		
-		html, body {
-		  font-size: 1rem;
-		}
 	</style>
 </head>
 <body class="d-flex align-items-center py-4 bg-body-tertiary">

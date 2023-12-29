@@ -57,4 +57,17 @@ public class ErrorController {
         
         return view;
     }
+    
+    
+    /**
+     * 세션 만료 페이지
+     * @return
+     */
+    @RequestMapping(value = "/error/noSessionView.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView noSessionView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	LOGGER.debug("params : [{}]", params);
+        ModelAndView view = new ModelAndView("error/noSession");
+        
+        return view;
+    }
 }

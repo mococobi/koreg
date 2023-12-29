@@ -11,6 +11,13 @@
 	<title>404</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
+	
+	<style type="text/css">
+		html, body {
+		  height: 100%;
+		  font-size: 1rem;
+		}
+	</style>
 </head>
 <body>
 	<div class="d-flex align-items-center justify-content-center vh-100">

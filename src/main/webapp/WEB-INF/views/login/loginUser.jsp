@@ -19,6 +19,7 @@
 	<style type="text/css">
 		html, body {
 		  height: 100%;
+		  font-size: 1rem;
 		}
 		
 		.form-signin {
@@ -42,9 +43,6 @@
 		  border-top-right-radius: 0;
 		}
 		
-		html, body {
-		  font-size: 1rem;
-		}
 	</style>
 </head>
 <body class="d-flex align-items-center py-4 bg-body-tertiary">

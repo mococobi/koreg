@@ -38,7 +38,7 @@
 		<filter-class>com.mococo.web.filter.SessionFilter</filter-class>
     	<init-param>
 			<param-name>entryPoints</param-name>
-			<param-value>.*/login/.*\.do$;.*/login/.*\.json$;</param-value>
+			<param-value>.*/login/.*\.do$;.*/login/.*\.json$;..*/error/.*;</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
