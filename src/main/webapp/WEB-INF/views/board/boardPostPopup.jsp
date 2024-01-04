@@ -196,7 +196,7 @@
 		}
 		
 		if(postData['POPUP_START_DT_TM'] || postData['POPUP_END_DT_TM']) {
-			$('#post_popup_dt').text(changeDisplayDate(postData['POPUP_START_DT_TM'], 'YYYY-MM-DD') + ' ~ ' + changeDisplayDate(postData['POPUP_END_DT_TM']), 'YYYY-MM-DD');
+			$('#post_popup_dt').text(changeDisplayDate(postData['POPUP_START_DT_TM'], 'YYYY-MM-DD') + ' ~ ' + changeDisplayDate(postData['POPUP_END_DT_TM'], 'YYYY-MM-DD'));
 		}
 		
 		if(postData['SECRET_YN'] == 'Y') {
@@ -236,12 +236,9 @@
 	}
 	
 	//팝업 쿠키 세팅
-	function popUpCookie(ckId, ckVal) {
+	function popUpCookie(ckId, ckVal, exp) {
 		handleCookie.setCookie('PopUp'+ckId, !ckVal, 7);
 	}
-	
-	
-	
 	
 </script>
 </html>

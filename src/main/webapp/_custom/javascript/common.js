@@ -46,7 +46,11 @@ function moveCommunityPage(moveBoardId) {
 	let pagePrams = [
 		['BRD_ID', moveBoardId]
 	];
-	pageGoPost('_self', __contextPath + '/app/board/boardPostListView.do', pagePrams);
+	if(moveBoardId=="1"){
+		pageGoPost('_self', __contextPath + '/app/board/boardPostListView.do', pagePrams);
+	}else{
+		pageGoPost('_self', __contextPath + '/app/board/boardPostFaqListView.do', pagePrams);
+	}
 }
 
 
@@ -436,7 +440,7 @@ let handleCookie = {
 		date.setHours(23,59,59);
 		
 		// 실제로 쿠키 작성하기
-		document.cookie = name + '=' + val + ';expires=' + date.toUTCString() + ';path=/'+__contextPath+'/app/main/';
+		document.cookie = name + '=' + val + ';expires=' + date.toUTCString() + ';path='+__contextPath+'/app/main/';
 	},
 	// 쿠키 읽어오기(정규식 이용해서 가져오기)
 	getCookie: function (name) {

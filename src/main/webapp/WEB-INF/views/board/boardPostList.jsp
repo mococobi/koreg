@@ -46,7 +46,8 @@
 </head>
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
-	
+	<% if(boardId.equals("1")) {
+		%>
 	<div id="boardPost_div" class="container py-4" style="max-width: 100%;">
 		<p class="h3">${postData['BRD_NM']}</p>
 		<p class="h6">${postData['BRD_DESC']}</p>
@@ -66,7 +67,7 @@
 			<% if(
 				(boardId.equals("1") && PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN"))
 				|| !boardId.equals("1")					
-			) { %>
+			   ) { %>
 			<!-- 관리자 기능 -->
 			<div class="col text-end">
 				<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
@@ -95,6 +96,7 @@
 			</table>
 		</div>
 	</div>
+	<% } %>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
 </body>
 <script type="text/javascript">

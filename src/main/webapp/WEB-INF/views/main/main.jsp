@@ -93,7 +93,7 @@
 								<col width="20%">
 							</colgroup>
 							<thead>
-								<tr>
+							<tr>
 									<th scope="col">제목</th>
 									<th scope="col">등록일자</th>
 								</tr>
@@ -239,15 +239,16 @@
 			let yPos = (document.body.offsetHeight/2) - (h/2);
 			
 			$.each(postData, function(idx, item) {
-				let isPopup = handleCookie.getCookie('PopUp'+item['POST_ID'])
+				let isPopup = handleCookie.getCookie('PopUp'+item['POST_ID']);
+				
 				if (isPopup == 'false'){
 					// 게시글에대한 쿠키가 있고 그 설정 값이 표시 안함일때
 				}else{
-					//0.5초 정도 딜레이 주는거
+					//1초 정도 딜레이 주는거
 					setTimeout(function() {
 						let popup = window.open('${pageContext.request.contextPath}/app/board/boardPostPopupView.do'+'?BRD_ID='+item['BRD_ID'] + '&POST_ID='+item['POST_ID'], idx, "width="+w+", height="+h+", left="+(xPos + (idx*30))+", top="+(yPos + (idx*30))+",resizable=yes");
 						popup.focus();
-					},500);
+					},1000);
 				}
 			});
 		});

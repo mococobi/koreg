@@ -184,7 +184,7 @@
 								<span>첨부 파일</span>
 							</td>
 							<td colspan="7">
-								<div style="">
+								<div>
 									<input id="post_file" class="form-control" type="file" multiple>
 								</div>
 								<div id="post_file_output" class="list-group"></div>
