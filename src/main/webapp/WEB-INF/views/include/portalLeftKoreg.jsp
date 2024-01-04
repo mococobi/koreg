@@ -202,6 +202,8 @@
 					objectId = menu['id'];
 					type = menu['type'];
 					isvi = menu['isVI'];
+					
+					$('#mstrReportTitle').text(getMstrTitleName(menu['name']));
 					fnReportInit();
 				}
 			}

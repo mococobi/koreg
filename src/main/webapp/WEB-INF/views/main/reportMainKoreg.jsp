@@ -52,7 +52,7 @@
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 	
-	<div class="top cont-wrap flex" style="height: calc(100vh - 122px);">
+	<div class="top cont-wrap flex" style="height: calc(100vh - 163px);">
 	    <iframe name="mstrReport" id="mstrReport" src=""
 				style="width: 100%; border: 1px solid silver; margin: 0px; background: #fff; border-radius: 8px; border: 1px solid #c8d8ec;"
 				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto">
@@ -84,6 +84,7 @@
 			getAnswerXML();
 		})
 		
+		$('#mstrReportTitle').text(getMstrTitleName('${title}'));
 		fnReportInit();
 	});
 	

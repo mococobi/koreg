@@ -334,6 +334,17 @@ function getMstrFormDefinition(type) {
 			, src: 'mstrWeb.4001'
 			, reportID: objectId
 		}
+		, Gcgf_report : {
+			  evt: '4001'
+			, src: 'mstrWeb.4001'
+			, reportID: objectId
+		}
+		, Koreg_report : {
+			  evt: '4001'
+			, src: 'mstrWeb.4001'
+			, reportID: objectId
+			, hiddenSections : 'path'
+		}
 		, document : {
 	          evt: '2048001'
 	        , src: 'mstrWeb.2048001'
@@ -388,7 +399,7 @@ function getMstrFormDefinition(type) {
 	
 	switch (type) {
 		case 3:
-			$.extend(rtnInput, formDefs['report']);
+			$.extend(rtnInput, formDefs[__portalAppName + '_report']);
 			break;
 		case 55:
 	        if (isvi == true) {

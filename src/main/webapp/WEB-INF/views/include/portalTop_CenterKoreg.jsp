@@ -23,7 +23,7 @@
 				top: 0px;
 				left: 0px;
 				*/
-				top: 100px;
+				top: 139px;
     			left: 250px;
 				position: fixed;
 				display: block;

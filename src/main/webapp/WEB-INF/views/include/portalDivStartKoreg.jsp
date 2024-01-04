@@ -46,6 +46,9 @@
 								<% } %>
                                 
                             </div>
+                            <div style="margin-bottom: 10px;">
+                            	<h1 id="mstrReportTitle"></h1>
+                            </div>
                             <div class="tab-cont-wrap">
                                 <div class="cont-tab cont-tab1 on">
                                 <!-- 메인 영역 -->
