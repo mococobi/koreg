@@ -11,7 +11,7 @@
 .ms-options-wrap > button {
     position: relative;
     /* width: 100%; */
-    width: 300px;
+    width: 128px;
     text-align: left;
     border: 1px solid #aaa;
     background-color: #fff;
@@ -23,6 +23,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 10px 12px;
 }
 
 .ms-options-wrap > button[disabled] {

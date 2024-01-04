@@ -30,12 +30,12 @@
 <head>
 	<title>${title}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/jquery-multiselect/jquery.multiselect.css?v=20231006001" />
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/jquery-multiselect/jquery.multiselect.css?v=20240104001" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/jquery-multiselect/jquery.multiselect.js?v=20231128001"></script>
-	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/prompt-renderer.js?v=20231228001"></script>
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/prompt-renderer.js?v=20240104001"></script>
 	
 	<style type="text/css">
 		#mstrReport {
@@ -52,10 +52,10 @@
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 	
-	<div class="run-box flex">
+	<div class="run-box flex" style="display: flow-root;">
 		<!-- 프롬프트 영역 -->
-	    <ul class="run-setting-box flex"></ul>
-	    <button id="run" class="btn-run blue">실행</button>
+	    <ul class="run-setting-box flex" style="float: left; padding-left: 20px;"></ul>
+    	<button id="run" class="btn-run blue" style="float: right; margin-right: 20px;">실행</button>
 	</div>
 	
 	<div class="top cont-wrap flex" style="height: calc(100vh - 203px);">

@@ -92,4 +92,9 @@ public class CustomPromptDao<P1, P2> implements PromptDao {
 		return -1;
 	}
 
+	@Override
+	public String getMeaning() {
+		return null;
+	}
+
 }

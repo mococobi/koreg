@@ -64,17 +64,28 @@ public class ReportCharger {
     private static void chargePrompts(WebIServerSession session, Report report, WebPrompts prompts)
             throws IndexOutOfBoundsException, Exception {
         List<Prompt> promptList = report.getPromptList();
-
+        System.out.println("mksong : " + promptList.size());
+        
         if (promptList == null) {
             return;
         }
 
+        /* 2024-01-04 mksong 수정 - 프롬프트 순서 체크 */
+        for(int i=0; i<prompts.size(); i++) {
+        	WebPrompt prompt = prompts.get(i);
+            logger.debug("=> id: [{}]", prompt.getID());
+            
+            promptList.add(PromptCharger.getChargedPrompt(session, prompt));
+        }
+        
+        /*
         for (Enumeration<?> elem = prompts.elements(); elem.hasMoreElements();) {
             WebPrompt prompt = (WebPrompt) elem.nextElement();
             logger.debug("=> id: [{}]", prompt.getID());
-
+            
             promptList.add(PromptCharger.getChargedPrompt(session, prompt));
         }
+        */
     }
 
     private static void chargeReport(WebIServerSession session, Report report, String objectId) {

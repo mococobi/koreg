@@ -433,7 +433,7 @@ var promptRenderer = {
 			var $checkbox = $('<input type="checkbox" class="form-check-input" ui-type="checkbox" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" '
 			+ 'prompt-title="' + data['title'] + '" prompt-min="' + data['min'] + '" prompt-max="' + data['max'] + '" prompt-required="' + data['required'] + '" '
 			+ 'value="'+ data['exAction']['value'] +'" value-unchecked="'+ data['exAction']['value-unchecked'] +'"'
-			+ 'style="cursor:pointer; font-size: 1rem;"/>');
+			+ 'style="cursor:pointer; font-size: 2rem;"/>');
 			$wrapper.append($checkbox);
 			
 			//기본 값 설정

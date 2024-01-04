@@ -26,8 +26,10 @@ public class Prompt {
     
     private int promptType = -1;
 	private int promptSubType = -1;
+	
+	private String meaning = null;
 
-    public Prompt(String id, String title) {
+	public Prompt(String id, String title) {
         this.id = id;
         this.title = title;
     }
@@ -180,6 +182,14 @@ public class Prompt {
 	public void setPromptSubType(int promptSubType) {
 		this.promptSubType = promptSubType;
 	}
+	
+    public String getMeaning() {
+		return meaning;
+	}
+
+	public void setMeaning(String meaning) {
+		this.meaning = meaning;
+	}
 
     @Override
     public String toString() {
@@ -202,6 +212,7 @@ public class Prompt {
 	        .append(", exValidation: ").append(exValidation)
 	        .append(", promptType: ").append(promptType)
 	        .append(", promptSubType: ").append(promptSubType)
+	        .append(", meaning: ").append(meaning)
 	        .append("}").toString();
     }
 

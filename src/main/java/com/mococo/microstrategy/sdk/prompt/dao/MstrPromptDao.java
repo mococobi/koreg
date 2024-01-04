@@ -127,4 +127,9 @@ public class MstrPromptDao<T extends WebPrompt> implements PromptDao {
         return webPrompt.getSubType();
     }
 
+	@Override
+	public String getMeaning() {
+		return webPrompt.getMeaning();
+	}
+
 }

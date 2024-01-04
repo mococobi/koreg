@@ -32,6 +32,7 @@
 		System.out.println("SSO인증에 실패하였습니다.");
 	}
 	
+	pageContext.setAttribute("ssotoken", ssotoken);
 	pageContext.setAttribute("sabun", sabun);
 
 %>
@@ -84,18 +85,63 @@
 	
 	
 	function fnSsoLogin() {
-		if('${sabun}' != '') {
-			$frmSignIn = $('#frmSignIn');
-		    $frmSignIn.empty();
-		    $frmSignIn.attr('action', '${pageContext.request.contextPath}/app/login/loginTrust.do');
-		    $('<input type="hidden"/>').attr('name', 'userId').val('${sabun}').appendTo($frmSignIn);
-		    $('<input type="hidden"/>').attr('name', 'screenId').val('PORTAL').appendTo($frmSignIn);
-		    $frmSignIn.attr('method', 'post');
-		    $frmSignIn.attr('target', '_self').submit();
-		    $frmSignIn.empty().removeAttr('action','').removeAttr('target','').removeAttr('method','');
-		} else {
-			pageGoPost('_self', '${pageContext.request.contextPath}/app/error/errorAuth', []);
-		}    
+		
+		const agent = window.navigator.userAgent.toLowerCase();
+		let browserName;
+		let newWindowCheck = false;
+		
+		switch (true) {
+			case agent.indexOf("edge") > -1: 
+				browserName = "MS Edge"; // MS 엣지
+				break;
+			case agent.indexOf("edg/") > -1: 
+				browserName = "Edge (chromium based)"; // 크롬 기반 엣지
+				break;
+			case agent.indexOf("opr") > -1 && !!window.opr: 
+				browserName = "Opera"; // 오페라
+				break;
+			case agent.indexOf("chrome") > -1 && !!window.chrome: 
+				browserName = "Chrome"; // 크롬
+				break;
+			case agent.indexOf("trident") > -1: 
+				browserName = "MS IE"; // 익스플로러
+				
+				//Edge 브라우저로 열기
+				newWindowCheck = true;
+				
+				let moveUrl = location.origin + location.pathname + '?ssotoken=${ssotoken}';
+				window.open("microsoft-edge:"+ location.href);
+
+				top.window.open('about:blank','_self').close();
+				top.window.opener = self;
+				top.self.close(); 
+				
+				break;
+			case agent.indexOf("firefox") > -1: 
+				browserName = "Mozilla Firefox"; // 파이어 폭스
+				break;
+			case agent.indexOf("safari") > -1: 
+				browserName = "Safari"; // 사파리
+				break;
+			default: 
+				browserName = "other"; // 기타
+		}
+		
+		if(!newWindowCheck) {
+			if('${sabun}' != '') {
+				$frmSignIn = $('#frmSignIn');
+			    $frmSignIn.empty();
+			    $frmSignIn.attr('action', '${pageContext.request.contextPath}/app/login/loginTrust.do');
+			    $('<input type="hidden"/>').attr('name', 'userId').val('${sabun}').appendTo($frmSignIn);
+			    $('<input type="hidden"/>').attr('name', 'screenId').val('PORTAL').appendTo($frmSignIn);
+			    $frmSignIn.attr('method', 'post');
+			    $frmSignIn.attr('target', '_self').submit();
+			    $frmSignIn.empty().removeAttr('action','').removeAttr('target','').removeAttr('method','');
+			} else {
+				pageGoPost('_self', '${pageContext.request.contextPath}/app/error/errorAuth', []);
+			}
+		}
+		
 	}
 
 </script>

@@ -35,5 +35,7 @@ public interface PromptDao {
 	int getPromptType();
 
 	int getPromptSubType();
+	
+	public String getMeaning();
 
 }

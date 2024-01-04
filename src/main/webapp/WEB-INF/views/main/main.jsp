@@ -48,14 +48,14 @@
 	<div id="main_div" class="container py-1" style="max-width: 100%;">
 		<!-- 이미지 영역 -->
 		<div class="mb-4 bg-body-tertiary rounded-3">
-			<img alt="메인 이미지" src="${pageContext.request.contextPath}/_custom/image/main/mainImage.png?v=20231123001" style="width: 100%; height: calc(23vh);">
+			<img alt="메인 이미지" src="${pageContext.request.contextPath}/_custom/image/main/mainImage.png?v=20231123001" style="width: 100%; height: calc(33vh);">
 		</div>
 
 		<!-- 그리드 영역 -->
 		<div class="row align-items-md-stretch" style="font-size: 2.0rem;">
 			<!-- 공지사항 영역 -->
 			<div class="col-md-6" style="padding: 0 10px 0 0;">
-				<div class="h-100 p-4 bg-body-tertiary border rounded-3" style="min-height: calc(22.5vh);">
+				<div class="h-100 p-4 bg-body-tertiary border rounded-3" style="min-height: calc(29.5vh);">
 					<div style="display: flex;">
 						<h3 style="font-size: 3rem;">공지사항</h3>
 						<h3 onclick="moveCommunityPage(1)" title="더보기" style="margin-left: auto; cursor: pointer; font-size: 3rem;">+</h3>
@@ -81,7 +81,7 @@
 			
 			<!-- FAQ 영역 -->
 			<div class="col-md-6" style="padding: 0 0 0 10px;">
-				<div class="h-100 p-4 bg-body-tertiary border rounded-3" style="min-height: calc(22.5vh);">
+				<div class="h-100 p-4 bg-body-tertiary border rounded-3" style="min-height: calc(29.5vh);">
 					<div style="display: flex;">
 						<h3 style="font-size: 3rem;">FAQ</h3>
 						<h3 onclick="moveCommunityPage(2)" title="더보기" style="margin-left: auto; cursor: pointer; font-size: 3rem;">+</h3>
