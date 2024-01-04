@@ -15,7 +15,7 @@
 			, MOD_DT_TM
 			, MOD_USR_ID
 		FROM
-			PORTAL.PORTAL_ADMIN
+			PORTAL.PT_PORTAL_ADMIN
 		WHERE 1=1
 			AND DEL_YN = 'N'
 			AND USR_ID = #{userId}
@@ -53,7 +53,7 @@
 				, MOD_DT_TM
 				, MOD_USR_ID
 			FROM 
-				PORTAL.BOARD
+				PORTAL.PT_BOARD
 			WHERE 1=1
 		)
 		SELECT 
@@ -134,7 +134,7 @@
 			, MOD_DT_TM
 			, MOD_USR_ID
 		FROM 
-			PORTAL.BOARD
+			PORTAL.PT_BOARD
 		WHERE 1=1
 			AND BRD_ID = #{boardId}
 	</select>
@@ -145,10 +145,10 @@
         	SELECT
         		NVL(MAX(BRD_ID)+1, 1) AS INSERTKEY
         	FROM 
-        		PORTAL.BOARD
+        		PORTAL.PT_BOARD
     	</selectKey>
 		INSERT INTO /* Admin.boardInsert */ 
-			PORTAL.BOARD(
+			PORTAL.PT_BOARD(
 				  BRD_ID
 				, BRD_NM
 				, BRD_DESC
@@ -183,7 +183,7 @@
 	
 	<update id="Admin.boardUpdate" parameterType="Map">
 		UPDATE /* Admin.boardUpdate */ 
-			PORTAL.BOARD
+			PORTAL.PT_BOARD
 		SET
 			  BRD_NM = #{BRD_NM}
 			, BRD_DESC = #{BRD_DESC}
@@ -221,11 +221,11 @@
 					, post.POST_TITLE
 				</if>
 			FROM 
-				PORTAL.PORTAL_LOG plog
+				PORTAL.PT_PORTAL_LOG plog
 				<if test="LOG_TYPE != null and LOG_TYPE.equals('BOARD')">
-					INNER JOIN PORTAL.BOARD board
+					INNER JOIN PORTAL.PT_BOARD board
 						ON plog.SCRN_ID = TO_CHAR(board.BRD_ID)
-					LEFT OUTER JOIN PORTAL.BOARD_POST post
+					LEFT OUTER JOIN PORTAL.PT_BOARD_POST post
 						ON (
 							    plog.SCRN_ID = TO_CHAR(post.BRD_ID)
 							AND plog.SCRN_DET_ID = TO_CHAR(post.POST_ID)

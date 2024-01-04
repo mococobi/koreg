@@ -46,7 +46,7 @@
 	<header class="header"> <!-- 헤더 영역 -->
 		<div class="logo">
 			<a href="#">
-				<img id="top_menu_logo" src="${pageContext.request.contextPath}/_custom/image/logo/gcgf/logo.png?v=20231218001" alt="경기신용보증재단">
+				<img id="top_menu_logo" src="${pageContext.request.contextPath}/_custom/image/gcgf/logo.png?v=20231218001" alt="경기신용보증재단">
 			</a>
 		</div>
 		<div class="util flex">

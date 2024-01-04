@@ -8,12 +8,12 @@
 	<insert id="Log.addPortalLog" parameterType="Map">
 		<selectKey resultType="int" keyProperty="insertKey" order="BEFORE">
         	SELECT
-        		NVL(MAX(LOG_ID)+1, 1) AS INSERTKEY
+        		PORTAL.PT_PORTAL_LOG_SEQ.NEXTVAL AS INSERTKEY
         	FROM 
-        		PORTAL.PORTAL_LOG 
+        		DUAL
     	</selectKey>
 		INSERT INTO /* Log.addPortalLog */
-			PORTAL.PORTAL_LOG (
+			PORTAL.PT_PORTAL_LOG (
 				  LOG_ID
 				, USR_ID
 				, USR_NM

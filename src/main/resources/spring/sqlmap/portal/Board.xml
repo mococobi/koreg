@@ -18,30 +18,30 @@
 	<!-- 게시판 목록 조회 -->
 	<select id="Board.boardDetail" resultType="HashMap" parameterType="Map">
 		SELECT /* Board.boardList */
-			  BRD_ID
-			, BRD_NM
-			, BRD_DESC
-			, BRD_ADM_USR
-			, BRD_CRT_AUTH
-			, BRD_VIEW_AUTH
-			, POST_FILE_YN
-			, POST_CMNT_YN
-			, POST_CMNT_FILE_YN
-			, POST_POPUP_YN
-			, POST_SECRET_YN
-			, POST_FIX_YN
-			, DEL_YN
-			, CRT_DT_TM
-			, CRT_USR_ID
-			, MOD_DT_TM
-			, MOD_USR_ID
+			  board.BRD_ID
+			, board.BRD_NM
+			, board.BRD_DESC
+			, board.BRD_ADM_USR
+			, board.BRD_CRT_AUTH
+			, board.BRD_VIEW_AUTH
+			, board.POST_FILE_YN
+			, board.POST_CMNT_YN
+			, board.POST_CMNT_FILE_YN
+			, board.POST_POPUP_YN
+			, board.POST_SECRET_YN
+			, board.POST_FIX_YN
+			, board.DEL_YN
+			, board.CRT_DT_TM
+			, board.CRT_USR_ID
+			, board.MOD_DT_TM
+			, board.MOD_USR_ID
 		FROM 
-			PORTAL.BOARD
+			PORTAL.PT_BOARD board
 		WHERE 1=1
-			AND BOARD.BRD_ID = #{BRD_ID}
-			AND DEL_YN = 'N'
+			AND board.BRD_ID = #{BRD_ID}
+			AND board.DEL_YN = 'N'
 		ORDER BY
-			CRT_DT_TM DESC
+			board.CRT_DT_TM DESC
 	</select>
 	
 	
@@ -58,10 +58,10 @@
 				, post.CRT_DT_TM
 				, post.CRT_USR_ID
 				, post.CRT_USR_ID AS CRT_USR_NM
-				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
-				, (SELECT COUNT(post_file.FILE_ID) FROM PORTAL.BOARD_POST_FILE post_file WHERE post_file.DEL_YN = 'N' AND post.POST_ID = post_file.POST_ID) AS POST_FILE_COUNT
+				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PT_PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
+				, (SELECT COUNT(post_file.FILE_ID) FROM PORTAL.PT_BOARD_POST_FILE post_file WHERE post_file.DEL_YN = 'N' AND post.POST_ID = post_file.POST_ID) AS POST_FILE_COUNT
 			FROM 
-				PORTAL.BOARD_POST post 
+				PORTAL.PT_BOARD_POST post 
 			WHERE 1=1
 				AND post.BRD_ID = #{BRD_ID}
 				AND post.DEL_YN = 'N'
@@ -141,8 +141,8 @@
 			  post.POST_ID
 			, post.BRD_ID
 		FROM 
-			PORTAL.BOARD_POST post 
-			INNER JOIN PORTAL.BOARD board
+			PORTAL.PT_BOARD_POST post 
+			INNER JOIN PORTAL.PT_BOARD board
 				ON (post.BRD_ID = board.BRD_ID) 
 		WHERE 1=1 
 			AND SYSDATE BETWEEN post.POPUP_START_DT_TM AND post.POPUP_END_DT_TM
@@ -179,10 +179,10 @@
 			, board.POST_POPUP_YN
 			, board.POST_SECRET_YN
 			, board.POST_FIX_YN
-			, (SELECT COUNT(USR_ACTN) FROM PORTAL.PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
+			, (SELECT COUNT(USR_ACTN) FROM PORTAL.PT_PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
 		FROM 
-			PORTAL.BOARD_POST post 
-			INNER JOIN PORTAL.BOARD board
+			PORTAL.PT_BOARD_POST post 
+			INNER JOIN PORTAL.PT_BOARD board
 				ON (post.BRD_ID = board.BRD_ID) 
 		WHERE 1=1
 			AND post.DEL_YN = 'N'
@@ -201,7 +201,7 @@
 					, post.POST_ID
 					, post.POST_TITLE 
 				FROM 
-					PORTAL.BOARD_POST post
+					PORTAL.PT_BOARD_POST post
 				WHERE 1=1
 					AND post.DEL_YN = 'N'
 					AND post.POST_ID <![CDATA[<]]> #{POST_ID}
@@ -217,7 +217,7 @@
 					, post.POST_ID
 					, post.POST_TITLE 
 				FROM 
-					PORTAL.BOARD_POST post
+					PORTAL.PT_BOARD_POST post
 				WHERE 1=1
 					AND post.DEL_YN = 'N'
 					AND post.POST_ID <![CDATA[>]]> #{POST_ID}
@@ -242,12 +242,12 @@
         	SELECT
         		NVL(MAX(post.POST_ID)+1, 1) AS INSERTKEY
         	FROM 
-        		PORTAL.BOARD_POST post
+        		PORTAL.PT_BOARD_POST post
         	WHERE 1=1
 				AND post.BRD_ID = #{BRD_ID}
     	</selectKey>
     	INSERT INTO /* Board.boardPostInsert */ 
-    		PORTAL.BOARD_POST(
+    		PORTAL.PT_BOARD_POST(
     			POST_ID
     		  , BRD_ID
     		  , POST_TITLE
@@ -283,7 +283,7 @@
 	<!-- 게시판 - 게시물 수정 -->
 	<update id="Board.boardPostUpdate" parameterType="Map"> <!-- keyProperty="keyNum" -->
     	UPDATE /* Board.boardPostUpdate */
-    		PORTAL.BOARD_POST
+    		PORTAL.PT_BOARD_POST
     	SET
     		    BRD_ID = #{BRD_ID}
     		  , POST_TITLE = #{POST_TITLE}
@@ -305,7 +305,7 @@
 	<!-- 게시판 - 게시물 삭제 -->
 	<update id="Board.boardPostDelete" parameterType="Map">
     	UPDATE /* Board.boardPostDelete */
-    		PORTAL.BOARD_POST
+    		PORTAL.PT_BOARD_POST
     	SET
    		    DEL_YN = 'Y'
    		  , MOD_DT_TM = SYSDATE
@@ -334,7 +334,7 @@
 			, post_file.MOD_DT_TM
 			, post_file.MOD_USR_ID
 		FROM
-			PORTAL.BOARD_POST_FILE post_file
+			PORTAL.PT_BOARD_POST_FILE post_file
 		WHERE 1=1
 			AND post_file.DEL_YN = 'N'
 			AND post_file.POST_ID = #{POST_ID}
@@ -359,7 +359,7 @@
 			, MOD_DT_TM
 			, MOD_USR_ID
 		FROM
-			PORTAL.BOARD_POST_FILE
+			PORTAL.PT_BOARD_POST_FILE
 		WHERE 1=1
 			AND FILE_ID = #{FILE_ID}
 			AND POST_ID = #{POST_ID}
@@ -373,11 +373,11 @@
 			SELECT
 				NVL(MAX(post_file.FILE_ID)+1, 1) AS INSERTKEY
 			FROM
-				PORTAL.BOARD_POST_FILE post_file
+				PORTAL.PT_BOARD_POST_FILE post_file
 			WHERE 1=1
 		</selectKey>
 		INSERT INTO /* Board.boardPostFileInsert */ 
-			PORTAL.BOARD_POST_FILE(
+			PORTAL.PT_BOARD_POST_FILE(
     			FILE_ID
     		  , POST_ID
     		  , FILE_TYPE
@@ -411,7 +411,7 @@
 	<!-- 게시판 - 게시물 - 파일 삭제 -->
 	<update id="Board.boardPostFileDelete" parameterType="Map">
     	UPDATE /* Board.boardPostFileDelete */
-    		PORTAL.BOARD_POST_FILE
+    		PORTAL.PT_BOARD_POST_FILE
     	SET
    		    DEL_YN = 'Y'
    		  , MOD_DT_TM = SYSDATE

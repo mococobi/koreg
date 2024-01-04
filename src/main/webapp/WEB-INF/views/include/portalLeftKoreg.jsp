@@ -13,7 +13,7 @@
 <head>
 </head>
 <body>
-	<nav class="lnb" style="position: relative; overflow: auto; height: calc(100vh - 195px);">
+	<nav class="lnb" style="position: relative; overflow: auto; height: calc(100vh - 122px);">
 	</nav>
 	<!-- //Left Menu -->
 </body>
@@ -93,6 +93,11 @@
 	            $(this).css('position', 'absolute');
 	            $(this).removeClass('on');
 	        });
+	        
+	        $('#mstrReport').on('mouseenter', function(e) {
+	        	$('.dep3-wrap').css('position', 'absolute');
+	        	$('.dep3-wrap').removeClass('on');
+	        });
 		});
 	}
 	
@@ -104,8 +109,8 @@
 			let depLiHtml = $('<li>', {class : 'dep1'});
 			let aHtml = $('<a>', {
 				  href : 'javascript:void(0)'
-				, title : menu['name']
-				, text : menu['name']
+				, title : getMstrTitleName(menu['name'])
+				, text : getMstrTitleName(menu['name'])
 				, click : function(e) {
 					clickReportObj(menu);
 				}
@@ -130,8 +135,8 @@
 			let depLiHtml = $('<li>', {class : 'dep2'});
 			let aHtml = $('<a>', {
 				  href : '#'
-				, title : menu['name']
-				, text : menu['name']
+				, title : getMstrTitleName(menu['name'])
+				, text : getMstrTitleName(menu['name'])
 				, click : function(e) {
 					clickReportObj(menu);
 				}
@@ -161,8 +166,8 @@
 			let depLiHtml = $('<li>', {class : 'dep3'});
 			let aHtml = $('<a>', {
 				  href : '#'
-				, title : menu['name']
-				, text : menu['name']
+				, title : getMstrTitleName(menu['name'])
+				, text : getMstrTitleName(menu['name'])
 				, click : function(e) {
 					clickReportObj(menu);
 				}
@@ -197,8 +202,7 @@
 					objectId = menu['id'];
 					type = menu['type'];
 					isvi = menu['isVI'];
-// 					$('.prompt-wrapper').parent().show();
-					getPromptInfo();
+					fnReportInit();
 				}
 			}
 		}

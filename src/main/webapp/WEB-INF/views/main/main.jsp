@@ -55,13 +55,13 @@
 		<div class="row align-items-md-stretch" style="font-size: 2.0rem;">
 			<!-- 공지사항 영역 -->
 			<div class="col-md-6" style="padding: 0 10px 0 0;">
-				<div class="h-100 p-4 bg-body-tertiary border rounded-3">
+				<div class="h-100 p-4 bg-body-tertiary border rounded-3" style="min-height: calc(22.5vh);">
 					<div style="display: flex;">
 						<h3 style="font-size: 3rem;">공지사항</h3>
 						<h3 onclick="moveCommunityPage(1)" title="더보기" style="margin-left: auto; cursor: pointer; font-size: 3rem;">+</h3>
 					</div>
 					<div class="table-responsive small">
-						<table class="table table-striped table-sm" style="min-height: calc(22.5vh);">
+						<table class="table table-striped table-sm">
 							<colgroup>
 								<col width="80%">
 								<col width="20%">
@@ -81,12 +81,12 @@
 			
 			<!-- FAQ 영역 -->
 			<div class="col-md-6" style="padding: 0 0 0 10px;">
-				<div class="h-100 p-4 bg-body-tertiary border rounded-3">
+				<div class="h-100 p-4 bg-body-tertiary border rounded-3" style="min-height: calc(22.5vh);">
 					<div style="display: flex;">
 						<h3 style="font-size: 3rem;">FAQ</h3>
 						<h3 onclick="moveCommunityPage(2)" title="더보기" style="margin-left: auto; cursor: pointer; font-size: 3rem;">+</h3>
 					</div>
-					<div class="table-responsive small" style="min-height: calc(22.5vh);">
+					<div class="table-responsive small">
 						<table class="table table-striped table-sm">
 							<colgroup>
 								<col width="80%">

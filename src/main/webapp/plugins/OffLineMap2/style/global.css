@@ -32,3 +32,7 @@
     stroke-linejoin: miter ;     
 }
 
+/* 2024-01-03 mksong 수정 - 지도 줌 버튼 숨김 처리 */
+.leaflet-control-zoom {
+	display: none;
+}

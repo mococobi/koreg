@@ -111,6 +111,17 @@
 	            $(this).css('position', 'absolute');
 	            $(this).removeClass('on');
 	        });
+	        
+	        $('#mainReport').on('mouseenter', function(e) {
+	        	$('.dep3-wrap').css('position', 'absolute');
+	        	$('.dep3-wrap').removeClass('on');
+	        });
+	        
+	        $('#mstrReport').on('mouseenter', function(e) {
+	        	$('.dep3-wrap').css('position', 'absolute');
+	        	$('.dep3-wrap').removeClass('on');
+	        });
+	        
 		});
 	}
 	

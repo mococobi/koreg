@@ -409,7 +409,8 @@
                                         onEachFeature: onEachFeature 
                                     }).addTo(mymap);
 
-                    geoJson.bindTooltip(setToolTip);
+					/* 2024-01-03 mksong 수정 - 툴팁 제거 */
+                    //geoJson.bindTooltip(setToolTip);
 
 					featureLabel = [];
 					geoJson.getLayers().forEach(function(d, i) {

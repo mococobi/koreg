@@ -52,13 +52,7 @@
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 	
-	<div class="run-box flex">
-		<!-- 프롬프트 영역 -->
-	    <ul class="run-setting-box flex"></ul>
-	    <button id="run" class="btn-run blue">실행</button>
-	</div>
-	
-	<div class="top cont-wrap flex" style="height: calc(100vh - 275px);">
+	<div class="top cont-wrap flex" style="height: calc(100vh - 122px);">
 	    <iframe name="mstrReport" id="mstrReport" src=""
 				style="width: 100%; border: 1px solid silver; margin: 0px; background: #fff; border-radius: 8px; border: 1px solid #c8d8ec;"
 				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="auto">
@@ -96,145 +90,9 @@
 	
     //초기 실행 함수
 	function fnReportInit() {
-		getPromptInfo();
-	}
-	
-	
-	//리포트정보 및 프롬프트정보의 조회
-	function getPromptInfo() {
-		$('#portal-loading').show();
-		$('.run-setting-box').html('');
-		
-		let callParams = {
-			  objectId : objectId
-			, type : type
-		};
-		callAjaxPost('/mstr/getReportInfo.json', callParams, function(data) {
-			if (data) {
-    			reportInfo = data.report;
-    			document.title = reportInfo['title'];
-	    		renderPrompt();
-	    		setTimeout(() => {
-	    			$('#run').trigger('click');
-	    		}, 100);
-    		} else {
-    		    alert('리포트정보를 가져올 수 없습니다.');
-    		    $('#portal-loading').hide();
-    		}
-		});
-	}
-	
-	
-	//프롬프트정보를 이용한 랜더링
-	function renderPrompt() {
-		
-		if (reportInfo == undefined || reportInfo.promptList == undefined) {
-			//자동실행
-// 			$('#run').trigger('click');
-        	return; 
-        }
-        	
-        $.each(reportInfo.promptList, function(i, v) {
-        	var uiType = undefined;
-        	
-        	if (v['exUiType']) {
-        		uiType = v['exUiType'];
-        	} else {
-	            switch (v['type']) { // 프롬프트유형을 이용한 UI유형결정
-		            case 1:
-		            	uiType = 'value-default';
-		            	break;
-		            case 2:	  
-		            case 4:
-		            	uiType = 'list-default';
-		            	if ((v['max'] && Number(v['max']) > 1) || !v['max']) {
-		            	    uiType = 'multiSelect-default';
-		            	}
-		                break;
-		            default:
-	            } 
-        	}
-        	
-        	if (promptRenderer[uiType]) {
-        		var $wrapper = $('<li>', {class : 'flex'});
-        		$('.run-setting-box').append($wrapper);
-        		promptRenderer[uiType]['label']($wrapper, v);
-        		promptRenderer[uiType]['body']($wrapper, v);
-        	}
-        });
-        
-        if(reportInfo.promptList.length == 0) {
-			//자동실행
-// 			$('#run').trigger('click');
-        } else {
-//         	$('#mstrReport').attr('src', '${pageContext.request.contextPath}/app/main/selectPrompt.do');
-        }
-	}
-	
-	
-	//정합성 체크
-	function validationPrompt() {
-		var elemVal = {};
-		$('[prompt-id]').each(function(i, v) {
-			var $elem = $(v);
-			elemVal[$elem.attr('prompt-id')] = promptRenderer[$elem.attr('ui-type')]['validation']($elem);
-		});
-		
-		return elemVal;
-	}
-	
-	
-	//프롬프트 값 세팅
-	function getPromptVal() {
-		var elemVal = {};
-		$('[prompt-id]').each(function(i, v) {
-			var $elem = $(v);
-			elemVal[$elem.attr('prompt-id')] = promptRenderer[$elem.attr('ui-type')]['selected']($elem);
-		});
-		
-		return elemVal;
-	}
-	
-	
-	//리포트 실행
-	function getAnswerXML() {
 		$('#portal-loading').show();
 		
-		//정합성 체크
-		let promptCheck = validationPrompt();
-		for (const [key, value] of Object.entries(promptCheck)) {
-			if(value) {
-				alert(value);
-				$('#portal-loading').hide();
-				return false;
-			}
-		}
-		
-		//현재 선택된 프롬프트값들을 파라미터로 전달하여 XML형태로 반환 받음.
-		let promptVal = getPromptVal();
-		
-	    $.ajax({
-	    	  type: 'post'
-	    	, url: '${pageContext.request.contextPath}/app/mstr/getAnswerXML.json'
-	    	, async: true
-	    	, contentType: 'application/json;charset=utf-8'
-	    	, data : JSON.stringify({
-    			  objectId: objectId
-    			, type: type
-    			, promptVal: promptVal
-    		})
-    		, dataType: 'json'
-    		, success: function(data, text, request) {
-	    		// 리포트 실행 시 파라미터로 전달될 promptsAnswerXML의 값을 서버로부터 조회 성공
-	    		let inputs = getMstrFormDefinition(type);
-	    		$.extend(inputs, {promptsAnswerXML : data['xml']});
-	    		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', inputs);
-	    	}
-	    	, error : function(jqXHR, textStatus, errorThrown) {
-	    		$('#portal-loading').hide();
-	    		errorProcess(jqXHR, textStatus, errorThrown);
-	    	}
-	    });
+		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', getMstrFormDefinition(type));
 	}
 	
 	

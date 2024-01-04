@@ -35,8 +35,9 @@
                                 <button onclick="popupMstrPage('SHARE_REPORT')" class="tab-btn">부서 공유 리포트</button>
                                 <button onclick="popupMstrPage('MY_REPORT')" class="tab-btn">내 리포트</button>
                                 <button onclick="popupMstrPage('NEW_REPORT')" class="tab-btn">비정형 분석</button>
+                                <%--
                                 <button onclick="popupMstrPage('NEW_DOSSIER')" class="tab-btn">새 대시보드</button>
-                                
+                                --%>
                                 <button onclick="moveCommunityPage(1)" class="tab-btn">공지사항</button>
                                 <button onclick="moveCommunityPage(2)" class="tab-btn">FAQ</button>
                                 <% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>

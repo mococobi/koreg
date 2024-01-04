@@ -1,5 +1,7 @@
 .header{height: 80px; background: #1a3057; position: relative;}
-.header .logo img{width: 200px; height: 50px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
+/* 2023-01-02 mksong 수정 - 헤더 왼쪽으로 */
+/* .header .logo img{width: 200px; height: 50px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);} */
+.header .logo img{width: 200px; height: 50px; position: absolute; top: 50%; left: 7%; transform: translate(-50%, -50%);}
 .header .util{position: absolute; top: 50%; right: 100px; transform: translateY(-50%); align-items: center;}
 .header .util * {color: #a9c0e4; font-size: 1.4rem; position: relative;}
 .header .util .welcome-text{padding-right: 16px; margin-right: 16px; display: flex; align-items: center;}
@@ -7,7 +9,9 @@
 .header .util .welcome-text::before{content: ''; display: block; margin-right: 4px; border-radius: 50%; width: 24px; height: 24px; background: url(../../image/gcgf/user-img.png) #fff no-repeat center; background-size: 10px;}
 .header .util .welcome-text::after{content: ''; position: absolute; width: 1px; height: 12px; top: 50%; right: 0; transform: translateY(-50%); background: rgba(169, 192, 228, .5);}
 
-.contents .bg > .inner{padding-top: 92px;}
+/* 2023-01-02 mksong 수정 - 컨텐츠 위쪽으로 */
+/* .contents .bg > .inner{padding-top: 92px;} */
+.contents .bg > .inner{padding-top: 20px;}
 
 .lnb{
     width: 210px; margin-right: 20px; min-width: 210px;
@@ -37,7 +41,9 @@
 .lnb .dep3-ul li:hover a::before{content: ">"; margin-right: 3px;}
 
 .content{position: relative;}
-.content .tab-btn-wrap{position: absolute; top: -60px; left: 45%; transform: translateX(-50%); gap: 4px;}
+/* 2023-01-02 mksong 수정 - 이동 버튼 위쪽으로 */
+/* .content .tab-btn-wrap{position: absolute; top: -60px; left: 45%; transform: translateX(-50%); gap: 4px;} */
+.content .tab-btn-wrap{position: absolute; top: -84px; left: 39%; transform: translateX(-50%); gap: 4px;}
 .content .tab-btn-wrap .tab-btn{border-radius: 6px; border: 1px solid #c8d8ec; background: #fff; font-size: 1.6rem; font-weight: 500; padding: 10px 16px; font-family: 'Noto Sans KR', sans-serif;}
 .content .tab-btn-wrap .tab-btn.active{background: #e5fcfb;}
 

@@ -1,0 +1,4 @@
+<browser-settings>
+    <!-- mksong 수정 - 모든 개체 tree 기본 설정 -->
+	<browser-setting desc="Display format of the object browser in report" name="obDF" value="tree"/>
+</browser-settings>

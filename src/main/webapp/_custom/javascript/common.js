@@ -444,3 +444,19 @@ let handleCookie = {
 		return value ? value[2] : null;
 	}
 };
+
+
+//MSTR 타이틀 이름 앞에 .자르고 표시
+function getMstrTitleName(title) {
+	let titleSplit = title.split('.');
+	let rtnTitle = '';
+	
+	if(titleSplit.length < 2) {
+		rtnTitle = title;
+	} else {
+		titleSplit.shift();
+		rtnTitle = titleSplit.join('');
+	}
+	
+	return rtnTitle;
+}

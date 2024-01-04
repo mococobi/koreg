@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<deco> 
+    <fileData filename="folderLinks.xml" filepath="/MSTR/webapp/plugins/CustomCreateReport/WEB-INF/xml/config" ischanged="0" lastversion="2" tstversion="0" itemid="000001046367" ecmMd5sum="f47e4c60758d009c9e33abf19926c559" ecmTstmd5sum="" lastChangedDate="1650243505000" editor="송민권:9804345" lastUser="송민권:9804345" filestatus="운영중:0" islock="1" isAuthority="1" rsrccd="81" rsrccdcodename="버전관리" rsrcinfo="010000000001000000000001000001000100000010000000000000000101000000000000000" jobcd="IBI" jobname="BI" syscd="21202" sysmsg="정보분석_BIS_Portal" srid="R202204-2884"/> 
+</deco>

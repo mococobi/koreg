@@ -1,0 +1,29 @@
+<framework>
+	<pages>
+		<page desc="Report Execution" useResourceMgr="on" desc-id="" feature-id="" class="com.microstrategy.web.app.beans.ReportPageComponentImpl" login-required="true" name="report" persist-mode="8" title-bean="frame.rb" track="true" event-handler="com.microstrategy.web.app.beans.ReportPageEventHandler" help-topic="Running_reports.htm">
+			<web-beans>
+				<web-bean bean-type="app" name="frame" persist-mode="2" sys-bean="ReportFrameBean">
+					<web-beans>
+						<web-bean bean-type="app" name="accordion" persist-mode="2" sys-bean="AccordionTabManagerBean" event-handler="com.microstrategy.web.app.beans.AccordionTabManagerEventHandler">
+							<init-properties>
+								<!-- 모든 개체  - 탭 기본 사용 -->
+								<property name="defaultTabNameReportDesign" source="const" type="string" value="objectBrowser"/>
+								<property name="defaultTabNameReportRun" source="const" type="string" value="objectBrowser"/>
+							</init-properties>
+							<web-beans>
+								<!-- 리포트 생성 - MDX개체 삭제 -->
+								<web-bean deleted="1" name="mdxObjBrwsr" persist-mode="2" sys-bean="OptimizedTabBean"/>
+								
+								<!-- 리포트 생성 - 노트 삭제 -->
+								<web-bean deleted="1" bean-type="app" name="annotations" persist-mode="0" sys-bean="TabBean"/>
+								
+								<!-- 리포트 생성 - 관련 리포트 삭제 -->
+								<web-bean deleted="1" bean-type="app" name="relatedReports" persist-mode="0" sys-bean="TabBean"/>
+							</web-beans>
+						</web-bean>
+					</web-beans>
+				</web-bean>
+			</web-beans>
+		</page>
+	</pages>
+</framework>
