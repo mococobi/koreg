@@ -211,6 +211,7 @@
 		callAjaxPost('/board/boardPostDetail.json', callParams, function(data){
 			let postData = data['data'];
 			let postFile = data['file'];
+			
 			let postLocation = data['location'];
 			
 			displayContents(postData, postFile, postLocation);

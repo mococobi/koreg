@@ -456,6 +456,11 @@
 			editor.getHTML().focus();
 			return false;
 		}
+		
+		if($('#popup_yn').val() == 'Y') {
+			alert('팝업일자를 선택하세요');
+			return false;
+		}
 
 		return rtnCheck;
 	}

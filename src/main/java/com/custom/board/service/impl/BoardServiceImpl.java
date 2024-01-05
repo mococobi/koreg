@@ -70,6 +70,28 @@ public class BoardServiceImpl implements BoardService {
         
         params.put("countCheck", true);
     	Map<String, Object> rtnListCnt = simpleBizDao.select("Board.boardPostList", params);
+    	 	
+		/*
+		 * //첨부파일 if(params.get("CHECK_POST_FILE") != null &&
+		 * (Boolean)params.get("CHECK_POST_FILE") == true) { List<Map<String, Object>>
+		 * rtnPostFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
+		 * rtnMap.put("file", rtnPostFileList); }
+		 */
+    	//첨부파일
+    	if(params.get("CHECK_POST_FILE") != null && (Boolean)params.get("CHECK_POST_FILE") == true) {
+    		int tmpPostID = 0;
+	    	List<Map<String, Object>> rtnPostFileList = null;
+	    	for (Map<String, Object> mPostItem : rtnList) {
+	    		tmpPostID = (BigDecimal) mPostItem.get("POST_ID").intValue();
+	    		params.put("POST_ID", tmpPostID); 
+	    		
+	        	rtnPostFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
+	    		mPostItem.put("attachfiles", rtnPostFileList);
+	    	}
+    	}
+
+    	
+    	
     	
     	if((Boolean)params.get("PORTAL_LOG") == true) {
     		//포탈 로그 기록(조회)
@@ -374,4 +396,6 @@ public class BoardServiceImpl implements BoardService {
         
         return rtnMap;
     }
+    
+    
 }

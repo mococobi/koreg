@@ -179,12 +179,10 @@
 	function displayContents(postData, postFile) {
 		
 		$('#post_title').text(postData['POST_TITLE']);
-		
 		$('#post_create_user_id').text(postData['CRT_USR_ID']);
 		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);
 		$('#post_create_date').text(changeDisplayDate(postData['CRT_DT_TM'], 'YYYY-MM-DD'));
 		$('#post_count').text(postData['POST_VIEW_COUNT']);
-		
 		$('#post_content').html(postData['POST_CONTENT']);
 		
 		if(postData['POPUP_YN'] == 'Y') {

@@ -82,6 +82,7 @@ public class BoardController {
     @ResponseBody
     public Map<String, Object> boardPostList(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
     	params.put("PORTAL_LOG", false);
+    	
     	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
@@ -605,6 +606,32 @@ public class BoardController {
 		}
         
         return view;
+    }
+    
+    
+    /**
+     * FAQ - 게시물 리스트 조회
+     * @return
+     */
+    @RequestMapping(value = "/board/boardPostFaqList.json", method = { RequestMethod.POST })
+    @ResponseBody
+    public Map<String, Object> boardPostFaqList(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+    	params.put("PORTAL_LOG", false);
+    	params.put("CHECK_POST_FILE", true);
+    	
+    	LOGGER.debug("params : [{}]", params);
+    	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+    	
+    	try {
+    		Map<String, Object> rtnList = new HashMap<String, Object>();
+    		rtnList = boardService.boardPostList(request, response, params);
+    		rtnMap.putAll(rtnList);
+		} catch (Exception e) {
+			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			LOGGER.error("boardPostFaqList Exception", e);
+		}
+    	
+    	return rtnMap;
     }
     
 }
