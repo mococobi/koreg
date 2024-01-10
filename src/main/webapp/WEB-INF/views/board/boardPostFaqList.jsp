@@ -100,7 +100,7 @@
 	let searchKey = '';
 	let searchVal = '';
 	$(function() {
-		fnBoardInit('2');
+		fnBoardInit(boardId);
 		
 		$('#searchVal').keypress(function(e){
 			if(e.keyCode && e.keyCode == 13){
@@ -113,8 +113,11 @@
 	
 	//게시물 목록
 	function fnBoardInit(boardId) {
+		$('#board_div_2').html('');
 		let callParams = {
-			BRD_ID : boardId
+			  BRD_ID : boardId
+			, searchKey : $('#searchKey option:selected').val()
+			, searchVal : $('#searchVal').val()
 		};
 		callAjaxPost('/board/boardPostFaqList.json', callParams, function(data) {
 			let postData = data['data'];
@@ -134,7 +137,7 @@
 					+		'<div id="collapse' + post['POST_ID'] + '" class="accordion collapse" data-bs-parent="#accordionExample">'
 					+			'<div class="accordion-body">'
 					+				'<span>' + post['POST_CONTENT'] + '</span>'
-					+				'<div class="list-group" id="post_file' + post['POST_ID'] + '">'
+					+				'<div class="list-group" id="post_file' + post['POST_ID'] + '" style="margin-top:10px;">'
 					+				'</div>'
 					+			'</div>'
 					+		'</div>'
@@ -191,8 +194,7 @@
 		searchKey = $('#searchKey option:selected').val();
 		searchVal = $('#searchVal').val();
 		
-		var dataTable = $('#boardPostTable').DataTable();
-		dataTable.ajax.reload();
+		fnBoardInit(boardId);
 	}
 	
 	

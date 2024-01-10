@@ -325,7 +325,7 @@ public class BoardServiceImpl implements BoardService {
 		rtnMap.put("INSERT_POST_CNT", boardUpdateCount);
 		rtnMap.put("INSERT_FILE_CNT", totalFileUpdateCount);
 		rtnMap.put("DELETE_FILE_CNT", totalFileUpdateCount);
-//		rtnMap.put("params", params);
+		rtnMap.put("params", params);
 	    
 		Map<String, Object> logParams = new HashMap<String, Object>();
 		

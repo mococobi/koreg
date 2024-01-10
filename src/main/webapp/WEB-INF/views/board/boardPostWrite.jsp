@@ -138,8 +138,8 @@
 							<td colspan="5">
 								<span id="post_popup_dt"> 
 									<img src="${pageContext.request.contextPath}/_custom/image/bootstrap-icons-1.11.2/calendar-fill.svg" id="datefilter" name="datefilter" style="width: 20px; pointer-events:none;" />
-									<input type="text" name="startDateInput" id="startDateInput" value="" readonly style="width: 200px;" disabled /> 
-									<input type="text" name="endDateInput" id="endDateInput" value="" readonly	style="width: 200px;" disabled />
+									<input type="text" name="startDateInput" id="startDateInput" value="" readonly style="width: 200px;" readonly /> 
+									<input type="text" name="endDateInput" id="endDateInput" value="" readonly	style="width: 200px;" readonly />
 								</span>
 							</td>
 						</tr>
@@ -478,7 +478,7 @@
 				formData.append('BRD_ID', boardId);
 				formData.append('POST_TITLE', $('#post_title').val());
 				formData.append('POST_CONTENT', editor.getHTML());
-				formData.append('POPUP_YN', $('#popup_yn').val());
+				formData.append('POPUP_YN', $('#popup_yn').is(":checked")?"Y":"N");
 				formData.append('POPUP_START_DT_TM', $('#startDateInput').val());
 				formData.append('POPUP_END_DT_TM', $('#endDateInput').val());
 				//multiple 파일 갯수에 만큼 저장
@@ -514,14 +514,14 @@
 				formData.append('BRD_ID', boardId);
 				formData.append('POST_TITLE', $('#post_title').val());
 				formData.append('POST_CONTENT', editor.getHTML());
-				formData.append('POPUP_YN', $('#popup_yn').val());
+				formData.append('POPUP_YN', $('#popup_yn').is(":checked")?"Y":"N");
 				formData.append('POPUP_START_DT_TM', $('#startDateInput').val());
 				formData.append('POPUP_END_DT_TM', $('#endDateInput').val());
 				//multiple 파일 갯수에 만큼 저장
 				Object.values(filesObj).forEach((file, idx) => {
 					formData.append('ATTACH_FILE_' + idx, file);
 				});
-				
+				console.log($('#startDateInput').val());
 				//삭제 첨부파일 추가
 				deleteFileIds.forEach(id => {
 					formData.append('deleteFileIds', id);
