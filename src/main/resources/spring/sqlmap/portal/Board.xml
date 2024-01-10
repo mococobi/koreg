@@ -54,6 +54,7 @@
 				, post.BRD_ID
 				, post.POPUP_YN
 				, post.POST_TITLE
+				, post.POST_CONTENT
 				/* , TO_CHAR(post.CRT_DT_TM, 'yyyy-mm-dd') AS CRT_DT_TM */
 				, post.CRT_DT_TM
 				, post.CRT_USR_ID
@@ -61,7 +62,7 @@
 				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PT_PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
 				, (SELECT COUNT(post_file.FILE_ID) FROM PORTAL.PT_BOARD_POST_FILE post_file WHERE post_file.DEL_YN = 'N' AND post.POST_ID = post_file.POST_ID) AS POST_FILE_COUNT
 			FROM 
-				PORTAL.PT_BOARD_POST post 
+				PORTAL.PT_BOARD_POST post
 			WHERE 1=1
 				AND post.BRD_ID = #{BRD_ID}
 				AND post.DEL_YN = 'N'
@@ -129,7 +130,7 @@
 			) ORDER_T
 		) T
 		WHERE 1=1
-			<if test="countCheck != null and countCheck == false">
+			<if test="countCheck != null and countCheck == false and listViewCount != null">
 				AND rn BETWEEN #{listViewCount} * (((#{start} + #{length}) / #{listViewCount}) - 1) + 1 AND #{listViewCount} * ((#{start} + #{length}) / #{listViewCount})
 			</if>
 	</select>
@@ -338,6 +339,35 @@
 		WHERE 1=1
 			AND post_file.DEL_YN = 'N'
 			AND post_file.POST_ID = #{POST_ID}
+		ORDER BY
+			post_file.FILE_ID
+	</select>
+	
+		<!-- 게시판 - 게시물 - 파일 목록 조회 -->
+	<select id="Board.boardPostFaqFileList" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
+		SELECT /* Board.boardPostFileList */
+			  post_file.FILE_ID
+			, post_file.POST_ID
+			, post_file.FILE_TYPE
+			, post_file.PARENT_CMNT_ID
+			, post_file.SRV_FILE_PATH
+			, post_file.SRV_FILE_NM
+			, post_file.ORG_FILE_NM
+			, post_file.FILE_EXT
+			, post_file.FILE_SIZE
+			, post_file.DEL_YN
+			, post_file.CRT_DT_TM
+			, post_file.CRT_USR_ID
+			, post_file.MOD_DT_TM
+			, post_file.MOD_USR_ID
+		FROM
+			PORTAL.PT_BOARD_POST_FILE post_file
+		WHERE 1=1
+			AND post_file.DEL_YN = 'N'
+			AND post_file.POST_ID IN #{data}
+		ORDER BY
+			  post_file.POST_ID
+			, post_file.FILE_ID
 	</select>
 	
 	
