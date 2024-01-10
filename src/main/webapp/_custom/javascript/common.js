@@ -46,10 +46,11 @@ function moveCommunityPage(moveBoardId) {
 	let pagePrams = [
 		['BRD_ID', moveBoardId]
 	];
-	if(moveBoardId=="1"){
-		pageGoPost('_self', __contextPath + '/app/board/boardPostListView.do', pagePrams);
-	}else{
+	
+	if(moveBoardId == '2') {
 		pageGoPost('_self', __contextPath + '/app/board/boardPostFaqListView.do', pagePrams);
+	} else {
+		pageGoPost('_self', __contextPath + '/app/board/boardPostListView.do', pagePrams);
 	}
 }
 
@@ -59,8 +60,8 @@ function detailBoardPost(moveBoardId, movePostId) {
 	let pagePrams = [
 		  ['BRD_ID', moveBoardId]
 		, ['POST_ID', movePostId]
-		
 	];
+	
 	pageGoPost('_self', __contextPath + '/app/board/boardPostDetailView.do', pagePrams);
 }
 

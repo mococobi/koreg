@@ -46,8 +46,6 @@
 </head>
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
-	<% if(boardId.equals("1")) {
-		%>
 	<div id="boardPost_div" class="container py-4" style="max-width: 100%;">
 		<p class="h3">${postData['BRD_NM']}</p>
 		<p class="h6">${postData['BRD_DESC']}</p>
@@ -64,14 +62,16 @@
 			<div class="col-md-1">
 				<button class="btn btn-primary btn-sm" onclick="searchBoardPostList()">조회</button>
 			</div>
-			<% if(
-				(boardId.equals("1") && PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN"))
-				|| !boardId.equals("1")					
-			   ) { %>
-			<!-- 관리자 기능 -->
-			<div class="col text-end">
-				<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
-			</div>
+			<% if(boardId.equals("1") || boardId.equals("3")) { %>
+				<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
+					<div class="col text-end">
+						<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
+					</div>
+				<% } %>
+			<% } else { %>
+					<div class="col text-end">
+						<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
+					</div>
 			<% } %>
 	    </div>
 		<div id="boardPostTable_div">
@@ -96,7 +96,6 @@
 			</table>
 		</div>
 	</div>
-	<% } %>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
 </body>
 <script type="text/javascript">

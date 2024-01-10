@@ -40,6 +40,7 @@
                                 --%>
                                 <button onclick="moveCommunityPage(1)" class="tab-btn">공지사항</button>
                                 <button onclick="moveCommunityPage(2)" class="tab-btn">FAQ</button>
+                                <button onclick="moveCommunityPage(3)" class="tab-btn">자료실</button>
                                 <% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
 									<!-- 관리자 기능 -->
 									<button onclick="moveAdminPage('BOARD_ADMIN')" class="tab-btn">관리자</button>

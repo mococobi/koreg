@@ -1,37 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-	<entry key="portal.application.file.name">Koreg</entry> <!-- Gcgf, Koreg -->
-	<entry key="enc.token">mococoportal2023</entry>
+	<!-- 어플리케이션 관련 -->
+	<entry key="portal.application.file.name">Koreg</entry> 								<!-- 어플리케이션 Gcgf, Koreg 선택 -->
+	<entry key="enc.token">mococoportal2023</entry>											<!-- 암호화 키 변경 X -->
 	
-	<entry key="mstr.server.name">WIN-QS3VSHTT7D7</entry>
-	<entry key="mstr.server.port">34952</entry>
-	<entry key="mstr.default.project.name">MicroStrategyTutorial</entry>
-	<entry key="mstr.session.locale">1042</entry><!-- 한글 -->
-	<!-- <entry key="mstr.session.locale">1033</entry> --><!-- 영어 -->
 	
-	<entry key="mstr.admin.user.id">administrator</entry>
-	<entry key="mstr.admin.user.pwd">QVqmwu20yG0nwoZX2qAyrg==</entry>
+	<!-- MSTR 서버 정보 -->
+	<entry key="mstr.server.name">WIN-QS3VSHTT7D7</entry>									<!-- MSTR 서버 이름 -->
+	<entry key="mstr.server.port">34952</entry>												<!-- MSTR 서버 포트 -->
+	<entry key="mstr.default.project.name">MicroStrategyTutorial</entry>					<!-- MSTR 기본 프로젝트명 -->
+	<entry key="mstr.session.locale">1042</entry><!-- 한글 -->								<!-- MSTR 로그인 언어 -->
+	<entry key="mstr.trust.token">TokenC3FF8829403B168F274C9CA0D6937131</entry>				<!-- MSTR 트러스트 토큰 -->
+	<entry key="mstr.admin.user.id">administrator</entry>									<!-- MSTR 관리자 정보 -->
+	<entry key="mstr.admin.user.pwd">QVqmwu20yG0nwoZX2qAyrg==</entry>						<!-- MSTR 관리자 정보 -->
 	
-	<entry key="mstr.trust.token">TokenC3FF8829403B168F274C9CA0D6937131</entry>
-	<entry key="mstr.esm.fail.url">/app/error/noSessionView.do</entry>
 	
-	<entry key="portal.login.page">/app/error/noSessionView.do</entry>
-	<entry key="eis.login.page">/app/login/loginUserEisView.do</entry>
+	<!-- 포탈 관련 -->
+	<entry key="mstr.esm.fail.url">/app/error/noSessionView.do</entry>						<!-- MSTR ESM 실패시 에러 페이지 -->
+	<entry key="portal.login.page">/app/error/noSessionView.do</entry>						<!-- 포탈 로그인 페이지 -->
+	<entry key="eis.login.page">/app/login/loginUserEisView.do</entry>						<!-- EIS 로그인 페이지 -->
 	
-	<entry key="mstr.menu.folder.id">032A5E114A59D28267BDD8B6D9E58B22</entry><!-- 왼쪽 메뉴 폴더 ID -->
+	<entry key="mstr.menu.folder.id">032A5E114A59D28267BDD8B6D9E58B22</entry>				<!-- 왼쪽 메뉴 폴더 ID -->
+	<entry key="portal.iframe.page.move.yn">N</entry>										<!-- 리포트 클릭시 화면 전환 -->
+	<entry key="portal.main.display">MAIN</entry>											<!-- 메인화면 MSTR_DASHBOARD, MAIN 선택 -->
+	<entry key="portal.main.dashboard.id">4DBD67E243DB89B5B9BCC3BEB8FE2CFF</entry>			<!-- 메인화면 표시 대표 대시보드(MSTR_DASHBOARD일 경우) -->
+	<entry key="portal.main.dashboard.type">551</entry>										<!-- 메인화면 표시 대표 대시보드 타입(MSTR_DASHBOARD일 경우) -->
 	
-	<entry key="attach.base.location">/mococo/portal/</entry>
-	<entry key="attach.base.file.size">104857600</entry>
-	<entry key="attach.base.file.extension">.DOC,.DOCX,.PPTX,.PPT,.XLS,.XLSX,.PDF,.PNG,.GIF,.JPG,.JPEG</entry>
 	
-	<entry key="portal.main.display">MAIN</entry><!-- MSTR_DASHBOARD, MAIN -->
-	<entry key="portal.main.dashboard.id">4DBD67E243DB89B5B9BCC3BEB8FE2CFF</entry><!-- 메인화면 표시 대표 대시보드 -->
-	<entry key="portal.main.dashboard.type">551</entry><!-- 메인화면 표시 대표 대시보드 타입 -->
+	<!-- SSO 관련 -->
+	<entry key="portal.sso.token.api.key">N</entry>											<!-- 포탈 SSO 토큰 키 -->
 	
-	<entry key="portal.iframe.page.move.yn">N</entry><!-- 리포트 클릭시 화면 전환 -->
 	
-	<entry key="portal.sso.token.api.key">N</entry><!-- 포탈 SSO 토큰 키 -->
+	<!-- 게시판 관련 -->
+	<entry key="attach.base.location">/mococo/portal/</entry>													<!-- 게시판 첨부파일 Root 경로 -->
+	<entry key="attach.base.file.size">104857600</entry>														<!-- 게시판 첨부파일 크기 제한 -->
+	<entry key="attach.base.file.extension">.DOC,.DOCX,.PPTX,.PPT,.XLS,.XLSX,.PDF,.PNG,.GIF,.JPG,.JPEG</entry>	<!-- 게시판 첨부파일 확장자 제한 -->
 	
+	
+	<!-- 배치 관련 -->
+	<entry key="mstr.dept.root.id">52900EBA42E08DBF5D45B5AB8F267838</entry>					<!-- 부서 그룹 ID -->
+	<entry key="mstr.auth.root.id">224E87FA47BDB241297F44853406BF04</entry>					<!-- 권한 그룹 ID -->
+	<entry key="mstr.delete.user.group.id">C05AE2D44AD0DDFD1D63AE955E5ACB57</entry>			<!-- 비활성 그룹 ID -->
+	<entry key="mstr.user.default.pwd">test</entry>											<!-- 비활성 그룹 ID -->
 	
 </properties>
