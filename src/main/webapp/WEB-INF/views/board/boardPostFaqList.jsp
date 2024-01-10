@@ -5,6 +5,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
 	String boardId = (String)request.getParameter("BRD_ID");
+	String postId = (String)request.getParameter("POST_ID");
 
 	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
 	
@@ -41,6 +42,18 @@
 		#boardPost_div .h6 {
 			font-size: 2rem;
 			font-family: 맑은 고딕;
+		}
+		
+		.accordion-button::after {
+		    flex-shrink: 0;
+		    width: var(--bs-accordion-btn-icon-width);
+		    height: var(--bs-accordion-btn-icon-width);
+		    margin-left: 10px;
+		    content: "";
+		    background-image: var(--bs-accordion-btn-icon);
+		    background-repeat: no-repeat;
+		    background-size: var(--bs-accordion-btn-icon-width);
+		    transition: var(--bs-accordion-btn-icon-transition);
 		}
 	</style>
 </head>
@@ -83,9 +96,9 @@
 </body>
 <script type="text/javascript">
 	let boardId = <%=boardId%>;
+	let postId = <%=postId%>;
 	let searchKey = '';
 	let searchVal = '';
-	console.log(boardId);
 	$(function() {
 		fnBoardInit('2');
 		
@@ -101,38 +114,74 @@
 	//게시물 목록
 	function fnBoardInit(boardId) {
 		let callParams = {
-			    BRD_ID : boardId
+			BRD_ID : boardId
 		};
 		callAjaxPost('/board/boardPostFaqList.json', callParams, function(data) {
 			let postData = data['data'];
-			let postFile = data['file'];
+
 			let accordionHTML = '<div class="accordion" id="accordionExample">';
-			console.log(data['file']);
+			
 			postData.forEach((post, idx) => {
 				let divHtml = $('<div>');
-				
 			    accordionHTML +=
 						'<div class="accordion-item">'
 					+		'<h2 class="accordion-header">'
-					+			'<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse' + post['POST_ID'] + '" aria-expanded="false" aria-controls="collapse"' + post['POST_ID'] +'>'
+					+			'<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse' + post['POST_ID'] + '" aria-expanded="false" aria-controls="collapse"' + post['POST_ID'] +'style="margin-right:0;">'
 					+				'<strong>' + post['POST_TITLE'] + '</strong>'
+					+				'<input type="button" id="btn_post_detail" class="btn btn-secondary btn-sm" value="상세" onclick="detailBoardPost(' + post['POST_ID'] + ')" style="width:5%; height:50%; margin-left:auto;">'
 					+			'</button>'
 					+		'</h2>'
 					+		'<div id="collapse' + post['POST_ID'] + '" class="accordion collapse" data-bs-parent="#accordionExample">'
 					+			'<div class="accordion-body">'
 					+				'<span>' + post['POST_CONTENT'] + '</span>'
-					+				'<div class="list-group" id="post_file">'
-					+					'<button id="btn_post_modify" class="btn btn-secondary btn-sm" onclick="' + modifyBoardPost() + '" style="width:10%;">수정</button>'
-					+					'<button id="btn_post_delete" class="btn btn-secondary btn-sm" onclick="' + deleteBoardPost() + '" style="width:10%;">삭제</button>'
+					+				'<div class="list-group" id="post_file' + post['POST_ID'] + '">'
 					+				'</div>'
 					+			'</div>'
 					+		'</div>'
 					+	'</div>';
 			});
 			
+			// 첨부 파일들 렌더링
+			let aTempFileInfoTag = [];
+			if(postData) {
+				postData.forEach((data, idx) => {
+					let tmpAttachFileInfo = data;
+					//console.log("tmpAttachFileInfo ["+tmpAttachFileInfo+"]");
+					$.each(tmpAttachFileInfo.attachfiles, function(attachFileIdx, attachFileInfo) {
+						let fileHtml = $('<a></a>', {
+							  class : 'list-group-item list-group-item-action list-group-item-secondary'
+							, style : 'cursor:pointer;'
+							, text : attachFileInfo['ORG_FILE_NM'] + '.' + attachFileInfo['FILE_EXT'] + '\t' + formatFileSize(attachFileInfo['FILE_SIZE'])
+							, title : attachFileInfo['ORG_FILE_NM'] + '.' + attachFileInfo['FILE_EXT']
+							, click : function(e) {
+								let fileData = {
+									  BRD_ID : boardId
+									, POST_ID : attachFileInfo['POST_ID']
+									, FILE_ID : attachFileInfo['FILE_ID']
+								};
+								downloadAttachFile(fileData);
+							}
+						});
+						//console.log(attachFileInfo['ORG_FILE_NM']);
+						
+						fileHtml.attr('id', attachFileInfo['POST_ID']);
+						
+						aTempFileInfoTag.push(fileHtml);
+						//$('#post_file').append(fileHtml);
+					});
+					
+				});
+			}
+			
 			accordionHTML += '</div>';
 			$('#board_div_2').append(accordionHTML);
 			
+			$.each(aTempFileInfoTag, function(idx, item) {
+				//console.log(item);
+				//console.log($(item).attr('id'));
+				//$('#post_file').append(item);
+				$('div#collapse'+$(item).attr('id')).find('div#post_file'+$(item).attr('id')).append(item);
+			});
 		});
 	}
 	
@@ -142,7 +191,8 @@
 		searchKey = $('#searchKey option:selected').val();
 		searchVal = $('#searchVal').val();
 		
-		$('#boardPostTable').ajax.reload();
+		var dataTable = $('#boardPostTable').DataTable();
+		dataTable.ajax.reload();
 	}
 	
 	
@@ -156,17 +206,17 @@
 	
 	
 	//게시물 수정
-	function modifyBoardPost() {
+	function detailBoardPost(postId) {
 		let pagePrams = [
 			  ['BRD_ID', boardId]
 			, ['POST_ID', postId]
 		];
 		
-		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
+		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostDetailView.do', pagePrams);
 	}
 	
 	//게시물 삭제
-	function deleteBoardPost() {
+	function deleteBoardPost(postId) {
 		let pagePrams = [
 			  ['BRD_ID', boardId]
 			, ['POST_ID', postId]

@@ -130,7 +130,7 @@
 								<span>팝업여부</span>
 							</td>
 							<td class="text-center">
-								<input type="checkbox" id="popup_yn" value="N" onclick="checkPopUp(this)">
+								<input type="checkbox" id="popup_yn" value="" onclick="checkPopUp(this)">
 							</td>
 							<td>
 								<span>팝업일자</span>
@@ -457,7 +457,7 @@
 			return false;
 		}
 		
-		if($('#popup_yn').val() == 'Y') {
+		if($('#popup_yn').val() == 'Y' && $('#startDateInput').val() == '') {
 			alert('팝업일자를 선택하세요');
 			return false;
 		}
@@ -488,9 +488,11 @@
 				
 				callAjaxForm('/board/boardPostInsert.json', formData, function(data) {
 					alert('게시글이 등록되었습니다.');
-					if (data['POST_ID']) {
+					if (data['BRD_ID']=='1' && data['POST_ID']) {
 						detailBoardPost(boardId, data.POST_ID);//POST_ID 받아오는 값
-					} else {
+					} else if (data['BRD_ID']=='2' && data['POST_ID']){
+						moveCommunityPage(boardId);
+					}else {
 						console.log('Undefined. post id [%s]', data.POST_ID);
 					}
 				});
@@ -527,9 +529,11 @@
 				
 				callAjaxForm('/board/boardPostUpdate.json', formData, function(data) {
 					alert('게시글이 수정되었습니다.');
-					if (data['POST_ID']) {
-						detailBoardPost(boardId, data.POST_ID);//POST_ID 받아오는 값으로 변경
-					} else {
+					if (data['BRD_ID']=='1' && data['POST_ID']) {
+						detailBoardPost(boardId, data['POST_ID']);//POST_ID 받아오는 값으로 변경
+					}else if (data['BRD_ID']=='2' && data['POST_ID']){
+						moveCommunityPage(boardId);
+					}else {
 						console.log('Undefined. post id [%s]', data.POST_ID);
 					}
 				});

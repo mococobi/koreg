@@ -364,7 +364,7 @@
 			PORTAL.PT_BOARD_POST_FILE post_file
 		WHERE 1=1
 			AND post_file.DEL_YN = 'N'
-			AND post_file.POST_ID IN #{data}
+			AND post_file.POST_ID IN #{POST_ID}
 		ORDER BY
 			  post_file.POST_ID
 			, post_file.FILE_ID

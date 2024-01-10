@@ -744,7 +744,6 @@ progress {
   width: 100%;
   padding-left: calc(var(--bs-gutter-x) * 0.5);
   padding-right: calc(var(--bs-gutter-x) * 0.5);
-  margin-left: auto;
   margin-right: auto;
 }
 
@@ -4617,7 +4616,6 @@ textarea.form-control-lg {
   flex-shrink: 0;
   width: var(--bs-accordion-btn-icon-width);
   height: var(--bs-accordion-btn-icon-width);
-  margin-right: auto;
   content: "";
   background-image: var(--bs-accordion-btn-icon);
   background-repeat: no-repeat;

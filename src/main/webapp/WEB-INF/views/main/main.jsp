@@ -180,7 +180,6 @@
 		};
 		callAjaxPost('/board/boardPostList.json', callParams, function(data) {
 			let postData = data['data'];
-			console.log(postData);
 			postData.forEach((post, idx) => {
 				
 				let trHtml = $('<tr>');

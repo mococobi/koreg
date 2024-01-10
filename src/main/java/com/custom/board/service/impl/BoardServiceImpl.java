@@ -78,16 +78,18 @@ public class BoardServiceImpl implements BoardService {
 		 * rtnMap.put("file", rtnPostFileList); }
 		 */
     	//첨부파일
-    	if(params.get("CHECK_POST_FILE") != null && (Boolean)params.get("CHECK_POST_FILE") == true) {
-    		int tmpPostID = 0;
-	    	List<Map<String, Object>> rtnPostFileList = null;
-	    	for (Map<String, Object> mPostItem : rtnList) {
-	    		tmpPostID = (BigDecimal) mPostItem.get("POST_ID").intValue();
-	    		params.put("POST_ID", tmpPostID); 
-	    		
-	        	rtnPostFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
-	    		mPostItem.put("attachfiles", rtnPostFileList);
-	    	}
+    	if (params.get("CHECK_POST_FILE") != null && (Boolean) params.get("CHECK_POST_FILE") == true) {
+    	    int tmpPostID = 0;
+    	    List<Map<String, Object>> rtnPostFileList = null;
+    	    for (Map<String, Object> mPostItem : rtnList) {
+    	        Object postIDObj = mPostItem.get("POST_ID");
+    	        if (postIDObj != null) {
+    	            tmpPostID = ((Number) postIDObj).intValue();
+    	            params.put("POST_ID", tmpPostID);
+    	            rtnPostFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
+    	            mPostItem.put("attachfiles", rtnPostFileList);
+    	        }
+    	    }
     	}
 
     	
