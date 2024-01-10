@@ -14,7 +14,7 @@
 	<entry key="mstr.admin.user.pwd">QVqmwu20yG0nwoZX2qAyrg==</entry>
 	
 	<entry key="mstr.trust.token">TokenC3FF8829403B168F274C9CA0D6937131</entry>
-	<entry key="mstr.esm.fail.url">/app/login/logoutUser.do</entry>
+	<entry key="mstr.esm.fail.url">/app/error/noSessionView.do</entry>
 	
 	<entry key="portal.login.page">/app/error/noSessionView.do</entry>
 	<entry key="eis.login.page">/app/login/loginUserEisView.do</entry>

@@ -355,7 +355,12 @@
   </filter-mapping>
   -->
       
-  
+	<!-- start::add mococo -->
+ 	<welcome-file-list>
+    		<welcome-file>index.jsp</welcome-file>
+  	</welcome-file-list>
+	<!-- end::add mococo -->
+
     <filter>
               
         <filter-name>ExpireHeader</filter-name>
@@ -744,6 +749,43 @@
           
     </jsp-config>
       
+	<!-- start::add mococo -->	
+    <!-- IMPORTANT NOTICE: UNCOMMENT CONSTRAINTS WHEN SWITCHING TO ANY NON-SAML  AUTHENTICATION MODE -->	
+      	
+    <security-constraint>	
+        <web-resource-collection>	
+            <web-resource-name>Administrator</web-resource-name>	
+            <url-pattern>/servlet/mstrWebAdmin</url-pattern>	
+            <!-- TQMS 245539: The following url-patterns are to prevent IBM WebSphere 6.0.2 security hole being exploited.  -->	
+            <url-pattern>/servlet/mstrWebAdmin/*</url-pattern>	
+            <url-pattern>/servlet/mstrWeb/mstrWebAdmin</url-pattern>	
+            <url-pattern>/servlet/mstrWeb/mstrWebAdmin/*</url-pattern>	
+        </web-resource-collection>	
+        <auth-constraint>	
+            <role-name>admin</role-name>	
+        </auth-constraint>	
+        <user-data-constraint>	
+            <transport-guarantee>NONE</transport-guarantee>	
+        </user-data-constraint>	
+    </security-constraint>	
+  	
+    <security-constraint>	
+        <web-resource-collection>	
+            <web-resource-name>TaskAdministrator</web-resource-name>	
+            <url-pattern>/servlet/taskAdmin</url-pattern>	
+            <url-pattern>/servlet/taskAdmin/*</url-pattern>	
+        </web-resource-collection>	
+        <auth-constraint>	
+            <role-name>admin</role-name>	
+        </auth-constraint>	
+        <user-data-constraint>	
+            <transport-guarantee>NONE</transport-guarantee>	
+        </user-data-constraint>	
+    </security-constraint>	
+      	
+    <!-- End of constrains -->	
+	<!-- end::add mococo -->
+
 
     <security-constraint>
             

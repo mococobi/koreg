@@ -78,66 +78,72 @@
     <!-- Bootstrap Bundle with Popper -->
 
 <script type="text/javascript">
-//prevent mouse right click..
-window.addEventListener('contextmenu', function(e) { e.preventDefault(); }, false); // Not compatible with IE < 9
-
-let $frmSignIn;
-// init
-$(document).ready(function() {
-    $('#submit_signin').off('click').on('click', signinInit);
-});
-
-
-//엔터키 이벤트
-function enterkey() {
-	if (window.event.keyCode == 13) {
-		signinInit();
-    }
-}
-
-
-function signinInit() {
-    //alert("init SignIn...");
-    $.ajax({
-          type: 'post'
-        , url: '${pageContext.request.contextPath}/app/login/createLoginKey.json'
-        , async: false
-        , contentType: 'application/json;charset=utf-8'
-        , data: JSON.stringify({})
-        , dataType: 'json'
-        , success: function(data, text, request) {
-            //console.log(data);
-            if (data.RSAModulus && data.RSAExponent) {
-                signinProc(data.RSAModulus, data.RSAExponent);
-            } else {
-                alert('처리중 오류가 발생하였습니다.')
-            }
-            
-        }
-        , error: function(jqXHR, textStatus, errorThrown) {
-        	errorProcess(jqXHR, textStatus, errorThrown);
-        }
-    });
-}
-
-
-function signinProc(key1, key2) {
-    //alert('proc SignIn...');
-    
-    const rsa = new RSAKey();
-    rsa.setPublic(key1, key2);
-    
-    $frmSignIn = $('#frmSignIn');
-    $frmSignIn.empty();
-    $frmSignIn.attr('action', '${pageContext.request.contextPath}/app/login/loginUserEis.do');
-    $('<input type="hidden"/>').attr('name', 'encAcntID').val(rsa.encrypt($('#uid').val())).appendTo($frmSignIn);
-    $('<input type="hidden"/>').attr('name', 'encAcntPW').val(rsa.encrypt($('#upw').val())).appendTo($frmSignIn);
-    $('<input type="hidden"/>').attr('name', 'screenId').val('EIS').appendTo($frmSignIn);
-    $frmSignIn.attr('method', 'post');
-    $frmSignIn.attr('target', '_self').submit();
-    $frmSignIn.empty().removeAttr('action','').removeAttr('target','').removeAttr('method','');
-    
-}
+	//prevent mouse right click..
+	window.addEventListener('contextmenu', function(e) { e.preventDefault(); }, false); // Not compatible with IE < 9
+	
+	let $frmSignIn;
+	
+	// init
+	$(document).ready(function() {
+		if(self !== top) {
+			//iframe 여부 확인
+			window.top.location = '${pageContext.request.contextPath}/app/error/noSessionView.do';
+		}
+		
+	    $('#submit_signin').off('click').on('click', signinInit);
+	});
+	
+	
+	//엔터키 이벤트
+	function enterkey() {
+		if (window.event.keyCode == 13) {
+			signinInit();
+	    }
+	}
+	
+	
+	function signinInit() {
+	    //alert("init SignIn...");
+	    $.ajax({
+	          type: 'post'
+	        , url: '${pageContext.request.contextPath}/app/login/createLoginKey.json'
+	        , async: false
+	        , contentType: 'application/json;charset=utf-8'
+	        , data: JSON.stringify({})
+	        , dataType: 'json'
+	        , success: function(data, text, request) {
+	            //console.log(data);
+	            if (data.RSAModulus && data.RSAExponent) {
+	                signinProc(data.RSAModulus, data.RSAExponent);
+	            } else {
+	                alert('처리중 오류가 발생하였습니다.')
+	            }
+	            
+	        }
+	        , error: function(jqXHR, textStatus, errorThrown) {
+	        	errorProcess(jqXHR, textStatus, errorThrown);
+	        }
+	    });
+	}
+	
+	
+	function signinProc(key1, key2) {
+	    //alert('proc SignIn...');
+	    
+	    const rsa = new RSAKey();
+	    rsa.setPublic(key1, key2);
+	    
+	    $frmSignIn = $('#frmSignIn');
+	    $frmSignIn.empty();
+	    $frmSignIn.attr('action', '${pageContext.request.contextPath}/app/login/loginUserEis.do');
+	    $('<input type="hidden"/>').attr('name', 'encAcntID').val(rsa.encrypt($('#uid').val())).appendTo($frmSignIn);
+	    $('<input type="hidden"/>').attr('name', 'encAcntPW').val(rsa.encrypt($('#upw').val())).appendTo($frmSignIn);
+	    $('<input type="hidden"/>').attr('name', 'screenId').val('EIS').appendTo($frmSignIn);
+	    $frmSignIn.attr('method', 'post');
+	    $frmSignIn.attr('target', '_self').submit();
+	    $frmSignIn.empty().removeAttr('action','').removeAttr('target','').removeAttr('method','');
+	    
+	}
 
 </script>
 </body>

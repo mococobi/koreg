@@ -35,7 +35,7 @@
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/jquery-multiselect/jquery.multiselect.js?v=20231128001"></script>
-	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/prompt-renderer.js?v=20240104001"></script>
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/prompt-renderer.js?v=20240110001"></script>
 	
 	<style type="text/css">
 		#mstrReport {

@@ -191,6 +191,18 @@ var promptRenderer = {
 			//엔터키 이벤트
 			$day.on('keyup', function(e) {
 				if(e.keyCode==13) {
+					let promptVal = $day.val();
+					let promptDate = null;
+					
+					if(promptVal.indexOf('-') > -1) {
+						promptDate = new Date(promptVal);
+					} else {
+						promptDate = new Date(changeStringToDate(promptVal));
+					}
+					
+					selectDate.selectDate(promptDate);
+					selectDate.setViewDate(promptDate);
+					
 					$('#run').trigger('click');
 				}
 			});
@@ -295,6 +307,18 @@ var promptRenderer = {
 			//엔터키 이벤트
 			$month.on('keyup', function(e) {
 				if(e.keyCode==13) {
+					let promptVal = $month.val();
+					let promptDate = null;
+					
+					if(promptVal.indexOf('-') > -1) {
+						promptDate = new Date(promptVal);
+					} else {
+						promptDate = new Date(changeStringToDate(promptVal));
+					}
+					
+					selectDate.selectDate(promptDate);
+					selectDate.setViewDate(promptDate);
+					
 					$('#run').trigger('click');
 				}
 			});
@@ -379,6 +403,18 @@ var promptRenderer = {
 			//엔터키 이벤트
 			$year.on('keyup', function(e) {
 				if(e.keyCode==13) {
+					let promptVal = $year.val();
+					let promptDate = null;
+					
+					if(promptVal.indexOf('-') > -1) {
+						promptDate = new Date(promptVal);
+					} else {
+						promptDate = new Date(changeStringToDate(promptVal));
+					}
+					
+					selectDate.selectDate(promptDate);
+					selectDate.setViewDate(promptDate);
+					
 					$('#run').trigger('click');
 				}
 			});

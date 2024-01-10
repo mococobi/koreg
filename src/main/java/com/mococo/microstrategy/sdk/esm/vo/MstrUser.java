@@ -62,6 +62,10 @@ public class MstrUser {
     public String getProjectSession(String project) {
         return mstrSession.get(project);
     }
+    
+    public Map<String, String> getMstrSession() {
+        return mstrSession;
+    }
 
     public void setProjectSession(String project, String sessionState) {
         mstrSession.put(project, sessionState);
@@ -105,7 +109,11 @@ public class MstrUser {
 
     @Override
     public String toString() {
-        return new StringBuffer().append("id:").append(id).append(", password:").append(password).append(", authMode:")
-                .append(authMode).append(", mstrSession:").append(mstrSession).toString();
+        return new StringBuffer()
+    		.append("id:").append(id)
+    		.append(", password:").append(password)
+    		.append(", authMode:").append(authMode)
+    		.append(", mstrSession:").append(mstrSession)
+    		.toString();
     }
 }

@@ -30,7 +30,7 @@ public class UserTest {
 		    		CustomProperties.getProperty("mstr.server.name")
 		    		, CustomProperties.getProperty("mstr.default.project.name")
 		    		, CustomProperties.getProperty("mstr.admin.user.id")
-		    		, CustomProperties.getProperty("mstr.admin.user.pwd")
+		    		, EncryptUtil.decrypt(CustomProperties.getProperty("mstr.admin.user.pwd"))
 		    	);
 		    
 		    	WebObjectSource source = session.getFactory().getObjectSource();

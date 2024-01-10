@@ -47,6 +47,19 @@ public class ErrorController {
     
     
     /**
+     * 권한 에러 처리 - SSO 에러
+     * @return
+     */
+    @RequestMapping(value = "/error/errorSsoAuth", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView errorSsoAuth(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	LOGGER.debug("params : [{}]", params);
+        ModelAndView view = new ModelAndView("error/authSso");
+        
+        return view;
+    }
+    
+    
+    /**
      * 권한 에러 처리 - 어드민 접근
      * @return
      */

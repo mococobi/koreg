@@ -26,6 +26,7 @@ import com.microstrategy.web.objects.WebObjectsFactory;
 import com.microstrategy.webapi.EnumDSSXMLApplicationType;
 import com.microstrategy.webapi.EnumDSSXMLAuthModes;
 import com.microstrategy.webapi.EnumDSSXMLObjectFlags;
+import com.mococo.microstrategy.sdk.esm.vo.MstrUser;
 import com.mococo.microstrategy.sdk.exception.SdkRuntimeException;
 import com.mococo.web.util.SpringUtil;
 
@@ -46,7 +47,10 @@ public class MstrUtil {
         Enumeration<WebCluster> clusters = admin.getClusters().elements();
         if (clusters.hasMoreElements()) {
             WebCluster cluster = clusters.nextElement();
-            serverName = cluster.get(0).getNodeName();
+            
+            if(cluster.size() > 0) {
+            	serverName = cluster.get(0).getNodeName();
+            }
 
         }
 
@@ -215,7 +219,12 @@ public class MstrUtil {
 	 * @return
 	 */
     public static Map<String, String> getSessionStateMap(HttpSession session) {
-		return (Map<String, String>)session.getAttribute("mstrSessionStateMap"); 
+    	MstrUser mstrUserVo = (MstrUser)session.getAttribute("mstr-user-vo");
+    	if(mstrUserVo == null) {
+    		return null;
+    	}
+    	
+		return mstrUserVo.getMstrSession(); 
 	}
 	
 	

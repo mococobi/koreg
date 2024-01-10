@@ -138,7 +138,7 @@
 			    $frmSignIn.attr('target', '_self').submit();
 			    $frmSignIn.empty().removeAttr('action','').removeAttr('target','').removeAttr('method','');
 			} else {
-				pageGoPost('_self', '${pageContext.request.contextPath}/app/error/errorAuth', []);
+				pageGoPost('_self', '${pageContext.request.contextPath}/app/error/errorSsoAuth', []);
 			}
 		}
 		

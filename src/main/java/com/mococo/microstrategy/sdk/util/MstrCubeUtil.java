@@ -70,7 +70,7 @@ public class MstrCubeUtil {
 			//Caches are group on Project level, so get the cache collection for each project
 			Caches result = cubeResults.get(j);
 			
-			if(result.getProjectName().equalsIgnoreCase(CustomProperties.getProperty("mstr.default.project"))) {
+			if(result.getProjectName().equalsIgnoreCase(CustomProperties.getProperty("mstr.default.project.name"))) {
 				for(int i=0; i<result.getCount(); i++) {
 					CubeCache cache = (CubeCache) result.get(i);
 					

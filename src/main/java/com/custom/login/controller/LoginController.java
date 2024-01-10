@@ -189,7 +189,7 @@ public class LoginController {
 	 * @param param
 	 * @return
 	 */
-	@RequestMapping(value = {"/login/loginUser.do", "/login/loginUserEis.do"}, method = {RequestMethod.POST})
+	@RequestMapping(value = {"/login/loginUser.do", "/login/loginUserEis.do"}, method = {RequestMethod.GET, RequestMethod.POST})
 	@ResponseBody
 	public ModelAndView loginUser(HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
 		ModelAndView view = new ModelAndView("login/loginUser");
@@ -209,10 +209,10 @@ public class LoginController {
 			MstrUtil.cleanOtherUserMstrSession(request.getSession(), userId);
 			
 			isession = MstrUtil.connectSession(
-					CustomProperties.getProperty("mstr.server.name"),
-					CustomProperties.getProperty("mstr.default.project"),
-					userId,
-					userPwd
+				CustomProperties.getProperty("mstr.server.name"),
+				CustomProperties.getProperty("mstr.default.project.name"),
+				userId,
+				userPwd
 			);
 			
 			//로그인 프로세스 처리(데이터 및 로그 기록시)
@@ -265,7 +265,7 @@ public class LoginController {
 			
 			isession = MstrUtil.connectTrustSession(
 				CustomProperties.getProperty("mstr.server.name"),
-				CustomProperties.getProperty("mstr.default.project"),
+				CustomProperties.getProperty("mstr.default.project.name"),
 				userId,
 				CustomProperties.getProperty("mstr.trust.token")
 			);
@@ -312,6 +312,8 @@ public class LoginController {
 			//MSTR 사용자가 없을 경우
 			resultMap = ControllerUtil.getFailMap("error.no.user.found");
 			resultMap.put("userId", userId);
+			
+			request.getSession().setAttribute("mstr-user-vo", null);
 			
 			request.getSession().setAttribute("mstrUserIdAttr", "");
 			request.getSession().setAttribute("mstrUserNameAttr", "");
@@ -385,6 +387,7 @@ public class LoginController {
 		
 		//포탈 로그 기록(로그아웃)
 		if(HttpUtil.getLoginUserId(request) != null) {
+			//MSTR 세션 제거
 			logService.addPortalLog(request, screenId, screenId, "LOGOUT", null);
 		}
 		
