@@ -112,12 +112,12 @@
 				let moveUrl = location.origin + location.pathname + '?ssotoken=${ssotoken}';
 				window.open("microsoft-edge:"+ moveUrl);
 
-				top.window.open('about:blank','_self').close();
-				top.window.opener = self;
-				top.self.close();
+// 				top.window.open('about:blank','_self').close();
+// 				top.window.opener = self;
+// 				top.self.close();
 
 				//테스트 필요
-				//window.open('','_self').close(); 
+// 				window.open('','_self').close();
 				
 				break;
 			case agent.indexOf("firefox") > -1: 

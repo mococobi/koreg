@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,11 +28,13 @@ import com.microstrategy.web.objects.WebObjectSource;
 import com.microstrategy.web.objects.WebObjectsException;
 import com.microstrategy.web.objects.admin.users.WebUser;
 import com.microstrategy.web.objects.admin.users.WebUserGroup;
+import com.microstrategy.web.objects.admin.users.WebUserList;
 import com.microstrategy.webapi.EnumDSSXMLAccessEntryType;
 import com.microstrategy.webapi.EnumDSSXMLAccessRightFlags;
 import com.microstrategy.webapi.EnumDSSXMLObjectFlags;
 import com.microstrategy.webapi.EnumDSSXMLObjectSubTypes;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
+import com.mococo.microstrategy.sdk.util.MstrUserUtil;
 import com.mococo.web.util.CustomProperties;
 
 public class SyncUserUtil {
@@ -140,6 +143,7 @@ public class SyncUserUtil {
 		
 		return result;
 	}
+	
 	
 	public static Map<String, Map<String, ?>> getSubUserGroup(WebObjectSource source, String baseMstrGroupId) {
 		Map<String, String> mstrGroupMap = new HashMap<String, String>();
@@ -378,5 +382,58 @@ public class SyncUserUtil {
 		} catch (WebObjectsException e) {
 			LOGGER.error("!!! error", e);
 		}
-	}	
+	}
+	
+	
+	//MSTR 하위 그룹 확인
+	@SuppressWarnings("unchecked")
+	public static Map<String, String> searchGroup(WebObjectSource source, String groupId) {
+		Map<String, Map<String, ?>> map = getSubUserGroup(source, groupId);
+		Map<String, String> rtnMap = (Map<String, String>)map.get("mstrGroupMap");
+		
+		return rtnMap;
+	}
+	
+	
+	//사용자 그룹 확인
+	public static Map<String, String> searchUserGroup(WebUser user, Map<String, String> searchGroup) throws WebObjectsException {
+		Map<String, String> result = new HashMap<String, String>();
+		List<WebUserGroup> groupNameList = MstrUserUtil.getUserGroupList(user);
+		
+		for(int i=0; i<groupNameList.size(); i++) {
+			String groupId = groupNameList.get(i).getID();
+			String groupName = groupNameList.get(i).getName();
+			
+			if (searchGroup.containsKey(groupName)) { // 기준 사용자그룹 하위의 사용자그룹만을 비교대상으로 한다.
+//				System.out.println("groupNameList : " + groupNameList.get(i));
+				result.put(groupName, groupId);
+			}
+		}
+		
+		if(result.size() == 0) {
+//			result.add("권한 없음");
+		}
+		
+		return result;
+	}
+
+	
+	//MSTR 전체 사용자
+	@SuppressWarnings("unchecked")
+	public static Map<String, String> getAllMstrUser(WebObjectSource source) throws WebObjectsException {
+		Map<String, String> allMstrUserMap = new HashMap<String, String>();
+		
+		WebUserGroup group = MstrUserUtil.searchUserGroup(MstrUserUtil.getUserGroupSearch(source), "Everyone");
+		WebUserList userList = null;
+		if(group != null) {
+			userList = group.getMembers();
+		}
+		
+		for (Enumeration<WebUser> e = userList.elements(); e.hasMoreElements();) {
+			WebUser user = e.nextElement();
+			allMstrUserMap.put(user.getAbbreviation(), user.getID());
+		}
+		
+		return allMstrUserMap;
+	}
 }

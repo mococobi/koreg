@@ -187,7 +187,8 @@ function errorProcess(jqXHR, textStatus, errorThrown) {
 	if(jqXHR['status'] == 404) {
 		alert('지정되지 않은 URL입니다.');
 	} else {
-		alert('에러 처리 필요');
+		alert(errorThrown['message']);
+		console.log(errorThrown);
 	}
 	
 	$('#portal-loading').hide();

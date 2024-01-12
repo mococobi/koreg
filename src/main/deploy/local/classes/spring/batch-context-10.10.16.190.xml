@@ -15,6 +15,7 @@
 		">
 
     <context:property-placeholder location="classpath:spring/batch-jdbc-10.10.16.190.properties"/>
+    
     <bean id="dataSourceUserBatch" class="com.mococo.web.util.SecureBasicDataSource">
         <property name="driverClassName" value="${jdbc.portal.driverClassName}" />
         <property name="url" value="${jdbc.portal.url}" />

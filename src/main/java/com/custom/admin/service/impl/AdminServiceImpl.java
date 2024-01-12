@@ -119,6 +119,9 @@ public class AdminServiceImpl implements AdminService {
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
     	
+    	
+    	System.out.println("\n\n\nmksong 테스트 : " + params.get("BRD_CRT_AUTH"));
+    	
 		//게시판 정보 입력
 		int boardupdateCount = simpleBizDao.update("Admin.boardUpdate", params);
 		

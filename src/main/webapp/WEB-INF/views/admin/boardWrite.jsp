@@ -27,31 +27,37 @@
 		  border: 1px solid rgba(112.520718, 44.062154, 249.437846, .3);
 		}
 		
-		  #board_div
-		, #board_div a
-		, #board_div input
-		, #board_div span
-		, #board_div select
-		, #board_div button {
+		  .board_custom_div
+		, .board_custom_div a
+		, .board_custom_div input
+		, .board_custom_div span
+		, .board_custom_div select
+		, .board_custom_div button {
 			font-size: 1.5rem;
 			font-family: 맑은 고딕;
 		}
 		
-		#board_div .h3 {
+		.board_custom_div .h3 {
 			font-size: 3rem;
 			font-family: 맑은 고딕;
 		}
 		
-		#board_div .h6 {
+		.board_custom_div .h6 {
 			font-size: 2rem;
 			font-family: 맑은 고딕;
 		}
+		
+		table.dataTable td.focus {
+	        outline: 1px solid #ac1212;
+	        outline-offset: -3px;
+	        background-color: #f8e6e6 !important;
+	    }
 	</style>
 </head>
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/adminDivStart.jsp" />
 	
-	<div id="board_div" class="container py-4" style="max-width: 100%;">
+	<div class="container py-4 board_custom_div" style="max-width: 100%;">
 		<p class="h3">게시판 관리</p>
 		<p class="h6">게시판을 관리할 수 있습니다.</p>
 		<div class="row mb-3">
@@ -102,6 +108,15 @@
              	 		<label class="form-check-label" for="credit">일반</label>
              	 		<input name="board_type" type="radio" value="FAQ" class="form-check-input" required="">
              	 		<label class="form-check-label" for="credit">FAQ</label>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span>게시물 작성 권한</span>
+					</td>
+					<td>
+						<button id="popup_board_create_auth" type="button" class="btn btn-primary">편집</button>
+						<span id="board_create_auth"></span>
 					</td>
 				</tr>
 				<tr>
@@ -184,6 +199,8 @@
 		</table>
 	</div>
 	
+	<jsp:include flush="true" page="/WEB-INF/views/modal/editUserList.jsp" />
+	
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
 </body>
 <script type="text/javascript">
@@ -192,7 +209,7 @@
 	$(function() {
 		if(boardId != null) {
 			//수정
-			fnBoardPostInit();
+			fnBoardInit();
 		} else {
 			//신규
 			$('#board_id').val('시스템 자동 채번');
@@ -203,11 +220,21 @@
 			$("input:radio[name='post_popup_yn']:radio[value='N']").prop('checked', true);
 			$("input:radio[name='del_yn']:radio[value='N']").prop('checked', true);
 		}
+		
+		
+		$('#popup_board_create_auth').on('click', function(e) {
+			$('#editUserListModal').modal('show');
+			
+			setTimeout(() => {
+				fnUserInit('modalUserListTable');
+    		}, 100);
+		});
+		
 	});
 	
 	
 	//초기 함수
-	function fnBoardPostInit() {
+	function fnBoardInit() {
 		let callParams = {
 			boardId : boardId
 		};
@@ -225,6 +252,8 @@
 		$('#board_nm').val(boardData['BRD_NM']);
 		$('#board_desc').val(boardData['BRD_DESC']);
 		$('input:radio[name="board_type"]:radio[value="'+ boardData['BRD_TYPE'] +'"]').prop('checked', true);
+		$('#board_create_auth').text(getUserListSpanName(boardData['BRD_CRT_AUTH']));
+		modalUserList = boardData['BRD_CRT_AUTH'];
 		
 		$('#board_create_date').text(changeDisplayDate(boardData['CRT_DT_TM'], 'YYYY-MM-DD'));
 		$('#board_create_user_id').text(boardData['CRT_USR_ID']);
@@ -291,6 +320,8 @@
 				formData.append('BRD_NM', $('#board_nm').val());
 				formData.append('BRD_DESC', $('#board_desc').val());
 				formData.append('BRD_TYPE', $('input:radio[name="board_type"]:checked').val());
+				
+				formData.append('BRD_CRT_AUTH', modalUserList);
 				
 				formData.append('POST_FILE_YN', $('input:radio[name="post_file_yn"]:checked').val());
 				formData.append('POST_CMNT_YN', $('input:radio[name="post_cmnt_yn"]:checked').val());

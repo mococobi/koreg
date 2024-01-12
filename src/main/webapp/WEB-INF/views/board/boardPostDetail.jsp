@@ -198,7 +198,15 @@
 	let searchVal = '';
 	
 	$(function() {
-		fnBoardPostInit();
+		if('${postData["data"]["BRD_NM"]}' == '') {
+			alert('선택한 게시판이 존재하지 않습니다.');
+			
+			let pagePrams = [];
+			pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
+		} else {
+			fnBoardPostInit();
+		}
+		
 	});
 	
 	

@@ -15,6 +15,7 @@
 <!-- dataTables -->
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/DataTables-1.13.8/js/jquery.dataTables.min.js?v=20231006001"></script>
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/DataTables-1.13.8/js/dataTables.bootstrap5.min.js?v=20231006001"></script>
+<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/KeyTable-2.11.0/js/dataTables.keyTable.min.js?v=20231006001"></script>
 
 <!-- Air Datepicker -->
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/air-datepicker-3/dist/air-datepicker.js?v=20231006001"></script>

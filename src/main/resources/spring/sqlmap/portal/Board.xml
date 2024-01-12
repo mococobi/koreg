@@ -196,36 +196,46 @@
 	<select id="Board.boardPostBeforeNext" parameterType="Map" resultMap="oracleBoardMap">
 			WITH /* Board.boardPostBeforeNext */
 			POST_BEFORE AS (
-				SELECT
-					'BEFORE' AS POST_LOCATION
-					, post.BRD_ID 
-					, post.POST_ID
-					, post.POST_TITLE 
-				FROM 
-					PORTAL.PT_BOARD_POST post
+				SELECT 
+					* 
+				FROM(
+					SELECT
+						'BEFORE' AS POST_LOCATION
+						, post.BRD_ID 
+						, post.POST_ID
+						, post.POST_TITLE 
+					FROM 
+						PORTAL.PT_BOARD_POST post
+					WHERE 1=1
+						AND post.DEL_YN = 'N'
+						AND post.POST_ID <![CDATA[<]]> #{POST_ID}
+						AND post.BRD_ID = #{BRD_ID}
+					ORDER BY 
+						post.POST_ID DESC
+				)
 				WHERE 1=1
-					AND post.DEL_YN = 'N'
-					AND post.POST_ID <![CDATA[<]]> #{POST_ID}
-					AND post.BRD_ID = #{BRD_ID}
 					AND ROWNUM = 1
-				ORDER BY 
-					post.POST_ID DESC
 			)
 			, POST_NEXT AS (
-				SELECT
-					'NEXT' AS POST_LOCATION
-					, post.BRD_ID 
-					, post.POST_ID
-					, post.POST_TITLE 
-				FROM 
-					PORTAL.PT_BOARD_POST post
+				SELECT 
+					* 
+				FROM(
+					SELECT
+						'NEXT' AS POST_LOCATION
+						, post.BRD_ID 
+						, post.POST_ID
+						, post.POST_TITLE 
+					FROM 
+						PORTAL.PT_BOARD_POST post
+					WHERE 1=1
+						AND post.DEL_YN = 'N'
+						AND post.POST_ID <![CDATA[>]]> #{POST_ID}
+						AND post.BRD_ID = #{BRD_ID}
+					ORDER BY 
+						post.POST_ID ASC
+				)
 				WHERE 1=1
-					AND post.DEL_YN = 'N'
-					AND post.POST_ID <![CDATA[>]]> #{POST_ID}
-					AND post.BRD_ID = #{BRD_ID}
 					AND ROWNUM = 1
-				ORDER BY 
-					post.POST_ID ASC
 			)
 			SELECT 
 				*

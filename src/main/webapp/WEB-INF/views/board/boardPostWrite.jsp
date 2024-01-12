@@ -208,7 +208,14 @@
 	let deleteFileIds = [];
 	
 	$(function() {
-		fnBoardPostInit();
+		if('${postData["BRD_NM"]}' == '') {
+			alert('선택한 게시판이 존재하지 않습니다.');
+			
+			let pagePrams = [];
+			pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
+		} else {
+			fnBoardPostInit();
+		}
 		
 		if(postId != null) {
 			//수정
@@ -488,13 +495,7 @@
 				
 				callAjaxForm('/board/boardPostInsert.json', formData, function(data) {
 					alert('게시글이 등록되었습니다.');
-					if (data['BRD_ID']=='1' && data['POST_ID']) {
-						detailBoardPost(boardId, data.POST_ID);//POST_ID 받아오는 값
-					} else if (data['BRD_ID']=='2' && data['POST_ID']){
-						moveCommunityPage(boardId);
-					}else {
-						console.log('Undefined. post id [%s]', data.POST_ID);
-					}
+					detailBoardPost(boardId, data.POST_ID);//POST_ID 받아오는 값
 				});
 		    }
 		}
@@ -529,13 +530,7 @@
 				
 				callAjaxForm('/board/boardPostUpdate.json', formData, function(data) {
 					alert('게시글이 수정되었습니다.');
-					if (data['BRD_ID']=='1' && data['POST_ID']) {
-						detailBoardPost(boardId, data['POST_ID']);//POST_ID 받아오는 값으로 변경
-					}else if (data['BRD_ID']=='2' && data['POST_ID']){
-						moveCommunityPage(boardId);
-					}else {
-						console.log('Undefined. post id [%s]', data.POST_ID);
-					}
+					detailBoardPost(boardId, data.POST_ID);//POST_ID 받아오는 값
 				});
 		    }
 		}

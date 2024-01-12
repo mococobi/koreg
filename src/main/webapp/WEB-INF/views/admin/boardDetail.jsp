@@ -106,6 +106,14 @@
 				</tr>
 				<tr>
 					<td>
+						<span>게시물 작성 권한</span>
+					</td>
+					<td>
+						<span id="board_create_auth"></span>
+					</td>
+				</tr>
+				<tr>
+					<td>
 						<span>생성일시</span>
 					</td>
 					<td>
@@ -214,6 +222,16 @@
 		$('#board_nm').text(boardData['BRD_NM']);
 		$('#board_desc').text(boardData['BRD_DESC']);
 		$('input:radio[name="board_type"]:radio[value="'+ boardData['BRD_TYPE'] +'"]').prop('checked', true);
+		
+		let authUserNm = '';
+		JSON.parse(boardData['BRD_CRT_AUTH']).forEach((authMap, idx) => {
+			if(authUserNm == '') {
+				authUserNm += authMap['AUTH_NAME'];
+			} else {
+				authUserNm += ', ' +authMap['AUTH_NAME'];
+			}
+		});
+		$('#board_create_auth').text(authUserNm);
 		
 		$('#board_create_date').text(changeDisplayDate(boardData['CRT_DT_TM'], 'YYYY-MM-DD'));
 		$('#board_create_user_id').text(boardData['CRT_USR_ID']);

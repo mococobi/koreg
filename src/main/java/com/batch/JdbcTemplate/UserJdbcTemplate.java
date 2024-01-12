@@ -33,7 +33,7 @@ public class UserJdbcTemplate {
 	 * </pre>
 	 */
 	public List<Map<String, Object>> selectEiamDepartment() {
-		return jdbcTemplate.queryForList(BatchProperties.getProperty("select.eaim.department"));
+		return jdbcTemplate.queryForList(BatchProperties.getProperty("Batch.eiamDepartmentList"));
 	}
 	
 	
@@ -46,6 +46,6 @@ public class UserJdbcTemplate {
 	 * </pre>
 	 */
 	public List<Map<String, Object>> selectEiamUser() {
-		return jdbcTemplate.queryForList(BatchProperties.getProperty("select.eaim.user"));
+		return jdbcTemplate.queryForList(BatchProperties.getProperty("Batch.eiamUserList"));
 	}
 }

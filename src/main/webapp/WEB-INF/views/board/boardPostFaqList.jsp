@@ -11,6 +11,9 @@
 	
 	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
 	pageContext.setAttribute("portalAppName", portalAppName);
+	
+	String mstrUserIdAttr = (String)session.getAttribute("mstrUserIdAttr");
+	pageContext.setAttribute("mstrUserIdAttr", mstrUserIdAttr);
 %>
 <!DOCTYPE html>
 <html>
@@ -55,6 +58,12 @@
 		    background-size: var(--bs-accordion-btn-icon-width);
 		    transition: var(--bs-accordion-btn-icon-transition);
 		}
+		
+		.accordion-item {
+		    color: var(--bs-accordion-color);
+		    background-color: var(--bs-accordion-bg);
+		    border: 2px solid var(--bs-accordion-border-color);
+		}
 	</style>
 </head>
 <body>
@@ -77,13 +86,19 @@
 			<div class="col-md-1">
 				<button class="btn btn-primary btn-sm" onclick="searchBoardPostList()">조회</button>
 			</div>
-			<% if(
-				(boardId.equals("2") && PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN"))
-				|| !boardId.equals("2")) { %>
+			<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
 				<!-- 관리자 기능 -->
 				<div class="col text-end" style="margin-top:-10px; margin-bottom:10px;">
 					<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
 				</div>
+			<% } else { %>
+				<c:set var="create_auth_check1" value="${fn:indexOf(postData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += mstrUserIdAttr += '\"')}" />
+				<c:set var="create_auth_check2" value="${fn:indexOf(postData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += 'ALL_USER' += '\"')}" />
+				<c:if test="${create_auth_check1 gt -1 || create_auth_check2 gt -1}">
+					<div class="col text-end" style="margin-top:-10px; margin-bottom:10px;">
+						<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
+					</div>
+				</c:if>
 			<% } %>
 		</div>
 			<table id="boardPostTable" class="table hover table-striped table-bordered dataTablesCommonStyle" style="width:100%;">
@@ -99,8 +114,17 @@
 	let postId = <%=postId%>;
 	let searchKey = '';
 	let searchVal = '';
+	
 	$(function() {
-		fnBoardInit(boardId);
+		if('${postData["BRD_NM"]}' == '') {
+			alert('선택한 게시판이 존재하지 않습니다.');
+			
+			let pagePrams = [];
+			pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
+		} else {
+			fnBoardInit(boardId);
+		}
+		
 		
 		$('#searchVal').keypress(function(e){
 			if(e.keyCode && e.keyCode == 13){
@@ -127,7 +151,7 @@
 			postData.forEach((post, idx) => {
 				let divHtml = $('<div>');
 			    accordionHTML +=
-						'<div class="accordion-item">'
+						'<div class="accordion-item" style="border : 1px solid var(--bs-accordion-border-color);">'
 					+		'<h2 class="accordion-header">'
 					+			'<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse' + post['POST_ID'] + '" aria-expanded="false" aria-controls="collapse"' + post['POST_ID'] +'style="margin-right:0;">'
 					+				'<strong>' + post['POST_TITLE'] + '</strong>'
@@ -216,6 +240,7 @@
 		
 		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostDetailView.do', pagePrams);
 	}
+	
 	
 	//게시물 삭제
 	function deleteBoardPost(postId) {

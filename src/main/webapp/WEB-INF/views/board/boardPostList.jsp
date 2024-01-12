@@ -10,6 +10,9 @@
 	
 	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
 	pageContext.setAttribute("portalAppName", portalAppName);
+	
+	String mstrUserIdAttr = (String)session.getAttribute("mstrUserIdAttr");
+	pageContext.setAttribute("mstrUserIdAttr", mstrUserIdAttr);
 %>
 <!DOCTYPE html>
 <html>
@@ -62,16 +65,18 @@
 			<div class="col-md-1">
 				<button class="btn btn-primary btn-sm" onclick="searchBoardPostList()">조회</button>
 			</div>
-			<% if(boardId.equals("1") || boardId.equals("3")) { %>
-				<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
-					<div class="col text-end">
-						<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
-					</div>
-				<% } %>
+			<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
+				<div class="col text-end">
+					<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
+				</div>
 			<% } else { %>
+				<c:set var="create_auth_check1" value="${fn:indexOf(postData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += mstrUserIdAttr += '\"')}" />
+				<c:set var="create_auth_check2" value="${fn:indexOf(postData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += 'ALL_USER' += '\"')}" />
+				<c:if test="${create_auth_check1 gt -1 || create_auth_check2 gt -1}">
 					<div class="col text-end">
 						<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
 					</div>
+				</c:if>
 			<% } %>
 	    </div>
 		<div id="boardPostTable_div">
@@ -104,7 +109,15 @@
 	let searchVal = '';
 	
 	$(function() {
-		fnBoardInit();
+		if('${postData["BRD_NM"]}' == '') {
+			alert('선택한 게시판이 존재하지 않습니다.');
+			
+			let pagePrams = [];
+			pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
+		} else {
+			fnBoardInit();
+		}
+		
 		
 		$('#searchVal').keypress(function(e){
 			if(e.keyCode && e.keyCode == 13){
@@ -150,11 +163,7 @@
 					}
 			    } 
 				, error: function (jqXHR, textStatus, errorThrown) {
-					if(xhr['status'] == 404) {
-						alert('지정되지 않은 URL입니다.');
-					} else {
-						alert('에러 처리 필요');
-					}
+					errorProcess(jqXHR, textStatus, errorThrown);
 			    }
 			}
 			, language : commonDatatableLanguage()

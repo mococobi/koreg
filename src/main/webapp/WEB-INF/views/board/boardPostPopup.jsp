@@ -28,11 +28,32 @@
 		html, body {
 			font-size: 1rem;
 		}
+		
+		  #boardPost_div
+		, #boardPost_div a
+		, #boardPost_div input
+		, #boardPost_div span
+		, #boardPost_div select
+		, #boardPost_div button {
+			font-size: 1rem;
+			font-family: 맑은 고딕;
+		}
+		
+		#boardPost_div .h3 {
+			font-size: 3rem;
+			font-family: 맑은 고딕;
+		}
+		
+		#boardPost_div .h6 {
+			font-size: 2rem;
+			font-family: 맑은 고딕;
+		}
 
 	</style>
 </head>
 <body>
-<table id="board_table" class="table table-sm table-bordered" style="width: 100%; border: 1px solid; border-collapse: collapse;">
+	<div id="boardPost_div">
+		<table id="board_table" class="table table-sm table-bordered" style="width: 100%; border: 1px solid; border-collapse: collapse;">
 			<colgroup>
 				<col width="12.5%">
 				<col width="12.5%">
@@ -141,6 +162,7 @@
 		</table>
 		
 		<input type="checkbox" id="hidePopupCheckbox"> 일주일 동안 보지 않기
+	</div>
 </body>
 <script type="text/javascript">
 	let boardId = <%=boardId%>;

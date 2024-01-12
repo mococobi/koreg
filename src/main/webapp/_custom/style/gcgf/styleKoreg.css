@@ -56,7 +56,9 @@
 .content .run-setting-box_input{border-radius: 6px; border: 0; width: 128px; padding: 10px 12px;}
 .content .run-box .btn-run{margin-left: 20px; font-size: 1.6rem; color: #fff; font-weight: 500; padding: 8px 0; background: #307fe2; border-radius: 6px; width: 100px;}
 
-.content {width: calc(100% - 210px);}
+/* 2023-01-12 mksong 수정 - 컨텐츠 100 퍼센트 */
+/* .content {width: calc(100% - 210px);} */
+.content {width: calc(100%);}
 .content .cont-tab{display: none;}
 .content .cont-tab.on{display: block; position: relative;}
 

@@ -29,6 +29,10 @@
                 	<!-- Left Menu -->
                 	<jsp:include flush="true" page="/WEB-INF/views/include/portalLeft${portalAppName}.jsp" />
                 	
+                	<div id="changeMenuDiv" style="position: fixed; left: 10.5%; z-index: 9999">
+                		<button class="btn btn-secondary btn-sm" style="font-size: 1.5rem;" onclick="changeLeftMenu()"><i class="bi bi-list"></i></button>
+                	</div>
+                	
                     <div class="content flex2">
                         <div class="cont-area">
                             <div class="tab-btn-wrap flex">
@@ -48,10 +52,26 @@
                                 
                             </div>
                             <div style="margin-bottom: 10px;">
-                            	<h1 id="mstrReportTitle"></h1>
+                            	<h1 id="mstrReportTitle" style="margin-left: 10px;"></h1>
                             </div>
                             <div class="tab-cont-wrap">
                                 <div class="cont-tab cont-tab1 on">
                                 <!-- 메인 영역 -->
+                                
 </body>
+<script type="text/javascript">
+	
+	//메뉴 숨김 및 표시
+	function changeLeftMenu() {
+		let displayCheck = $('.lnb').css('display');
+		if(displayCheck == 'block') {
+			$('.lnb').hide("slide", {direction: "left"}, 500);
+			$('#changeMenuDiv').css('left', '0px');
+		} else {
+			$('.lnb').show("slide", {direction: "left"}, 500);
+			$('#changeMenuDiv').css('left', '10.5%');
+		}
+	}
+	
+</script>
 </html>

@@ -1,7 +1,6 @@
 package com.custom.board.service.impl;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ import com.custom.board.service.BoardService;
 import com.custom.log.service.LogService;
 import com.mococo.biz.common.dao.SimpleBizDao;
 import com.mococo.web.util.CustomProperties;
+import com.mococo.web.util.FileUtil;
 import com.mococo.web.util.HttpUtil;
 
 @Service(value = "boardService")
@@ -200,7 +200,7 @@ public class BoardServiceImpl implements BoardService {
     
     
     //첨부파일 처리
-    private List<Map<String, Object>> uploadFile(MultipartHttpServletRequest request, Map<String, Object> params) {
+    private List<Map<String, Object>> uploadFile(MultipartHttpServletRequest request, Map<String, Object> params) throws Exception {
     	int boardinsertFileCount = 0;
 		long atchFileId = -1;
 		
@@ -212,60 +212,58 @@ public class BoardServiceImpl implements BoardService {
 			MultipartFile file = request.getFile(fileId);
 			
 			mRstUploadedFile = new HashMap<String, Object>();
-			try {
-				if(fileId.indexOf("ATTACH_FILE") > -1) {
-					mRstUploadedFile.put("fileType", "ATTACH_FILE");
-				} else {
-					mRstUploadedFile.put("fileType", "OTHER");
-				}
-				
-				String orgFileName = URLDecoder.decode(FilenameUtils.getBaseName(file.getOriginalFilename()), "utf-8");
-				
-				//파일 확인
-				if(!orgFileName.equals("")) {
-					SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmssSSS_");
-					String currentTime = timeFormat.format(new Date());
-					String newFileName = currentTime + HttpUtil.replaceFilePath(RandomStringUtils.randomAlphanumeric(32))+ '.' + FilenameUtils.getExtension(file.getOriginalFilename());
-					
-					mRstUploadedFile.put("newFileName", newFileName);
-					mRstUploadedFile.put("orgFileName", orgFileName);
-					mRstUploadedFile.put("orgFileType", FilenameUtils.getExtension(file.getOriginalFilename()));
-					mRstUploadedFile.put("atchFileId", atchFileId);
-					mRstUploadedFile.put("fileSize", file.getSize());
-					
-					String filePath = CustomProperties.getProperty("attach.base.location");//\mococo\portal\
-					String uploadFilePath = filePath + (String)params.get("BRD_ID") + "/";
-					mRstUploadedFile.put("uploadFilePath", uploadFilePath);
-					
-					uploadFilePath += newFileName;
-					File uploadFile = new File(uploadFilePath);
-					file.transferTo(uploadFile);
-					
-					/*
-					SLBsUtil sUtil = new SLBsUtil();
-					int encrypted = sUtil.isEncryptFile(uploadFilePath);
-					
-					if(encrypted == 1) {
-						//암호화 파일 처리
-						File rtnDecDrmFile = DrmUtil.decDrm(uploadFile);
-						uploadFile.delete();
-						FileUtils.moveFile(rtnDecDrmFile, new File(uploadFilePath.replace("tmp_", "")));
-					} else if(encrypted == 0) {
-						//일반파일 처리
-						FileUtils.moveFile(uploadFile, new File(uploadFilePath.replace("tmp_", "")));
-					}
-					*/
-					
-				} else {
-					mRstUploadedFile.put("newFileName", "");
-					mRstUploadedFile.put("orgFileName", "");
-					mRstUploadedFile.put("orgFileType", "");
-				}
-				
-				lmRstUploadedFile.add(mRstUploadedFile);
-			} catch (IllegalStateException | IOException e) {
-				LOGGER.error("!!! error", e);
+			if(fileId.indexOf("ATTACH_FILE") > -1) {
+				mRstUploadedFile.put("fileType", "ATTACH_FILE");
+			} else {
+				mRstUploadedFile.put("fileType", "OTHER");
 			}
+			
+			String orgFileName = URLDecoder.decode(FilenameUtils.getBaseName(file.getOriginalFilename()), "utf-8");
+			
+			//파일 확인
+			if(!orgFileName.equals("")) {
+				SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmssSSS_");
+				String currentTime = timeFormat.format(new Date());
+				String newFileName = currentTime + HttpUtil.replaceFilePath(RandomStringUtils.randomAlphanumeric(32))+ '.' + FilenameUtils.getExtension(file.getOriginalFilename());
+				
+				mRstUploadedFile.put("newFileName", newFileName);
+				mRstUploadedFile.put("orgFileName", orgFileName);
+				mRstUploadedFile.put("orgFileType", FilenameUtils.getExtension(file.getOriginalFilename()));
+				mRstUploadedFile.put("atchFileId", atchFileId);
+				mRstUploadedFile.put("fileSize", file.getSize());
+				
+				String filePath = CustomProperties.getProperty("attach.base.location");//\mococo\portal\
+				String uploadFilePath = filePath + (String)params.get("BRD_ID") + "/";
+				FileUtil.folderCheckAndCreate(uploadFilePath);
+				
+				mRstUploadedFile.put("uploadFilePath", uploadFilePath);
+				
+				uploadFilePath += newFileName;
+				File uploadFile = new File(uploadFilePath);
+				file.transferTo(uploadFile);
+				
+				/*
+				SLBsUtil sUtil = new SLBsUtil();
+				int encrypted = sUtil.isEncryptFile(uploadFilePath);
+				
+				if(encrypted == 1) {
+					//암호화 파일 처리
+					File rtnDecDrmFile = DrmUtil.decDrm(uploadFile);
+					uploadFile.delete();
+					FileUtils.moveFile(rtnDecDrmFile, new File(uploadFilePath.replace("tmp_", "")));
+				} else if(encrypted == 0) {
+					//일반파일 처리
+					FileUtils.moveFile(uploadFile, new File(uploadFilePath.replace("tmp_", "")));
+				}
+				*/
+				
+			} else {
+				mRstUploadedFile.put("newFileName", "");
+				mRstUploadedFile.put("orgFileName", "");
+				mRstUploadedFile.put("orgFileType", "");
+			}
+			
+			lmRstUploadedFile.add(mRstUploadedFile);
 		}
 		
 		return lmRstUploadedFile;

@@ -203,34 +203,43 @@ public class BoardController {
      * @return
      * @throws Exception 
      */
-    @RequestMapping(value = "/board/boardPostInsert.json", method = {RequestMethod.GET, RequestMethod.POST})
+    @SuppressWarnings("unchecked")
+	@RequestMapping(value = "/board/boardPostInsert.json", method = {RequestMethod.GET, RequestMethod.POST})
 	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) {
 //    	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
-    	{
-    		//기본 권한 설정
-    		Boolean boardPostInsertCheck = true;
-	    	if(params.get("BRD_ID").equals("1")) {
-	    		boardPostInsertCheck = false;
-	    	} else {
-	    		boardPostInsertCheck = true;
-	    	}
-	    	
-	    	//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
-	    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-	    		boardPostInsertCheck = true;
-	    	}
-	    	
-	    	//최종 권한 판단
-	    	if(!boardPostInsertCheck) {
-	    		rtnMap = ControllerUtil.getFailMap("portal.board.insert.auth.error");
-	    		return rtnMap;
-	    	}
-    	}
-    	
 		try {
+			{
+	    		//기본 권한 설정
+	    		Boolean boardPostInsertCheck = false;
+	    		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
+	    		Map<String, Object> boardMapData = (Map<String, Object>) boardMap.get("data");
+	    		String boardCreateAuth = boardMapData.get("BRD_CRT_AUTH").toString();
+	    		String userId = "\"AUTH_ID\":\"" + HttpUtil.getLoginUserId(request) + "\"";
+	    		if(boardCreateAuth.indexOf(userId) > -1) {
+	    			boardPostInsertCheck = true;
+	    		}
+	    		
+	    		//전체 유저 체크
+	    		String allUserId = "\"AUTH_ID\":\"" + "ALL_USER" + "\"";
+	    		if(boardCreateAuth.indexOf(allUserId) > -1) {
+	    			boardPostInsertCheck = true;
+	    		}
+	    		
+		    	//관리자 권한 체크
+		    	List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
+		    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
+		    		boardPostInsertCheck = true;
+		    	}
+		    	
+		    	//최종 권한 판단
+		    	if(!boardPostInsertCheck) {
+		    		rtnMap = ControllerUtil.getFailMap("portal.board.insert.auth.error");
+		    		return rtnMap;
+		    	}
+	    	}
+			
 			Map<String, Object> rtnList = new HashMap<String, Object>();
     		rtnList = boardService.boardPostInsert(request, response, params);
     		rtnMap.putAll(rtnList);
