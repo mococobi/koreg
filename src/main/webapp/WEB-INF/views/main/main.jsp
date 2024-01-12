@@ -190,12 +190,7 @@
 					, class : ''
 					, style : 'cursor : pointer'
 					, click : function(e) {
-						let pagePrams = [
-							  ['BRD_ID', boardId]
-							, ['POST_ID', post['POST_ID']]
-							
-						];
-						pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostDetailView.do', pagePrams);
+						detailBoardPost(boardId, post['POST_ID']);
 					}
 				});
 				
@@ -205,12 +200,7 @@
 					, class : ''
 					, style : 'cursor : pointer'
 					, click : function(e) {
-						let pagePrams = [
-							  ['BRD_ID', boardId]
-							, ['POST_ID', post['POST_ID']]
-							
-						];
-						pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostDetailView.do', pagePrams);
+						detailBoardPost(boardId, post['POST_ID']);
 					}
 				});
 				

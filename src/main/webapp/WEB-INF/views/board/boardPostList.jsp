@@ -169,7 +169,7 @@
 			, language : commonDatatableLanguage()
 			, columns : [
 				{
-					  data : 'POST_ID'
+					  data : 'POST_ID_ROWNUM'
 					, className : 'textCenter'
 					, render : function (data, type, row) {
 						let rtnData = '-';

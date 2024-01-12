@@ -49,22 +49,36 @@
 	<select id="Board.boardPostList" parameterType="Map" resultMap="oracleBoardMap">
 		WITH /* Board.BoardPostList */
 		POST_LIST AS (
+			SELECT 
+				  ROWNUM AS POST_ID_ROWNUM
+				, T.*
+			FROM (
+				SELECT
+					  post.POST_ID
+					, post.BRD_ID
+					, post.POPUP_YN
+					, post.POST_TITLE
+					, post.POST_CONTENT
+					, post.CRT_DT_TM
+					, post.CRT_USR_ID
+					, post.CRT_USR_ID AS CRT_USR_NM
+					, post.DEL_YN
+				FROM 
+					PORTAL.PT_BOARD_POST post
+				WHERE 1=1
+					AND post.BRD_ID = #{BRD_ID}
+				ORDER BY
+					post.POST_ID ASC
+			) T
+		)
+		, ROW_POST_LIST AS (
 			SELECT
-				  post.POST_ID
-				, post.BRD_ID
-				, post.POPUP_YN
-				, post.POST_TITLE
-				, post.POST_CONTENT
-				/* , TO_CHAR(post.CRT_DT_TM, 'yyyy-mm-dd') AS CRT_DT_TM */
-				, post.CRT_DT_TM
-				, post.CRT_USR_ID
-				, post.CRT_USR_ID AS CRT_USR_NM
+				  post.*
 				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PT_PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
 				, (SELECT COUNT(post_file.FILE_ID) FROM PORTAL.PT_BOARD_POST_FILE post_file WHERE post_file.DEL_YN = 'N' AND post.POST_ID = post_file.POST_ID) AS POST_FILE_COUNT
 			FROM 
-				PORTAL.PT_BOARD_POST post
+				POST_LIST post
 			WHERE 1=1
-				AND post.BRD_ID = #{BRD_ID}
 				AND post.DEL_YN = 'N'
 				<if test="searchKey != null and !searchKey.equals('') and searchVal != null and !searchVal.equals('')">
 					<choose>
@@ -94,26 +108,26 @@
 				SELECT 
 					* 
 				FROM 
-					POST_LIST 
+					ROW_POST_LIST 
 				ORDER BY 
 					<choose>
 						<when test="customOrder1 != null and customOrder1 == 0">
-							POST_LIST.POST_ID
+							ROW_POST_LIST.POST_ID_ROWNUM
 						</when>
 						<when test="customOrder1 != null and customOrder1 == 1">
-							POST_LIST.POST_TITLE
+							ROW_POST_LIST.POST_TITLE
 						</when>
 						<when test="customOrder1 != null and customOrder1 == 2">
-							POST_LIST.CRT_DT_TM
+							ROW_POST_LIST.CRT_DT_TM
 						</when>
 						<when test="customOrder1 != null and customOrder1 == 3">
-							POST_LIST.CRT_USR_NM
+							ROW_POST_LIST.CRT_USR_NM
 						</when>
 						<when test="customOrder1 != null and customOrder1 == 4">
-							POST_LIST.POST_VIEW_COUNT
+							ROW_POST_LIST.POST_VIEW_COUNT
 						</when>
 						<otherwise>
-							POST_LIST.POST_ID
+							ROW_POST_LIST.POST_ID
 						</otherwise>
 					</choose>
 					<choose>
@@ -254,8 +268,6 @@
         		NVL(MAX(post.POST_ID)+1, 1) AS INSERTKEY
         	FROM 
         		PORTAL.PT_BOARD_POST post
-        	WHERE 1=1
-				AND post.BRD_ID = #{BRD_ID}
     	</selectKey>
     	INSERT INTO /* Board.boardPostInsert */ 
     		PORTAL.PT_BOARD_POST(
