@@ -426,6 +426,12 @@ function getMstrFormDefinition(type) {
 			break;
 	}
 	
+	if(typeof reportInfo == 'undefined') {
+		delete rtnInput['promptAnswerMode'];
+	} else if(typeof reportInfo['promptList'] != 'undefined' && reportInfo['promptList'].length == 0) {
+		delete rtnInput['promptAnswerMode'];
+	}
+	
 	return rtnInput;
 }
 

@@ -200,41 +200,49 @@
 	function getAnswerXML() {
 		$('#portal-loading').show();
 		
-		//정합성 체크
-		let promptCheck = validationPrompt();
-		for (const [key, value] of Object.entries(promptCheck)) {
-			if(value) {
-				alert(value);
-				$('#portal-loading').hide();
-				return false;
-			}
-		}
-		
 		//현재 선택된 프롬프트값들을 파라미터로 전달하여 XML형태로 반환 받음.
 		let promptVal = getPromptVal();
 		
-	    $.ajax({
-	    	  type: 'post'
-	    	, url: '${pageContext.request.contextPath}/app/mstr/getAnswerXML.json'
-	    	, async: true
-	    	, contentType: 'application/json;charset=utf-8'
-	    	, data : JSON.stringify({
-    			  objectId: objectId
-    			, type: type
-    			, promptVal: promptVal
-    		})
-    		, dataType: 'json'
-    		, success: function(data, text, request) {
-	    		// 리포트 실행 시 파라미터로 전달될 promptsAnswerXML의 값을 서버로부터 조회 성공
-	    		let inputs = getMstrFormDefinition(type);
-	    		$.extend(inputs, {promptsAnswerXML : data['xml']});
-	    		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', inputs);
-	    	}
-	    	, error : function(jqXHR, textStatus, errorThrown) {
-	    		$('#portal-loading').hide();
-	    		errorProcess(jqXHR, textStatus, errorThrown);
-	    	}
-	    });
+		if(typeof reportInfo['promptList'] != 'undefined' && reportInfo['promptList'].length == 0) {
+			//프롬프트 없을 경우
+			let inputs = getMstrFormDefinition(type);
+			_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', inputs);
+		} else {
+			//프롬프트 있을 경우
+			
+			//정합성 체크
+			let promptCheck = validationPrompt();
+			for (const [key, value] of Object.entries(promptCheck)) {
+				if(value) {
+					alert(value);
+					$('#portal-loading').hide();
+					return false;
+				}
+			}
+			
+			$.ajax({
+		    	  type: 'post'
+		    	, url: '${pageContext.request.contextPath}/app/mstr/getAnswerXML.json'
+		    	, async: true
+		    	, contentType: 'application/json;charset=utf-8'
+		    	, data : JSON.stringify({
+	    			  objectId: objectId
+	    			, type: type
+	    			, promptVal: promptVal
+	    		})
+	    		, dataType: 'json'
+	    		, success: function(data, text, request) {
+		    		// 리포트 실행 시 파라미터로 전달될 promptsAnswerXML의 값을 서버로부터 조회 성공
+		    		let inputs = getMstrFormDefinition(type);
+		    		$.extend(inputs, {promptsAnswerXML : data['xml']});
+		    		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', inputs);
+		    	}
+		    	, error : function(jqXHR, textStatus, errorThrown) {
+		    		$('#portal-loading').hide();
+		    		errorProcess(jqXHR, textStatus, errorThrown);
+		    	}
+		    });
+		}
 	}
 	
 	
