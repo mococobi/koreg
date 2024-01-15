@@ -49,7 +49,7 @@
 			</div>
 		</div>
 		<div id="boardTable_div">
-			<table id="boardTable" class="table hover table-striped table-bordered dataTablesCommonStyle">
+			<table id="boardTable" class="table hover table-striped table-bordered dataTablesCommonStyle" style="width: 100%">
 				<colgroup>
 					<col width="10%">
 					<col >

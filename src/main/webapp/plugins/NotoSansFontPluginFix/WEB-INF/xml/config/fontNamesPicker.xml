@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<shortcut-list name="fontPicker">
+<shortcut desc="Noto Sans KR Regular" name="Noto Sans KR Regular">
+	<attributes>
+		<attribute name="style" value="font-family:Noto Sans KR Regular"/>
+		<attribute name="value" value="Noto Sans KR Regular"/>
+	</attributes>
+</shortcut>
+
+<shortcut desc="Noto Sans KR Bold" name="Noto Sans KR Bold">
+	<attributes>
+		<attribute name="style" value="font-family:Noto Sans KR Bold"/>
+		<attribute name="value" value="Noto Sans KR Bold"/>
+	</attributes>
+</shortcut>
+
+<shortcut desc="Noto Sans KR Black" name="Noto Sans KR Black">
+	<attributes>
+		<attribute name="style" value="font-family:Noto Sans KR Black"/>
+		<attribute name="value" value="Noto Sans KR Black"/>
+	</attributes>
+</shortcut>
+
+<shortcut desc="Noto Sans KR Light" name="Noto Sans KR Light">
+	<attributes>
+		<attribute name="style" value="font-family:Noto Sans KR Light"/>
+		<attribute name="value" value="Noto Sans KR Light"/>
+	</attributes>
+</shortcut>
+
+<shortcut desc="Noto Sans KR Medium" name="Noto Sans KR Medium">
+	<attributes>
+		<attribute name="style" value="font-family: Noto Sans KR Medium"/>
+		<attribute name="value" value="Noto Sans KR Medium"/>
+	</attributes>
+</shortcut>
+
+<shortcut desc="Noto Sans KR Thin" name="Noto Sans KR Thin">
+	<attributes>
+		<attribute name="style" value="font-family:Noto Sans KR Thin"/>
+		<attribute name="value" value="Noto Sans KR Thin"/>
+	</attributes>
+</shortcut>
+</shortcut-list>
+
+
+

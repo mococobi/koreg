@@ -187,8 +187,12 @@ function errorProcess(jqXHR, textStatus, errorThrown) {
 	if(jqXHR['status'] == 404) {
 		alert('지정되지 않은 URL입니다.');
 	} else {
-		alert(errorThrown['message']);
-		console.log(errorThrown);
+		if(jqXHR['responseText'].indexOf('세션 만료') > -1) {
+			window.top.location = __contextPath + '/app/error/noSessionView.do';
+		} else {
+			alert(errorThrown['message']);
+			console.log(errorThrown);
+		}
 	}
 	
 	$('#portal-loading').hide();

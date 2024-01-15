@@ -33,7 +33,7 @@
 								</div>
 							</div>
 							<div style="min-height: 410px;">
-								<table id="modalUserListTable" class="table hover table-striped table-bordered dataTablesCommonStyle">
+								<table id="modalUserListTable" class="table hover table-striped table-bordered dataTablesCommonStyle" style="width: 100%">
 									<colgroup>
 										<col width="50%">
 										<col >

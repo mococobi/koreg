@@ -71,30 +71,28 @@ public class BoardServiceImpl implements BoardService {
         params.put("countCheck", true);
     	Map<String, Object> rtnListCnt = simpleBizDao.select("Board.boardPostList", params);
     	 	
-		/*
-		 * //첨부파일 if(params.get("CHECK_POST_FILE") != null &&
-		 * (Boolean)params.get("CHECK_POST_FILE") == true) { List<Map<String, Object>>
-		 * rtnPostFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
-		 * rtnMap.put("file", rtnPostFileList); }
-		 */
     	//첨부파일
     	if (params.get("CHECK_POST_FILE") != null && (Boolean) params.get("CHECK_POST_FILE") == true) {
-    	    int tmpPostID = 0;
-    	    List<Map<String, Object>> rtnPostFileList = null;
-    	    for (Map<String, Object> mPostItem : rtnList) {
-    	        Object postIDObj = mPostItem.get("POST_ID");
-    	        if (postIDObj != null) {
-    	            tmpPostID = ((Number) postIDObj).intValue();
-    	            params.put("POST_ID", tmpPostID);
-    	            rtnPostFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
-    	            mPostItem.put("attachfiles", rtnPostFileList);
-    	        }
+    		List<Object> postIdList = new ArrayList<Object>();
+    	    for (Map<String, Object> postItem : rtnList) {
+    	    	postIdList.add(postItem.get("POST_ID"));
+    	    }
+    	    
+    	    params.put("postIdList", postIdList);
+    	    List<Map<String, Object>> postFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
+    	    
+    	    for (Map<String, Object> postItem : rtnList) {
+    	    	List<Map<String, Object>> postFile = new ArrayList<Map<String,Object>>();
+    	    	
+    	    	for (Map<String, Object> postFileItem : postFileList) {
+        	    	if(postItem.get("POST_ID").toString().equals(postFileItem.get("POST_ID").toString())) {
+        	    		postFile.add(postFileItem);
+        	    	}
+        	    }
+    	    	postItem.put("attachfiles", postFile);
     	    }
     	}
 
-    	
-    	
-    	
     	if((Boolean)params.get("PORTAL_LOG") == true) {
     		//포탈 로그 기록(조회)
     		logService.addPortalLog(request, params.get("BRD_ID").toString(), "", "READ", params);
@@ -201,7 +199,6 @@ public class BoardServiceImpl implements BoardService {
     
     //첨부파일 처리
     private List<Map<String, Object>> uploadFile(MultipartHttpServletRequest request, Map<String, Object> params) throws Exception {
-    	int boardinsertFileCount = 0;
 		long atchFileId = -1;
 		
 		List<Map<String,Object>> lmRstUploadedFile = new ArrayList<Map<String,Object>>();
@@ -299,14 +296,13 @@ public class BoardServiceImpl implements BoardService {
 	    	tmpFile.put("BRD_ID", params.get("BRD_ID"));
 	    	tmpFile.put("userId", HttpUtil.getLoginUserId(request));
 	    	
-	    	fileInsertCount = simpleBizDao.update("Board.boardPostFileInsert", tmpFile);
+	    	totalFileUpdateCount += simpleBizDao.update("Board.boardPostFileInsert", tmpFile);
 	    	LOGGER.debug("file Update result : [{}], [{}]", fileInsertCount, (String) tmpFile.get("orgFileName"));
-	    	
-	    	totalFileUpdateCount += fileInsertCount;
 	    }
-	    LOGGER.debug("total file Update result : [{}]", fileInsertCount);
+	    LOGGER.debug("total file Update result : [{}]", totalFileUpdateCount);
 	    
 	    //첨부 파일 삭제
+	    int totalFileDeleteCount = 0;
 	    String[] delete_file_ids = request.getParameterValues("deleteFileIds");
 	    List<String> deleteFileList = new ArrayList<String>();
 		if (delete_file_ids != null) {
@@ -315,14 +311,15 @@ public class BoardServiceImpl implements BoardService {
 	        }
 			
 			params.put("deleteFileList", deleteFileList);
-			int fileDeleteCount = simpleBizDao.update("Board.boardPostFileDelete", params);
+			totalFileDeleteCount += simpleBizDao.update("Board.boardPostFileDelete", params);
 		}
+		LOGGER.debug("total file Delete result : [{}]", totalFileDeleteCount);
 	    
 		rtnMap.put("BRD_ID", params.get("BRD_ID"));
 		rtnMap.put("POST_ID", params.get("POST_ID"));
 		rtnMap.put("INSERT_POST_CNT", boardUpdateCount);
 		rtnMap.put("INSERT_FILE_CNT", totalFileUpdateCount);
-		rtnMap.put("DELETE_FILE_CNT", totalFileUpdateCount);
+		rtnMap.put("DELETE_FILE_CNT", totalFileDeleteCount);
 		rtnMap.put("params", params);
 	    
 		Map<String, Object> logParams = new HashMap<String, Object>();

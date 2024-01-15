@@ -63,7 +63,7 @@ public class BoardController {
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         try {
     		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
-    		view.addObject("postData", boardMap);
+    		view.addObject("boardData", boardMap);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
 			view.addObject("data", rtnMap);
@@ -115,7 +115,7 @@ public class BoardController {
     		rtnMap.putAll(rtnList);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostList Exception", e);
+			LOGGER.error("boardPostListGrid Exception", e);
 		}
     	
     	return rtnMap;
@@ -133,8 +133,16 @@ public class BoardController {
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         
         try {
-    		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
-    		view.addObject("postData", boardMap);
+        	if(params.get("POST_ID") == null) {
+        		//신규
+        		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
+        		view.addObject("postData", boardMap);
+        	} else {
+        		//수정
+        		Map<String, Object> postMap = boardService.boardPostDetail(request, response, params);
+        		view.addObject("postData", postMap.get("data"));
+        	}
+        	
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
 			view.addObject("data", rtnMap);
@@ -157,12 +165,12 @@ public class BoardController {
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         
         try {
-        	Map<String, Object> boardMap = boardService.boardPostDetail(request, response, params);
-    		view.addObject("postData", boardMap);
+        	Map<String, Object> postMap = boardService.boardPostDetail(request, response, params);
+    		view.addObject("postData", postMap.get("data"));
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
 			view.addObject("data", rtnMap);
-			LOGGER.error("boardPostWriteView Exception", e);
+			LOGGER.error("boardPostDetailView Exception", e);
 		}
         
         return view;
@@ -211,7 +219,7 @@ public class BoardController {
     	
 		try {
 			{
-	    		//기본 권한 설정
+	    		//사용자 개인 권한 설정
 	    		Boolean boardPostInsertCheck = false;
 	    		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
 	    		Map<String, Object> boardMapData = (Map<String, Object>) boardMap.get("data");
@@ -245,7 +253,7 @@ public class BoardController {
     		rtnMap.putAll(rtnList);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostDetail Exception", e);
+			LOGGER.error("boardPostInsert Exception", e);
 		}
 		
 		return rtnMap;
@@ -261,7 +269,8 @@ public class BoardController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/board/boardPostUpdate.json", method = {RequestMethod.GET, RequestMethod.POST})
+    @SuppressWarnings("unchecked")
+	@RequestMapping(value = "/board/boardPostUpdate.json", method = {RequestMethod.GET, RequestMethod.POST})
 	public Map<String, Object> boardPostUpdate(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) {
 //    	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
@@ -295,7 +304,7 @@ public class BoardController {
     		rtnMap.putAll(rtnList);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostDetail Exception", e);
+			LOGGER.error("boardPostUpdate Exception", e);
 		}
 		
 		return rtnMap;
@@ -309,7 +318,8 @@ public class BoardController {
 	 * @param params
 	 * @return
 	 */
-    @RequestMapping(value = "/board/boardPostDelete.json", method = {RequestMethod.GET, RequestMethod.POST})
+    @SuppressWarnings("unchecked")
+	@RequestMapping(value = "/board/boardPostDelete.json", method = {RequestMethod.GET, RequestMethod.POST})
 	public Map<String, Object> boardPostDelete(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
     	LOGGER.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
@@ -343,7 +353,7 @@ public class BoardController {
     		rtnMap.putAll(rtnList);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostDetail Exception", e);
+			LOGGER.error("boardPostDelete Exception", e);
 		}
 		
 		return rtnMap;
@@ -444,12 +454,12 @@ public class BoardController {
 			logService.addPortalLog(request, boardId, postId, "DOWNLOAD", params);
 			
 		} catch (FileNotFoundException e) {
-			LOGGER.error("error", e);
+			LOGGER.error("downloadAttachFile FileNotFoundException", e);
 			
 			errorMsg = e.getMessage();
 			state = Status.FILE_NOT_FOUND;
 		} catch (Exception e) {
-			LOGGER.error("error", e);
+			LOGGER.error("downloadAttachFile Exception", e);
 			
 			errorMsg = e.getMessage();
 			state = Status.EXCEPTION;
@@ -516,7 +526,8 @@ public class BoardController {
 			}
 		}
 	}
-
+	
+	
 	/**
      * 팝업 - 게시물 리스트 조회
      * @return
@@ -536,7 +547,7 @@ public class BoardController {
     		rtnMap.putAll(rtnList);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostList Exception", e);
+			LOGGER.error("boardPostPopupList Exception", e);
 		}
     	
     	return rtnMap;
@@ -561,7 +572,7 @@ public class BoardController {
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
 			view.addObject("data", rtnMap);
-			LOGGER.error("boardPostWriteView Exception", e);
+			LOGGER.error("boardPostPopupView Exception", e);
 		}
         
         return view;
@@ -588,7 +599,7 @@ public class BoardController {
     		rtnMap.putAll(rtnList);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostDetail Exception", e);
+			LOGGER.error("boardPostPopupDetail Exception", e);
 		}
     	
     	return rtnMap;
@@ -607,11 +618,11 @@ public class BoardController {
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         try {
     		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
-    		view.addObject("postData", boardMap);
+    		view.addObject("boardData", boardMap);
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
 			view.addObject("data", rtnMap);
-			LOGGER.error("boardPostListView Exception", e);
+			LOGGER.error("boardPostFaqListView Exception", e);
 		}
         
         return view;

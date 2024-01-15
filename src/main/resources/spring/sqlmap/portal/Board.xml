@@ -365,9 +365,10 @@
 			post_file.FILE_ID
 	</select>
 	
-		<!-- 게시판 - 게시물 - 파일 목록 조회 -->
+	
+	<!-- 게시판 - 게시물 - 파일 목록 조회 -->
 	<select id="Board.boardPostFaqFileList" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
-		SELECT /* Board.boardPostFileList */
+		SELECT /* Board.boardPostFaqFileList */
 			  post_file.FILE_ID
 			, post_file.POST_ID
 			, post_file.FILE_TYPE
@@ -386,7 +387,11 @@
 			PORTAL.PT_BOARD_POST_FILE post_file
 		WHERE 1=1
 			AND post_file.DEL_YN = 'N'
-			AND post_file.POST_ID IN #{POST_ID}
+			AND post_file.POST_ID IN (
+				<foreach collection="postIdList" item="item" separator=",">
+   					#{item}
+   				</foreach>
+			)
 		ORDER BY
 			  post_file.POST_ID
 			, post_file.FILE_ID
@@ -426,7 +431,6 @@
 				NVL(MAX(post_file.FILE_ID)+1, 1) AS INSERTKEY
 			FROM
 				PORTAL.PT_BOARD_POST_FILE post_file
-			WHERE 1=1
 		</selectKey>
 		INSERT INTO /* Board.boardPostFileInsert */ 
 			PORTAL.PT_BOARD_POST_FILE(

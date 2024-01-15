@@ -3,12 +3,13 @@
 <%@ page import="java.util.*"%>
 <%@ page import="com.mococo.web.util.CustomProperties" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
 	String boardId = (String)request.getParameter("BRD_ID");
 	String postId = (String)request.getParameter("POST_ID");
+	pageContext.setAttribute("postId", postId);
 	
 	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
-	
 	
 	String attachBaseFileSize = (String)CustomProperties.getProperty("attach.base.file.size");
 	String attachBaseFileExtension = (String)CustomProperties.getProperty("attach.base.file.extension");
@@ -18,6 +19,9 @@
 	
 	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
 	pageContext.setAttribute("portalAppName", portalAppName);
+	
+	String mstrUserIdAttr = (String)session.getAttribute("mstrUserIdAttr");
+	pageContext.setAttribute("mstrUserIdAttr", mstrUserIdAttr);
 %>
 <!DOCTYPE html>
 <html>
@@ -71,8 +75,30 @@
 		<p class="h6">${postData['BRD_DESC']}</p>
 		<div class="row mb-3">
 			<div class="col">
-				<button id="btn_post_modify" class="btn btn-secondary btn-sm" onclick="updateBoardPost()" style="display: none;">저장</button>
-				<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick='createBoardPost()'>작성</button>
+				<c:choose>
+				    <c:when test="${not empty postId}">
+				    	<!-- 수정 -->
+				    	<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
+							<button class="btn btn-secondary btn-sm" onclick="updateBoardPost()">저장</button>
+						<% } else { %>
+							<c:if test="${postData['CRT_USR_ID'] eq mstrUserIdAttr}">
+								<button class="btn btn-secondary btn-sm" onclick="updateBoardPost()">저장</button>
+							</c:if>
+						<% } %>
+				    </c:when>
+				    <c:otherwise>
+				    	<!-- 신규 -->
+				    	<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
+							<button class="btn btn-secondary btn-sm" onclick='createBoardPost()'>작성</button>
+						<% } else { %>
+							<c:set var="create_auth_check1" value="${fn:indexOf(postData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += mstrUserIdAttr += '\"')}" />
+							<c:set var="create_auth_check2" value="${fn:indexOf(postData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += 'ALL_USER' += '\"')}" />
+							<c:if test="${create_auth_check1 gt -1 || create_auth_check2 gt -1}">
+								<button class="btn btn-secondary btn-sm" onclick='createBoardPost()'>작성</button>
+							</c:if>
+						<% } %>
+				    </c:otherwise>
+				</c:choose>
 			</div>
 			<div class="col text-end">
 				<button class="btn btn-secondary btn-sm" onclick="moveCommunityPage(<%=boardId%>)">목록</button>
@@ -208,6 +234,7 @@
 	let deleteFileIds = [];
 	
 	$(function() {
+		console.log('${postData}');
 		if('${postData["BRD_NM"]}' == '') {
 			alert('선택한 게시판이 존재하지 않습니다.');
 			
@@ -344,13 +371,6 @@
 	
 	//내용 표시
 	function displayContents(postData, postFile) {
-		
-		if(postData['CRT_USR_ID'] == '${mstrUserIdAttr}') {
-			$('#btn_post_write').hide();
-			$('#btn_post_modify').show();
-			$('#btn_post_delete').show();
-		}
-		
 		$('#post_title').val(postData['POST_TITLE']);
 		$('#post_create_user_id').text(postData['CRT_USR_ID']);
 		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);

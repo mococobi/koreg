@@ -20,7 +20,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>${postData['BRD_NM']}</title>
+	<title>${boardData['BRD_NM']}</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
@@ -50,8 +50,8 @@
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 	<div id="boardPost_div" class="container py-4" style="max-width: 100%;">
-		<p class="h3">${postData['BRD_NM']}</p>
-		<p class="h6">${postData['BRD_DESC']}</p>
+		<p class="h3">${boardData['BRD_NM']}</p>
+		<p class="h6">${boardData['BRD_DESC']}</p>
 		<div class="row mb-3">
 			<div class="col-md-1">
 				<select id="searchKey" class="form-select form-select-sm">
@@ -67,20 +67,20 @@
 			</div>
 			<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
 				<div class="col text-end">
-					<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
+					<button class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
 				</div>
 			<% } else { %>
-				<c:set var="create_auth_check1" value="${fn:indexOf(postData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += mstrUserIdAttr += '\"')}" />
-				<c:set var="create_auth_check2" value="${fn:indexOf(postData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += 'ALL_USER' += '\"')}" />
+				<c:set var="create_auth_check1" value="${fn:indexOf(boardData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += mstrUserIdAttr += '\"')}" />
+				<c:set var="create_auth_check2" value="${fn:indexOf(boardData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += 'ALL_USER' += '\"')}" />
 				<c:if test="${create_auth_check1 gt -1 || create_auth_check2 gt -1}">
 					<div class="col text-end">
-						<button id="btn_post_write" class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
+						<button class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
 					</div>
 				</c:if>
 			<% } %>
 	    </div>
 		<div id="boardPostTable_div">
-			<table id="boardPostTable" class="table hover table-striped table-bordered dataTablesCommonStyle">
+			<table id="boardPostTable" class="table hover table-striped table-bordered dataTablesCommonStyle" style="width: 100%">
 				<colgroup>
 					<col width="5%">
 					<col >
@@ -109,7 +109,7 @@
 	let searchVal = '';
 	
 	$(function() {
-		if('${postData["BRD_NM"]}' == '') {
+		if('${boardData["BRD_NM"]}' == '') {
 			alert('선택한 게시판이 존재하지 않습니다.');
 			
 			let pagePrams = [];
