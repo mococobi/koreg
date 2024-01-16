@@ -177,7 +177,7 @@ public class SyncUser {
 								}
 							} else {
 								//사용자 그룹 미존재(New)
-								newGroup = MstrUserUtil.createUserGroup(serverSession, groupPath[gIdx], parentGroupId, "EIAM 등록");
+								newGroup = MstrUserUtil.createUserGroup(serverSession, groupPath[gIdx], parentGroupId, "사용자 배치 등록");
 								
 								String[] changeComments = {};
 								newGroup.setComments(changeComments);

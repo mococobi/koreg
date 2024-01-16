@@ -15,6 +15,7 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.mococo.web.util.CustomProperties;
 import com.mococo.web.util.PropertiesHolder;
 
 /**
@@ -30,7 +31,7 @@ final public class BatchProperties {
 	private static final Logger LOGGER = LogManager.getLogger(BatchProperties.class);
 	
 	private static final String DFT_PTH = "/com/batch/properties/";
-	private static final String DFT_NAM = "batch-sql.xml";
+	private static final String DFT_NAM = "batch-sql-" + CustomProperties.getProperty("portal.application.file.name") + ".xml";
 	private static final String DFT_RTN = "";
 	
 	private static PropertiesHolder<BatchProperties> holder = new PropertiesHolder<BatchProperties>(

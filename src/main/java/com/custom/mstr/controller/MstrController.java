@@ -34,7 +34,7 @@ public class MstrController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MstrController.class);
 
     
-    @RequestMapping(value = "/mstr/getReportInfo.json", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = {"/mstr/getReportInfo.json", "/mstr/getEisReportInfo.json"}, method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
     public Map<String, Object> getReportInfo(@RequestBody final Map<String, Object> param, final HttpServletRequest request) {
     	LOGGER.debug("=> param : [{}]", param);
@@ -69,7 +69,8 @@ public class MstrController {
     }
     
 
-    @RequestMapping(value = "/mstr/getAnswerXML.json", method = { RequestMethod.GET, RequestMethod.POST })
+    @SuppressWarnings("unchecked")
+	@RequestMapping(value = {"/mstr/getAnswerXML.json", "/mstr/getEisAnswerXML.json"}, method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
     public Map<String, Object> getAnswerXML(@RequestBody final Map<String, Object> param,
             final HttpServletRequest request) {
@@ -105,7 +106,7 @@ public class MstrController {
     
 
     // 포탈 메뉴 리스트 조회하는 json 메소드
-    @RequestMapping(value = "/mstr/getFolderList.json", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = {"/mstr/getFolderList.json", "/mstr/getEisFolderList.json"}, method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
     public Map<String, Object> getFolderList(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
     	LOGGER.debug("params : [{}]", params);

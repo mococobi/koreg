@@ -4,106 +4,51 @@
 <% 
 	String portalIframePageMoveYn = CustomProperties.getProperty("portal.iframe.page.move.yn");
 	String mstrMenuFolderId = CustomProperties.getProperty("mstr.menu.folder.id");
+	
+	pageContext.setAttribute("portalIframePageMoveYn", portalIframePageMoveYn);
+	pageContext.setAttribute("mstrMenuFolderId", mstrMenuFolderId);
 %>
 <!DOCTYPE html>
 <html>
-	<head>
-		<style type="text/css">
-			body {
-			  min-height: 100vh;
-			  min-height: -webkit-fill-available;
-			}
-			
-			html {
-			  height: -webkit-fill-available;
-			}
-			
-			main {
-			  height: 100vh;
-			  height: -webkit-fill-available;
-			  max-height: 100vh;
-			  overflow-x: auto;
-			  overflow-y: hidden;
-			}
-			
-			.dropdown-toggle { outline: 0; }
-			
-			.btn-toggle {
-			  padding: .25rem .5rem;
-			  font-weight: 600;
-			  color: var(--bs-emphasis-color);
-			  background-color: transparent;
-			}
-			.btn-toggle:hover,
-			.btn-toggle:focus {
-			  color: rgba(var(--bs-emphasis-color-rgb), .85);
-			  background-color: var(--bs-tertiary-bg);
-			}
-			
-			.btn-toggle::before {
-			  width: 1.25em;
-			  line-height: 0;
-			  content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%280,0,0,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
-			  transition: transform .35s ease;
-			  transform-origin: .5em 50%;
-			}
-			
-			[data-bs-theme="dark"] .btn-toggle::before {
-			  content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%28255,255,255,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
-			}
-			
-			.btn-toggle[aria-expanded="true"] {
-			  color: rgba(var(--bs-emphasis-color-rgb), .85);
-			}
-			.btn-toggle[aria-expanded="true"]::before {
-			  transform: rotate(90deg);
-			}
-			
-			.btn-toggle-nav a {
-			  padding: .1875rem .5rem;
-			  margin-top: .125rem;
-			  margin-left: 1.25rem;
-			}
-			.btn-toggle-nav a:hover,
-			.btn-toggle-nav a:focus {
-			  background-color: var(--bs-tertiary-bg);
-			}
-			
-			.scrollarea {
-			  overflow-y: auto;
-			}
-
-			.mstrType-55::before {
-			    width: 1.25em;
-			    line-height: 0;
-			    content: url(${pageContext.request.contextPath}/image/bootstrap-icons-1.11.2/file-earmark-bar-graph.svg);
-			    transition: transform .35s ease;
-			    transform-origin: 0.5em 50%;
-			    margin-right: 5px;
-			}
-			
-			.mstrType-3::before {
-			    width: 1.25em;
-			    line-height: 0;
-			    content: url(${pageContext.request.contextPath}/image/bootstrap-icons-1.11.2/grid-3x3.svg);
-			    transition: transform .35s ease;
-			    transform-origin: 0.5em 50%;
-			    margin-right: 5px;
-			}
-			
-		</style>
-	</head>
+<head>
+</head>
 <body>
-<div class="flex-shrink-0 p-3" style="">
-	<ul id="left_menu_tree" class="list-unstyled ps-0" style="height: calc(87vh); overflow: auto;">
-	</ul>
-</div>
+	<nav class="lnb" style="position: relative; overflow: auto; height: calc(100vh - 45px);">
+	</nav>
+	<!-- //Left Menu -->
 </body>
 <script type="text/javascript">
-	var portalIframePageMoveYn = "<%=portalIframePageMoveYn%>"
-
+	
 	$(function() {
 		initLeftMenu();
+		
+        /* 컨텐츠 탭 */
+        /*
+        $('.tab-btn-wrap button').each(function(index, item) {
+            $(item).on('click', function(){
+                $('.tab-btn-wrap button').removeClass('active');
+                $(this).addClass('active');
+
+                var idx = index
+                var showCont = $('.cont-tab')[idx];
+                $('.cont-tab').removeClass('on');
+                $(showCont).addClass('on');
+            });
+        });
+        */
+        
+        /* box1 탭 */
+        $('.box-btn-wrap button').each(function(index, item) {
+            $(item).on('click', function(){
+                $('.box-btn-wrap button').removeClass('active');
+                $(this).addClass('active');
+
+                var idx = index
+                var showCont = $('.box-tab')[idx];
+                $('.box-tab').removeClass('on');
+                $(showCont).addClass('on');
+            });
+        });
 	});
 	
 	
@@ -111,98 +56,162 @@
 	function initLeftMenu() {
 		$(window).resize(function() {
 			let height	= $(window).height();
-			$('#left_menu_tree').height(height - $('#portal-top-nav-div').height() - 70);
+// 			$('.lnb').height(height - $('.header').height() - $('.tab-btn-wrap.flex').height() - 100);
 		});
 		
 		$(window).resize();
 		
 		let callParams = {
-			folderId : "<%=mstrMenuFolderId%>"
+			folderId : '${mstrMenuFolderId}'
 		};
-		callAjaxPost('/mstr/getFolderList.json', callParams, function(data) {
-			let menuReport = data['folder'];
-			let drawHtml = drawMenuReport(menuReport, $('<ul>', {class : 'list-unstyled ps-0'}));
-			$('#left_menu_tree').append(drawHtml);
+		callAjaxPost('/mstr/getEisFolderList.json', callParams, function(data) {
+			let drawHtml = drawMenuParentReport(data['folder'], $('<ul>', {class : 'dep1-ul'}));
+			$('.lnb').append(drawHtml);
+			
+			//초기 실행
+			if(objectId == '') {
+				$('.dep3').find('a').eq(0).click();
+			}
+			
+	        /* 메뉴 */
+	        $('.dep2').on('mouseenter', function(e) {
+	        	$('.dep3-wrap').css('position', 'absolute');
+	        	$('.dep3-wrap').removeClass('on');
+	        	
+	            $(this).find('.dep3-wrap').addClass('on');
+	            $(this).find('.dep3-wrap').css('position', 'fixed');
+	            $(this).find('.dep3-wrap').css('top', $(this).offset().top);
+	            $(this).find('.dep3-wrap').css('left', $(this).offset().left + 176);
+	            
+	            $(this).find('.dep3-wrap').width($(this).find('.dep3-ul').width());
+	            $(this).find('.dep3-wrap').height($(this).find('.dep3-ul').height());
+	        });
+	        
+	        /*
+	        $('.dep2').on('mouseleave', function(e){
+	            $(this).find('.dep3-wrap').removeClass('on');
+	        });
+	        */
+	        
+	        $('.dep3-wrap').on('mouseleave', function(e) {
+	            $(this).css('position', 'absolute');
+	            $(this).removeClass('on');
+	        });
+	        
+	        $('#mstrReport').on('mouseenter', function(e) {
+	        	$('.dep3-wrap').css('position', 'absolute');
+	        	$('.dep3-wrap').removeClass('on');
+	        });
 		});
 	}
 	
 	
 	//메뉴 리포트 동적 생성
-	function drawMenuReport(menuReport, rtnHtml) {
-		
+	function drawMenuParentReport(menuReport, rtnHtml) {
 		menuReport.forEach((menu, idx) => {
-			if(menu['type'] == 8) {
-				let buttonHtml = $('<button>', {
-					  text : menu['name']
-					, id : menu['id'] + '-btn'
-					, title : menu['name']
-					, class : 'btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed'
-					, 'data-bs-toggle' : 'collapse'
-					, 'data-bs-target' : '#' + menu['id'] + '-collapse'
-					, 'aria-expanded' : 'true'
-				});
-				
-				let menuHtml = $('<li>', { class : 'mb-1'});
-				
-				$(menuHtml).append(buttonHtml);
-				$(rtnHtml).append(menuHtml);
-			} else {
-				let menuHtml = $('<a>', {
-					  text : menu['name']
-					, title : menu['name']
-					, id : menu['id']
-					, href : '#'
-					, class : 'link-body-emphasis d-inline-flex text-decoration-none rounded mstrType-' + menu['type']
-					, click : function(e) {
-						let pagePrams = [
-							  ["objectId", menu['id']]
-							, ["type", menu['type']]
-							, ["subType", menu['subType']]
-						  	, ["isvi", menu['isVI']]
-						];
-						
-						if(portalIframePageMoveYn == 'Y') {
-							pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams);
-						} else {
-							if($('#mstrReport').length == 0) {
-								pageGoPost('_self', '${pageContext.request.contextPath}/app/main/reportMainView.do', pagePrams);
-							} else {
-								objectId = menu['id'];
-								type = menu['type'];
-								isvi = menu['isVI'];
-								$('.prompt-wrapper').parent().show();
-								getPromptInfo();
-							}
-						}
-
-					}
-				});
-				let liHtml = $('<li>');
-				
-				$(liHtml).append(menuHtml);
-				$(rtnHtml).find('ul').append(liHtml);
-			}
+			
+			let depLiHtml = $('<li>', {class : 'dep1'});
+			let aHtml = $('<a>', {
+				  href : 'javascript:void(0)'
+				, title : getMstrTitleName(menu['name'])
+				, text : getMstrTitleName(menu['name'])
+				, click : function(e) {
+					clickReportObj(menu);
+				}
+			});
+			depLiHtml.append(aHtml);
 			
 			if(menu['child']) {
-				let divHtml = $('<div>', {
-					  text : ''
-					, id : menu['id'] + '-collapse'
-					, class : 'collapse show'
-				});
-				
-				let ulHtml = $('<ul>', {
-					class : 'btn-toggle-nav list-unstyled fw-normal pb-1 small'
-				});
-				
-				$(divHtml).append(ulHtml);
-				
-				let childHtml = drawMenuReport(menu['child'], $(divHtml));
-				$(rtnHtml).find('#' + menu['id'] + '-btn').after(childHtml);
+				let childHtml = drawMenuChildDep2Report(menu['child'], $('<ul>', {class : 'dep2-ul'}));
+				depLiHtml.append(childHtml);
 			}
 			
+			$(rtnHtml).append(depLiHtml);
 		});
 		
 		return rtnHtml;
+	}
+	
+	
+	//2레벨 태그 생성
+	function drawMenuChildDep2Report(menuReport, rtnHtml) {
+		menuReport.forEach((menu, idx) => {
+			let depLiHtml = $('<li>', {class : 'dep2'});
+			let aHtml = $('<a>', {
+				  href : '#'
+				, title : getMstrTitleName(menu['name'])
+				, text : getMstrTitleName(menu['name'])
+				, click : function(e) {
+					clickReportObj(menu);
+				}
+			});
+			depLiHtml.append(aHtml);
+			
+			if(menu['child']) {
+				let divHtml = $('<div>', {
+					  class : 'dep3-wrap'
+					, style : 'z-index: 9001;'
+				});
+				let childHtml = drawMenuChildDep3Report(menu['child'], $('<ul>', {class : 'dep3-ul'}));
+				divHtml.append(childHtml);
+				depLiHtml.append(divHtml);
+			}
+			
+			$(rtnHtml).append(depLiHtml);
+		});
+		
+		return rtnHtml;
+	}
+	
+	
+	//3레벨 태그 생성
+	function drawMenuChildDep3Report(menuReport, rtnHtml) {
+		menuReport.forEach((menu, idx) => {
+			let depLiHtml = $('<li>', {class : 'dep3'});
+			let aHtml = $('<a>', {
+				  href : '#'
+				, title : getMstrTitleName(menu['name'])
+				, text : getMstrTitleName(menu['name'])
+				, click : function(e) {
+					clickReportObj(menu);
+				}
+			});
+			depLiHtml.append(aHtml);
+			$(rtnHtml).append(depLiHtml);
+		});
+		
+		return rtnHtml;
+	}
+	
+	
+	//리포트 클릭
+	function clickReportObj(menu) {
+		if(menu['type'] == 8) {
+			//폴더
+		} else {
+			let pagePrams = [
+				  ["objectId", menu['id']]
+				, ["type", menu['type']]
+				, ["subType", menu['subType']]
+			  	, ["isvi", menu['isVI']]
+				, ["title", encodeURI(menu['name'])]
+			];
+			
+			if('${portalIframePageMoveYn}' == 'Y') {
+				pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainEisView.do', pagePrams, 1);
+			} else {
+				if($('#mstrReport').length == 0) {
+					pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainEisView.do', pagePrams, 1);
+				} else {
+					objectId = menu['id'];
+					type = menu['type'];
+					isvi = menu['isVI'];
+					
+					$('#mstrReportTitle').text(getMstrTitleName(menu['name']));
+					fnReportInit();
+				}
+			}
+		}
 	}
 	
 </script>

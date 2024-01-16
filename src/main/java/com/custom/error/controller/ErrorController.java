@@ -73,13 +73,26 @@ public class ErrorController {
     
     
     /**
-     * 세션 만료 페이지
+     * 세션 만료 페이지 - 포탈
      * @return
      */
     @RequestMapping(value = "/error/noSessionView.do", method = { RequestMethod.GET, RequestMethod.POST })
     public ModelAndView noSessionView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
     	LOGGER.debug("params : [{}]", params);
         ModelAndView view = new ModelAndView("error/noSession");
+        
+        return view;
+    }
+    
+    
+    /**
+     * 세션 만료 페이지 - EIS
+     * @return
+     */
+    @RequestMapping(value = "/error/noSessionEisView.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView noSessionEisView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	LOGGER.debug("params : [{}]", params);
+        ModelAndView view = new ModelAndView("error/noSessionEis");
         
         return view;
     }

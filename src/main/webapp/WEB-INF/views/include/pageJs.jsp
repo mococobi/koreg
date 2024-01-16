@@ -4,6 +4,12 @@
 <% 
 	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
 	pageContext.setAttribute("portalAppName", portalAppName);
+	
+	String portalLoginPage = (String)CustomProperties.getProperty("portal.login.page");
+	pageContext.setAttribute("portalLoginPage", portalLoginPage);
+	
+	String eisLoginPage = (String)CustomProperties.getProperty("eis.login.page");
+	pageContext.setAttribute("eisLoginPage", eisLoginPage);
 %>
 <!-- Bootstrap JS -->
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/style/bootstrap-5.3.2-dist/js/bootstrap.bundle.min.js?v=20240115001"></script>
@@ -30,4 +36,7 @@
 <script type="text/javascript">
 	var __contextPath = '${pageContext.request.contextPath}';
 	var __portalAppName = '${portalAppName}';
+	
+	var __portalLoginPage = '${portalLoginPage}';
+	var __eisLoginPage = '${eisLoginPage}';
 </script>

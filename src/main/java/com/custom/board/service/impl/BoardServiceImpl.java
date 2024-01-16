@@ -93,7 +93,7 @@ public class BoardServiceImpl implements BoardService {
     	    }
     	}
 
-    	if((Boolean)params.get("PORTAL_LOG") == true) {
+    	if(params.get("PORTAL_LOG") != null && (Boolean)params.get("PORTAL_LOG") == true) {
     		//포탈 로그 기록(조회)
     		logService.addPortalLog(request, params.get("BRD_ID").toString(), "", "READ", params);
     	}
@@ -148,7 +148,7 @@ public class BoardServiceImpl implements BoardService {
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
     	
-    	if ( "Y".equalsIgnoreCase((String) params.get("POPUP_YN")) ) {
+    	if ("Y".equalsIgnoreCase((String) params.get("POPUP_YN")) ) {
     		params.put("POPUP_START_DT_TM", ((String) params.get("POPUP_START_DT_TM") + " 00:00:00.000") );
     		params.put("POPUP_END_DT_TM", ((String) params.get("POPUP_END_DT_TM") + " 23:59:59.999") );
     	} else {
@@ -275,7 +275,7 @@ public class BoardServiceImpl implements BoardService {
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
     	
-    	if ( "Y".equalsIgnoreCase((String) params.get("POPUP_YN")) ) {
+    	if ("Y".equalsIgnoreCase((String) params.get("POPUP_YN")) ) {
     		params.put("POPUP_START_DT_TM", ((String) params.get("POPUP_START_DT_TM") + " 00:00:00.000") );
     		params.put("POPUP_END_DT_TM", ((String) params.get("POPUP_END_DT_TM") + " 23:59:59.999") );
     	} else {

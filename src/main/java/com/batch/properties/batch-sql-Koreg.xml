@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="Batch.eiamDepartmentList">
+		SELECT /* Batch.eiamDepartmentList */
+			  '포탈팀' 			AS 부서명
+			, '기술연구소//포탈팀' 	AS 부서경로
+		FROM 
+			DUAL
+	</entry>
+	
+	
+	<entry key="Batch.eiamUserList">
+		SELECT /* Batch.eiamUserList */
+			  'mksong' 			AS 사용자사번
+			, '송민권' 			AS 사용자이름
+			, '서비스팀' 			AS 부서명
+			, '기술연구소//포탈팀' 	AS 부서경로
+			, 'Y' 				AS 계정상태
+			, '파워사용자' 			AS 권한명
+		FROM 
+			DUAL
+	</entry>
+
+
+</properties>

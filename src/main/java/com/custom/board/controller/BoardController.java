@@ -51,8 +51,12 @@ public class BoardController {
     @Autowired
     LogService logService;
     
+    
     /**
      * 게시판 - 게시물 조회 화면 이동
+     * @param request
+     * @param response
+     * @param params
      * @return
      */
     @RequestMapping(value = "/board/boardPostListView.do", method = { RequestMethod.GET, RequestMethod.POST })
@@ -76,6 +80,9 @@ public class BoardController {
     
     /**
      * 게시판 - 게시물 리스트 조회
+     * @param request
+     * @param response
+     * @param params
      * @return
      */
     @RequestMapping(value = "/board/boardPostList.json", method = { RequestMethod.POST })
@@ -101,6 +108,9 @@ public class BoardController {
     
     /**
      * 게시판 - 게시물 리스트 조회 - 그리드
+     * @param request
+     * @param response
+     * @param params
      * @return
      */
     @RequestMapping(value = "/board/boardPostListGrid.json", method = { RequestMethod.POST })
@@ -123,7 +133,65 @@ public class BoardController {
     
     
     /**
+     * FAQ - 게시물 조회 화면 이동
+     * @param request
+     * @param response
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/board/boardPostFaqListView.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView boardPostFaqListView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	LOGGER.debug("params : [{}]", params);
+        ModelAndView view = new ModelAndView("board/boardPostFaqList");
+        
+        Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+        try {
+    		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
+    		view.addObject("boardData", boardMap);
+		} catch (Exception e) {
+			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			view.addObject("data", rtnMap);
+			LOGGER.error("boardPostFaqListView Exception", e);
+		}
+        
+        return view;
+    }
+    
+    
+    /**
+     * FAQ - 게시물 리스트 조회
+     * @param request
+     * @param response
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/board/boardPostFaqList.json", method = { RequestMethod.POST })
+    @ResponseBody
+    public Map<String, Object> boardPostFaqList(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+    	params.put("PORTAL_LOG", true);
+    	params.put("CHECK_POST_FILE", true);
+    	
+    	LOGGER.debug("params : [{}]", params);
+    	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+    	
+    	try {
+    		Map<String, Object> rtnList = new HashMap<String, Object>();
+    		rtnList = boardService.boardPostList(request, response, params);
+    		rtnMap.putAll(rtnList);
+		} catch (Exception e) {
+			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			LOGGER.error("boardPostFaqList Exception", e);
+		}
+    	
+    	return rtnMap;
+    }
+    
+    
+    /**
      * 게시판 - 게시물 작성 화면 이동
+     * @param request
+     * @param response
+     * @param params
      * @return
      */
     @RequestMapping(value = "/board/boardPostWriteView.do", method = { RequestMethod.GET, RequestMethod.POST })
@@ -155,6 +223,9 @@ public class BoardController {
     
     /**
      * 게시판 - 게시물 상세 화면 이동
+     * @param request
+     * @param response
+     * @param params
      * @return
      */
     @RequestMapping(value = "/board/boardPostDetailView.do", method = { RequestMethod.GET, RequestMethod.POST })
@@ -179,6 +250,9 @@ public class BoardController {
     
     /**
      * 게시판 - 게시물 상세 조회
+     * @param request
+     * @param response
+     * @param params
      * @return
      */
     @RequestMapping(value = "/board/boardPostDetail.json", method = { RequestMethod.GET, RequestMethod.POST })
@@ -206,10 +280,11 @@ public class BoardController {
     
     /**
      * 게시판 - 게시물 등록
-     * @param params
      * @param request
+     * @param hrequest
+     * @param response
+     * @param params
      * @return
-     * @throws Exception 
      */
     @SuppressWarnings("unchecked")
 	@RequestMapping(value = "/board/boardPostInsert.json", method = {RequestMethod.GET, RequestMethod.POST})
@@ -267,7 +342,6 @@ public class BoardController {
      * @param response
      * @param params
      * @return
-     * @throws Exception
      */
     @SuppressWarnings("unchecked")
 	@RequestMapping(value = "/board/boardPostUpdate.json", method = {RequestMethod.GET, RequestMethod.POST})
@@ -529,9 +603,12 @@ public class BoardController {
 	
 	
 	/**
-     * 팝업 - 게시물 리스트 조회
-     * @return
-     */
+	 * 팝업 - 게시물 리스트 조회
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 */
     @RequestMapping(value = "/board/boardPostPopupList.json", method = {RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
     public Map<String, Object> boardPostListPopup(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
@@ -556,6 +633,9 @@ public class BoardController {
     
     /**
      * 팝업 - 게시물 상세 화면 이동
+     * @param request
+     * @param response
+     * @param params
      * @return
      */
     @RequestMapping(value = "/board/boardPostPopupView.do", method = { RequestMethod.GET, RequestMethod.POST })
@@ -581,6 +661,9 @@ public class BoardController {
     
     /**
      * 팝업 - 팝업 게시글 조회
+     * @param request
+     * @param response
+     * @param params
      * @return
      */
     @RequestMapping(value = "/board/boardPostPopupDetail.json", method = { RequestMethod.GET, RequestMethod.POST })
@@ -605,53 +688,5 @@ public class BoardController {
     	return rtnMap;
     }
     
-    
-    /**
-     * FAQ - 게시물 조회 화면 이동
-     * @return
-     */
-    @RequestMapping(value = "/board/boardPostFaqListView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView boardPostFaqListView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("board/boardPostFaqList");
-        
-        Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
-        try {
-    		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
-    		view.addObject("boardData", boardMap);
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			view.addObject("data", rtnMap);
-			LOGGER.error("boardPostFaqListView Exception", e);
-		}
-        
-        return view;
-    }
-    
-    
-    /**
-     * FAQ - 게시물 리스트 조회
-     * @return
-     */
-    @RequestMapping(value = "/board/boardPostFaqList.json", method = { RequestMethod.POST })
-    @ResponseBody
-    public Map<String, Object> boardPostFaqList(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
-    	params.put("PORTAL_LOG", false);
-    	params.put("CHECK_POST_FILE", true);
-    	
-    	LOGGER.debug("params : [{}]", params);
-    	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
-    	
-    	try {
-    		Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = boardService.boardPostList(request, response, params);
-    		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostFaqList Exception", e);
-		}
-    	
-    	return rtnMap;
-    }
     
 }

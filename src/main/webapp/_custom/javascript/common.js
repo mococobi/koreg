@@ -188,7 +188,11 @@ function errorProcess(jqXHR, textStatus, errorThrown) {
 		alert('지정되지 않은 URL입니다.');
 	} else {
 		if(jqXHR['responseText'].indexOf('세션 만료') > -1) {
-			window.top.location = __contextPath + '/app/error/noSessionView.do';
+			if(location['pathname'].indexOf('Eis') > -1) {
+				window.top.location = __contextPath + __eisLoginPage;
+			} else {
+				window.top.location = __contextPath + __portalLoginPage;
+			}
 		} else {
 			alert(errorThrown['message']);
 			console.log(errorThrown);
