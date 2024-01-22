@@ -22,6 +22,9 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 	
+	<!-- 게시판 JS -->
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/portal/boardCommon.js?v=20240122001"></script>
+	
 	<style type="text/css">
 		#board_table th, #board_table td {
 		    border: 1px solid;
@@ -211,32 +214,14 @@
 			let pagePrams = [];
 			pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
 		} else {
-			fnBoardPostInit();
+			callBoardPostDetail();
 		}
 		
 	});
 	
 	
-	//초기 함수
-	function fnBoardPostInit() {
-		let callParams = {
-			  BRD_ID : boardId
-			, POST_ID : postId
-		};
-		callAjaxPost('/board/boardPostDetail.json', callParams, function(data){
-			let postData = data['data'];
-			let postFile = data['file'];
-			
-			let postLocation = data['location'];
-			
-			displayContents(postData, postFile, postLocation);
-		});
-		
-	}
-	
-	
 	//내용 표시
-	function displayContents(postData, postFile, postLocation) {
+	function displayBoardPostContents(postData, postFile, postLocation) {
 		$('#post_title').text(postData['POST_TITLE']);
 		$('#post_create_user_id').text(postData['CRT_USR_ID']);
 		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);
@@ -326,37 +311,6 @@
 		}
 	}
 	
-	
-	//게시물 수정
-	function modifyBoardPost() {
-		let pagePrams = [
-			  ['BRD_ID', boardId]
-			, ['POST_ID', postId]
-		];
-		
-		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
-	}
-	
-	
-	//게시물 삭제
-	function deleteBoardPost() {
-		let pagePrams = [
-			  ['BRD_ID', boardId]
-			, ['POST_ID', postId]
-		];
-		
-		let msg = '게시글을 삭제하시겠습니까?';
-		if (confirm(msg)) {
-			let callParams = {
-				  BRD_ID : boardId
-				, POST_ID : postId
-			};
-			callAjaxPost('/board/boardPostDelete.json', callParams, function(data) {
-				alert('게시글이 삭제되었습니다.');
-				moveCommunityPage(boardId);
-			});
-		}
-	}
 	
 </script>
 </html>

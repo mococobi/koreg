@@ -25,6 +25,9 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 	
+	<!-- 게시판 JS -->
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/portal/boardCommon.js?v=20240122001"></script>
+	
 	<style type="text/css">
 		  #boardPost_div
 		, #boardPost_div a
@@ -233,24 +236,6 @@
 				}
 	        ]
 		});
-	}
-	
-	
-	//게시물 검색
-	function searchBoardPostList() {
-		searchKey = $('#searchKey option:selected').val();
-		searchVal = $('#searchVal').val();
-		
-		$('#boardPostTable').DataTable().ajax.reload();
-	}
-	
-	
-	//게시물 작성
-	function writeBoardPost() {
-		let pagePrams = [
-			['BRD_ID', boardId]
-		];
-		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
 	}
 	
 	

@@ -85,17 +85,19 @@ public class BoardServiceImpl implements BoardService {
     			}
     			
     			params.put("postIdList", postIdList);
-    			List<Map<String, Object>> postFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
-    			
-    			for (Map<String, Object> postItem : rtnList) {
-    				List<Map<String, Object>> postFile = new ArrayList<Map<String,Object>>();
-    				
-    				for (Map<String, Object> postFileItem : postFileList) {
-    					if(postItem.get("POST_ID").toString().equals(postFileItem.get("POST_ID").toString())) {
-    						postFile.add(postFileItem);
-    					}
-    				}
-    				postItem.put("attachfiles", postFile);
+    			if(postIdList.size() > 0) {
+    				List<Map<String, Object>> postFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
+        			
+        			for (Map<String, Object> postItem : rtnList) {
+        				List<Map<String, Object>> postFile = new ArrayList<Map<String,Object>>();
+        				
+        				for (Map<String, Object> postFileItem : postFileList) {
+        					if(postItem.get("POST_ID").toString().equals(postFileItem.get("POST_ID").toString())) {
+        						postFile.add(postFileItem);
+        					}
+        				}
+        				postItem.put("attachfiles", postFile);
+        			}
     			}
     		}
     	}

@@ -36,9 +36,12 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/daterangepicker.css"/>
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/_custom/javascript/toastui-editor/toastui-editor.min.css" />
 	
-	<script src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/daterangepicker.js"></script>
-	<script src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/moment.min.js"></script>
-	<script src="${pageContext.request.contextPath}/_custom/javascript/toastui-editor/toastui-editor-all.min.js"></script>
+	<script type="text/javascript" charset="UTF-8"  src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/daterangepicker.js"></script>
+	<script type="text/javascript" charset="UTF-8"  src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/moment.min.js"></script>
+	<script type="text/javascript" charset="UTF-8"  src="${pageContext.request.contextPath}/_custom/javascript/toastui-editor/toastui-editor-all.min.js"></script>
+	
+	<!-- 게시판 JS -->
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/portal/boardCommon.js?v=20240122001"></script>
 	
 	<style type="text/css">
 		#board_table th, #board_table td {
@@ -245,17 +248,7 @@
 		
 		if(postId != null) {
 			//수정
-			let callParams = {
-				  BRD_ID : boardId
-				, POST_ID : postId
-			};
-				
-			callAjaxPost('/board/boardPostDetail.json', callParams, function(data){
-				let postData = data['data'];
-				let postFile = data['file'];
-				
-				displayContents(postData, postFile);
-			});
+			callBoardPostDetail();
 		} else {
 			//신규
 			$('#post_write_not').hide();
@@ -277,7 +270,7 @@
 		
 		
 		//달력 지우기
-		$('#datefilter').on('cancel.daterangepicker', function(ev, picker) {  
+		$('#datefilter').on('cancel.daterangepicker', function(ev, picker) {
 			$('#startDateInput').val('');
 			$('#endDateInput').val('');
 		});
@@ -369,7 +362,7 @@
 	
 	
 	//내용 표시
-	function displayContents(postData, postFile) {
+	function displayBoardPostContents(postData, postFile) {
 		$('#post_title').val(postData['POST_TITLE']);
 		$('#post_create_user_id').text(postData['CRT_USR_ID']);
 		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);
@@ -467,92 +460,5 @@
 	}
 	
 	
-	//입력 정보 확인 체크
-	function checkPostInput() {
-		let rtnCheck = true;
-		
-		if($('#post_title').val() == '') {
-			alert('제목을 입력하세요');
-			$('#post_title').focus();
-			return false;
-		}
-		
-		if(editor.getHTML() == '') {
-			alert('내용을 입력하세요');
-			editor.getHTML().focus();
-			return false;
-		}
-		
-		if($('#popup_yn').val() == 'Y' && $('#startDateInput').val() == '') {
-			alert('팝업일자를 선택하세요');
-			return false;
-		}
-
-		return rtnCheck;
-	}
-	
-	
-	//게시글 등록
-	function createBoardPost() {
-		let checkVal = checkPostInput();
-		
-		if(checkVal) {
-			let msg = '게시글을 등록하시겠습니까?';
-			if (confirm(msg)) {
-				let formData = new FormData();
-				
-				formData.append('BRD_ID', boardId);
-				formData.append('POST_TITLE', $('#post_title').val());
-				formData.append('POST_CONTENT', editor.getHTML());
-				formData.append('POPUP_YN', $('#popup_yn').is(":checked")?"Y":"N");
-				formData.append('POPUP_START_DT_TM', $('#startDateInput').val());
-				formData.append('POPUP_END_DT_TM', $('#endDateInput').val());
-				//multiple 파일 갯수에 만큼 저장
-				Object.values(filesObj).forEach((file, idx) => {
-					formData.append('ATTACH_FILE_' + idx, file);
-				});
-				
-				callAjaxForm('/board/boardPostInsert.json', formData, function(data) {
-					alert('게시글이 등록되었습니다.');
-					detailBoardPost(boardId, data.POST_ID);//POST_ID 받아오는 값
-				});
-		    }
-		}
-	}
-	
-		
-	//게시글 수정
-	function updateBoardPost() {
-		let checkVal = checkPostInput();
-		
-		if(checkVal) {
-			let msg = '게시글을 수정하시겠습니까?';
-			if (confirm(msg)) {
-				let formData = new FormData();
-				
-				formData.append('POST_ID', postId);
-				formData.append('BRD_ID', boardId);
-				formData.append('POST_TITLE', $('#post_title').val());
-				formData.append('POST_CONTENT', editor.getHTML());
-				formData.append('POPUP_YN', $('#popup_yn').is(":checked")?"Y":"N");
-				formData.append('POPUP_START_DT_TM', $('#startDateInput').val());
-				formData.append('POPUP_END_DT_TM', $('#endDateInput').val());
-				//multiple 파일 갯수에 만큼 저장
-				Object.values(filesObj).forEach((file, idx) => {
-					formData.append('ATTACH_FILE_' + idx, file);
-				});
-				console.log($('#startDateInput').val());
-				//삭제 첨부파일 추가
-				deleteFileIds.forEach(id => {
-					formData.append('deleteFileIds', id);
-				});
-				
-				callAjaxForm('/board/boardPostUpdate.json', formData, function(data) {
-					alert('게시글이 수정되었습니다.');
-					detailBoardPost(boardId, data.POST_ID);//POST_ID 받아오는 값
-				});
-		    }
-		}
-	}
 </script>
 </html>

@@ -26,6 +26,9 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 	
+	<!-- 게시판 JS -->
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/portal/boardCommon.js?v=20240122001"></script>
+	
 	<style type="text/css">
 		  #boardPost_div
 		, #boardPost_div a
@@ -99,7 +102,7 @@
 				<% } %>
 			</div>
 		</div>
-			<table id="boardPostTable" class="table hover table-striped table-bordered dataTablesCommonStyle" style="width:100%;">
+			<table class="table hover table-striped table-bordered dataTablesCommonStyle" style="width:100%;">
 		  		<tbody id="board_div_2">
 		  		</tbody>
 			</table>
@@ -153,7 +156,7 @@
 					+		'<h2 class="accordion-header">'
 					+			'<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse' + post['POST_ID'] + '" aria-expanded="false" aria-controls="collapse"' + post['POST_ID'] +'style="margin-right:0;">'
 					+				'<strong>' + post['POST_TITLE'] + '</strong>'
-					+				'<input type="button" id="btn_post_detail" class="btn btn-secondary btn-sm" value="상세" onclick="detailBoardPost(' + post['POST_ID'] + ')" style="width:5%; height:50%; margin-left:auto;">'
+					+				'<input type="button" id="btn_post_detail" class="btn btn-secondary btn-sm" value="상세" onclick="detailBoardPost(' + post['BRD_ID'] + ',' + post['POST_ID'] + ')" style="width:5%; height:50%; margin-left:auto;">'
 					+			'</button>'
 					+		'</h2>'
 					+		'<div id="collapse' + post['POST_ID'] + '" class="accordion collapse" data-bs-parent="#accordionExample">'
@@ -211,53 +214,5 @@
 	}
 	
 	
-	//게시물 검색
-	function searchBoardPostList() {
-		searchKey = $('#searchKey option:selected').val();
-		searchVal = $('#searchVal').val();
-		
-		fnBoardInit(boardId);
-	}
-	
-	
-	//게시물 작성
-	function writeBoardPost() {
-		let pagePrams = [
-			['BRD_ID', boardId]
-		];
-		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostWriteView.do', pagePrams);
-	}
-	
-	
-	//게시물 수정
-	function detailBoardPost(postId) {
-		let pagePrams = [
-			  ['BRD_ID', boardId]
-			, ['POST_ID', postId]
-		];
-		
-		pageGoPost('_self', '${pageContext.request.contextPath}/app/board/boardPostDetailView.do', pagePrams);
-	}
-	
-	
-	//게시물 삭제
-	function deleteBoardPost(postId) {
-		let pagePrams = [
-			  ['BRD_ID', boardId]
-			, ['POST_ID', postId]
-		];
-		
-		let msg = '게시글을 삭제하시겠습니까?';
-		if (confirm(msg)) {
-			let callParams = {
-				  BRD_ID : boardId
-				, POST_ID : postId
-			};
-			callAjaxPost('/board/boardPostDelete.json', callParams, function(data) {
-				alert('게시글이 삭제되었습니다.');
-				moveCommunityPage(boardId);
-			});
-		}
-	}
 </script>
 </html>
