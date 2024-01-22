@@ -13,6 +13,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -23,7 +24,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tomcat.util.codec.binary.Base64;
 
 public class EncryptUtil {
 	private static final Logger LOGGER = LogManager.getLogger(EncryptUtil.class);
@@ -67,7 +67,7 @@ public class EncryptUtil {
 			Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			c.init(Cipher.ENCRYPT_MODE, keySpec, new IvParameterSpec(iv.getBytes()));
 			byte[] encrypted = c.doFinal(token.getBytes("UTF-8"));
-			result = new String(Base64.encodeBase64(encrypted));
+			result = new String(Base64.getEncoder().encodeToString(encrypted));
 		} catch (IOException e) {
 			LOGGER.error("!!! error", e);
 		} catch (NoSuchAlgorithmException e) {
@@ -103,7 +103,7 @@ public class EncryptUtil {
 		try {
 			Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			c.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(iv.getBytes()));
-			byte[] byteStr = Base64.decodeBase64(token.getBytes());
+			byte[] byteStr = Base64.getDecoder().decode(token.getBytes());
 			result = new String(c.doFinal(byteStr), "UTF-8");
 		} catch (IOException e) {
 			LOGGER.error("!!! error", e);

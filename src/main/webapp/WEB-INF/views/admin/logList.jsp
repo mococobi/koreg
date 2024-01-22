@@ -16,22 +16,22 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 	
 	<style type="text/css">
-		  #board_div
-		, #board_div a
-		, #board_div input
-		, #board_div span
-		, #board_div select
-		, #board_div button {
+		  .board_custom_div
+		, .board_custom_div a
+		, .board_custom_div input
+		, .board_custom_div span
+		, .board_custom_div select
+		, .board_custom_div button {
 			font-size: 1.5rem;
 			font-family: 맑은 고딕;
 		}
 		
-		#board_div .h3 {
+		.board_custom_div .h3 {
 			font-size: 3rem;
 			font-family: 맑은 고딕;
 		}
 		
-		#board_div .h6 {
+		.board_custom_div .h6 {
 			font-size: 2rem;
 			font-family: 맑은 고딕;
 		}
@@ -40,7 +40,7 @@
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/adminDivStart.jsp" />
 	
-	<div id="board_div" class="container py-4" style="max-width: 100%;">
+	<div class="container py-4 board_custom_div" style="max-width: 100%;">
 		<p class="h3">포탈 로그 확인(${LOG_TYPE_NM})</p>
 		<p class="h6">포탈을 사용한 로그를 확인한다.</p>
 		<div class="row mb-3">
@@ -72,11 +72,30 @@
 			</table>
 		</div>
 	</div>
+	
+	<div class="modal fade board_custom_div" id="logListModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title fs-5" id="exampleModalLabel">로그 정보</h3>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="ui segment" id ="smon_log" style="white-space: pre;"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
 </body>
 <script type="text/javascript">
 	let searchKey = '';
 	let searchVal = '';
+	let logDetail;
 	
 	$(function() {
 		fnBoardInit();
@@ -113,6 +132,7 @@
 					} else {
 				        data['recordsTotal'] = data['dataSize'];
 				        data['recordsFiltered'] = data['dataSize'];
+				        logDetail = data['data'];
 				        
 						return data['data'];
 					}
@@ -126,12 +146,12 @@
 				{
 					  data : 'LOG_ID'
 					, className : 'textCenter'
-					, render : function (data, type, row) {
+					, render : function (data, type, row, idx) {
 						let rtnData = '-';
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
-						return rtnData;
+						return '<a onclick="popupLogDetail('+ idx['row'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
 					}
 	            }
 				, {
@@ -142,7 +162,7 @@
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
-						return '<a onclick="detailBoard('+ row['BRD_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
+						return rtnData;
 					}
 	            }
 				, {
@@ -217,12 +237,15 @@
 	}
 	
 	
-	//관리자 - 게시판 상세 화면 이동
-	function detailBoard(moveBoardId) {
-		let pagePrams = [
-			["boardId", moveBoardId]
-		];
-		pageGoPost('_self', '${pageContext.request.contextPath}/app/admin/boardDetailView.do', pagePrams);
+	//관리자 - 로그 상세
+	function popupLogDetail(infoIdx) {
+		let logDetailInfo = logDetail[infoIdx];
+		
+		$('#smon_log').empty();
+		$('#smon_log').append(document.createTextNode(JSON.stringify(JSON.parse(logDetailInfo['DET_INFO_MAP']), null, 4)));
+
+		$('#logListModal').modal('show');
+// 		debugger;
 	}
 	
 	

@@ -42,6 +42,7 @@ public class SyncUserUtil {
 	}
 	
 	
+	//MSTR 하위 그룹 확인
 	public static Map<String, Map<String, ?>> getSubUserGroup(WebObjectSource source, String baseMstrGroupId) {
 		Map<String, String> mstrGroupMap = new HashMap<String, String>();
 		Map<String, String> mstrUserMap = new HashMap<String, String>();
@@ -125,7 +126,7 @@ public class SyncUserUtil {
 		
 		return result;
 	}
-
+	
 	
 	//MSTR 전체 사용자
 	@SuppressWarnings("unchecked")

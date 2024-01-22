@@ -308,20 +308,21 @@
     	UPDATE /* Board.boardPostUpdate */
     		PORTAL.PT_BOARD_POST
     	SET
-    		    BRD_ID = #{BRD_ID}
-    		  , POST_TITLE = #{POST_TITLE}
-    		  , POST_CONTENT = #{POST_CONTENT}
-    		  , POST_VIEW_AUTH = #{POST_VIEW_AUTH}
-    		  , POPUP_YN = #{POPUP_YN}
-    		  , POPUP_START_DT_TM = #{POPUP_START_DT_TM}
-    		  , POPUP_END_DT_TM = #{POPUP_END_DT_TM}
-    		  , SECRET_YN = #{SECRET_YN}
-    		  , FIX_YN = #{FIX_YN}
-    		  , DEL_YN = 'N'
-    		  , MOD_DT_TM = SYSDATE
-    		  , MOD_USR_ID = #{userId}
-    		WHERE 1=1
-    			AND POST_ID = #{POST_ID}
+   		    BRD_ID = #{BRD_ID}
+   		  , POST_TITLE = #{POST_TITLE}
+   		  , POST_CONTENT = #{POST_CONTENT}
+   		  , POST_VIEW_AUTH = #{POST_VIEW_AUTH}
+   		  , POPUP_YN = #{POPUP_YN}
+   		  , POPUP_START_DT_TM = #{POPUP_START_DT_TM}
+   		  , POPUP_END_DT_TM = #{POPUP_END_DT_TM}
+   		  , SECRET_YN = #{SECRET_YN}
+   		  , FIX_YN = #{FIX_YN}
+   		  , DEL_YN = 'N'
+   		  , MOD_DT_TM = SYSDATE
+   		  , MOD_USR_ID = #{userId}
+   		WHERE 1=1
+   			AND POST_ID = #{POST_ID}
+   			AND BRD_ID = #{BRD_ID}
 	</update>
 	
 	
@@ -460,7 +461,7 @@
     		  , 'N'
     		  , SYSDATE
     		  , #{userId}
-    	)
+    		)
 	</insert>
 	
 	

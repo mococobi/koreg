@@ -44,9 +44,20 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>포탈 SSO 로그인</title>
 	
-	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
-	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
+	<!-- Bootstrap Css -->
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/bootstrap-5.3.2-dist/css/bootstrap.min.css?v=20240115001" >
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/image/bootstrap-icons-1.11.2/font/bootstrap-icons.min.css?v=20240115001">
+
+	<!-- Bootstrap JS -->
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/style/bootstrap-5.3.2-dist/js/bootstrap.bundle.min.js?v=20240115001"></script>
+
+	<!-- Jquery JS -->
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/jquery-3.7.0.min.js?v=20240115001"></script>
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/jquery-ui/jquery-ui-1.9.2.min.js?v=20240115001"></script>
 	
+	<!-- 공통 CSS -->
+	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/common.js?v=20240115001"></script>
+
 	<style type="text/css">
 		#portal-loading {
 			width: 100%;

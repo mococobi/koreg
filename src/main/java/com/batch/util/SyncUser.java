@@ -71,7 +71,7 @@ public class SyncUser {
 	private static final String DELETE_USER_GROUP_ID = CustomProperties.getProperty("mstr.delete.user.group.id");
 	
 	
-//	@Scheduled(cron = "0 0/5 * * * *")
+//	@Scheduled(cron = "0 0/1 * * * *")
 //	public static void batchDo() {
 	public static void main(String[] args) {
 		LOGGER.info("배치 실행");
@@ -270,7 +270,7 @@ public class SyncUser {
 						} else {
 							//다른 경우 제거
 							MstrUserUtil.removeFromUserGroup(objSource, user, strValue);
-							LOGGER.debug("08.AS-IS 권한 제거 : [{}]", strKey);
+							LOGGER.info("08.AS-IS 권한 제거 : [{}]", strKey);
 						}
 					}
 					
@@ -278,9 +278,9 @@ public class SyncUser {
 						if(orgUserAuth.containsKey(createUserAuthName)) {
 							//권한 없는 경우 추가
 							MstrUserUtil.addToUserGroup(objSource, user, orgUserAuth.get(createUserAuthName));
-							LOGGER.debug("08.TO-BE 권한 추가 : [{}]", createUserAuthName);
+							LOGGER.info("08.TO-BE 권한 추가 : [{}]", createUserAuthName);
 						} else {
-							LOGGER.debug("08.TO-BE 권한 존재하지 않음 : [{}]", createUserAuthName);
+							LOGGER.info("08.TO-BE 권한 존재하지 않음 : [{}]", createUserAuthName);
 						}
 					}
 					
@@ -299,7 +299,7 @@ public class SyncUser {
 						} else {
 							//다른 경우 제거
 							MstrUserUtil.removeFromUserGroup(objSource, user, strValue);
-							LOGGER.debug("08.AS-IS 부서 제거 : [{}]", strKey);
+							LOGGER.info("08.AS-IS 부서 제거 : [{}]", strKey);
 						}
 					}
 					
@@ -307,9 +307,9 @@ public class SyncUser {
 						//부서 없는 경우 추가
 						if(orgMstrGroup.containsKey(createUserDeptName)) {
 							MstrUserUtil.addToUserGroup(objSource, user, orgMstrGroup.get(createUserDeptName));
-							LOGGER.debug("08.TO-BE 부서 추가 : [{}]", createUserDeptName);
+							LOGGER.info("08.TO-BE 부서 추가 : [{}]", createUserDeptName);
 						} else {
-							LOGGER.debug("08.TO-BE 부서 존재하지 않음 : [{}]", createUserDeptName);
+							LOGGER.info("08.TO-BE 부서 존재하지 않음 : [{}]", createUserDeptName);
 						}
 					}
 					
