@@ -29,9 +29,11 @@
                 	<!-- Left Menu -->
                 	<jsp:include flush="true" page="/WEB-INF/views/include/portalLeft${portalAppName}.jsp" />
                 	
+                	<!-- 
                 	<div id="changeMenuDiv" style="position: fixed; left: 10.5%; z-index: 9999">
                 		<button class="btn btn-secondary btn-sm" style="font-size: 1.5rem;" onclick="changeLeftMenu()"><i class="bi bi-list"></i></button>
                 	</div>
+                	-->
                 	
                     <div class="content flex2">
                         <div class="cont-area">

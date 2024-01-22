@@ -204,10 +204,11 @@ public class BoardController {
         	if(params.get("POST_ID") == null) {
         		//신규
         		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
-        		view.addObject("postData", boardMap);
+        		view.addObject("boardData", boardMap);
         	} else {
         		//수정
         		Map<String, Object> postMap = boardService.boardPostDetail(request, response, params);
+        		view.addObject("boardData", postMap.get("boardData"));
         		view.addObject("postData", postMap.get("data"));
         	}
         	
@@ -237,6 +238,7 @@ public class BoardController {
         
         try {
         	Map<String, Object> postMap = boardService.boardPostDetail(request, response, params);
+        	view.addObject("boardData", postMap.get("boardData"));
     		view.addObject("postData", postMap.get("data"));
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());

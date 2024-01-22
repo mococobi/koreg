@@ -16,8 +16,8 @@
 	
 	
 	<!-- 게시판 목록 조회 -->
-	<select id="Board.boardDetail" resultType="HashMap" parameterType="Map">
-		SELECT /* Board.boardList */
+	<select id="Board.boardDetail" parameterType="Map" resultMap="oracleBoardMap">
+		SELECT /* Board.boardDetail */
 			  board.BRD_ID
 			, board.BRD_NM
 			, board.BRD_DESC
@@ -63,8 +63,16 @@
 					, post.CRT_USR_ID
 					, post.CRT_USR_ID AS CRT_USR_NM
 					, post.DEL_YN
+					, board.POST_FILE_YN
+					, board.POST_CMNT_YN
+					, board.POST_CMNT_FILE_YN
+					, board.POST_POPUP_YN
+					, board.POST_SECRET_YN
+					, board.POST_FIX_YN
 				FROM 
 					PORTAL.PT_BOARD_POST post
+					INNER JOIN PORTAL.PT_BOARD board
+						ON (post.BRD_ID = board.BRD_ID) 
 				WHERE 1=1
 					AND post.BRD_ID = #{BRD_ID}
 				ORDER BY
@@ -75,7 +83,10 @@
 			SELECT
 				  post.*
 				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PT_PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
-				, (SELECT COUNT(post_file.FILE_ID) FROM PORTAL.PT_BOARD_POST_FILE post_file WHERE post_file.DEL_YN = 'N' AND post.POST_ID = post_file.POST_ID) AS POST_FILE_COUNT
+				, CASE 
+					WHEN post.POST_FILE_YN = 'Y' THEN (SELECT COUNT(post_file.FILE_ID) FROM PORTAL.PT_BOARD_POST_FILE post_file WHERE post_file.DEL_YN = 'N' AND post.POST_ID = post_file.POST_ID) 
+					ELSE 0
+				END AS POST_FILE_COUNT
 			FROM 
 				POST_LIST post
 			WHERE 1=1
@@ -183,6 +194,7 @@
 			, post.CRT_USR_ID
 			, post.MOD_DT_TM
 			, post.MOD_USR_ID
+			/*
 			, board.BRD_NM
 			, board.BRD_DESC
 			, board.BRD_ADM_USR
@@ -194,11 +206,14 @@
 			, board.POST_POPUP_YN
 			, board.POST_SECRET_YN
 			, board.POST_FIX_YN
+			*/
 			, (SELECT COUNT(USR_ACTN) FROM PORTAL.PT_PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
 		FROM 
 			PORTAL.PT_BOARD_POST post 
+			/*
 			INNER JOIN PORTAL.PT_BOARD board
 				ON (post.BRD_ID = board.BRD_ID) 
+			*/
 		WHERE 1=1
 			AND post.DEL_YN = 'N'
 			AND post.POST_ID = #{POST_ID}

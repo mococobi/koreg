@@ -65,32 +65,39 @@ public class BoardServiceImpl implements BoardService {
     	
     	params.put("userId", HttpUtil.getLoginUserId(request));
     	
+    	//게시판
+    	Map<String, Object> rtnBoardMap = simpleBizDao.select("Board.boardDetail", params);
+    	
+    	//게시물 - 리스트
     	params.put("countCheck", false);
         List<Map<String, Object>> rtnList = simpleBizDao.list("Board.boardPostList", params);
         
+        //게시물 - 카운트
         params.put("countCheck", true);
     	Map<String, Object> rtnListCnt = simpleBizDao.select("Board.boardPostList", params);
     	 	
     	//첨부파일
-    	if (params.get("CHECK_POST_FILE") != null && (Boolean) params.get("CHECK_POST_FILE") == true) {
-    		List<Object> postIdList = new ArrayList<Object>();
-    	    for (Map<String, Object> postItem : rtnList) {
-    	    	postIdList.add(postItem.get("POST_ID"));
-    	    }
-    	    
-    	    params.put("postIdList", postIdList);
-    	    List<Map<String, Object>> postFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
-    	    
-    	    for (Map<String, Object> postItem : rtnList) {
-    	    	List<Map<String, Object>> postFile = new ArrayList<Map<String,Object>>();
-    	    	
-    	    	for (Map<String, Object> postFileItem : postFileList) {
-        	    	if(postItem.get("POST_ID").toString().equals(postFileItem.get("POST_ID").toString())) {
-        	    		postFile.add(postFileItem);
-        	    	}
-        	    }
-    	    	postItem.put("attachfiles", postFile);
-    	    }
+    	if(rtnBoardMap.get("POST_FILE_YN").toString().equals("Y")) {
+    		if (params.get("CHECK_POST_FILE") != null && (Boolean) params.get("CHECK_POST_FILE") == true) {
+    			List<Object> postIdList = new ArrayList<Object>();
+    			for (Map<String, Object> postItem : rtnList) {
+    				postIdList.add(postItem.get("POST_ID"));
+    			}
+    			
+    			params.put("postIdList", postIdList);
+    			List<Map<String, Object>> postFileList = simpleBizDao.list("Board.boardPostFaqFileList", params);
+    			
+    			for (Map<String, Object> postItem : rtnList) {
+    				List<Map<String, Object>> postFile = new ArrayList<Map<String,Object>>();
+    				
+    				for (Map<String, Object> postFileItem : postFileList) {
+    					if(postItem.get("POST_ID").toString().equals(postFileItem.get("POST_ID").toString())) {
+    						postFile.add(postFileItem);
+    					}
+    				}
+    				postItem.put("attachfiles", postFile);
+    			}
+    		}
     	}
 
     	if(params.get("PORTAL_LOG") != null && (Boolean)params.get("PORTAL_LOG") == true) {
@@ -118,13 +125,18 @@ public class BoardServiceImpl implements BoardService {
 	    	logService.addPortalLog(request, params.get("BRD_ID").toString(), params.get("POST_ID").toString(), "DETAIL", params);
     	}
     	
+    	//게시판
+    	Map<String, Object> rtnBoardMap = simpleBizDao.select("Board.boardDetail", params);
+    	
     	//게시물
     	Map<String, Object> rtnPostMap = simpleBizDao.select("Board.boardPostDetail", params);
     	
     	//첨부파일
-    	if(params.get("CHECK_POST_FILE") != null && (Boolean)params.get("CHECK_POST_FILE") == true) {
-    		List<Map<String, Object>> rtnPostFileList = simpleBizDao.list("Board.boardPostFileList", params);
-    		rtnMap.put("file", rtnPostFileList);
+    	if(rtnBoardMap.get("POST_FILE_YN").toString().equals("Y")) {
+    		if(params.get("CHECK_POST_FILE") != null && (Boolean)params.get("CHECK_POST_FILE") == true) {
+    			List<Map<String, Object>> rtnPostFileList = simpleBizDao.list("Board.boardPostFileList", params);
+        		rtnMap.put("file", rtnPostFileList);
+    		}
     	}
     	
     	//이전글, 다음글
@@ -134,6 +146,7 @@ public class BoardServiceImpl implements BoardService {
     	}
     	
         rtnMap.put("data", rtnPostMap);
+        rtnMap.put("boardData", rtnBoardMap);
         rtnMap.put("params", params);
         
         return rtnMap;

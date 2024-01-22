@@ -17,7 +17,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>${postData['BRD_NM']} - 상세</title>
+	<title>${boardData['BRD_NM']} - 상세</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
@@ -52,15 +52,15 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 	
 	<div id="boardPost_div" class="container py-4" style="max-width: 100%;">
-		<p class="h3">${postData['BRD_NM']}</p>
-		<p class="h6">${postData['BRD_DESC']}</p>
+		<p class="h3">${boardData['BRD_NM']}</p>
+		<p class="h6">${boardData['BRD_DESC']}</p>
 		<div class="row mb-3">
 			<div class="col">
 				<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
 					<button id="btn_post_modify" class="btn btn-secondary btn-sm" onclick="modifyBoardPost()">수정</button>
 					<button id="btn_post_delete" class="btn btn-secondary btn-sm" onclick="deleteBoardPost()">삭제</button>
 				<% } else { %>
-					<c:if test="${postData['CRT_USR_ID'] eq mstrUserIdAttr}">
+					<c:if test="${boardData['CRT_USR_ID'] eq mstrUserIdAttr}">
 						<button id="btn_post_modify" class="btn btn-secondary btn-sm" onclick="modifyBoardPost()">수정</button>
 						<button id="btn_post_delete" class="btn btn-secondary btn-sm" onclick="deleteBoardPost()">삭제</button>
 					</c:if>
@@ -132,7 +132,7 @@
 						</td>
 					</tr>
 				<tr>
-					<c:if test="${postData['POST_FIX_YN'] eq 'Y'}">
+					<c:if test="${boardData['POST_FIX_YN'] eq 'Y'}">
 						<td  id="post_fix_yn_div">
 							<span>상단 고정</span>
 						</td>
@@ -140,7 +140,7 @@
 							<input type="checkbox" id="post_fix_yn" disabled>
 						</td>
 					</c:if>
-					<c:if test="${postData['POST_SECRET_YN'] eq 'Y'}">
+					<c:if test="${boardData['POST_SECRET_YN'] eq 'Y'}">
 						<td id="post_secret_yn_div">
 							<span>비밀글</span>
 						</td>
@@ -149,7 +149,7 @@
 						</td>
 					</c:if>
 				</tr>
-					<c:if test="${postData['BRD_VIEW_AUTH'] eq 'Y'}">
+					<c:if test="${boardData['BRD_VIEW_AUTH'] eq 'Y'}">
 						<td>
 							<span>보기 권한</span>
 						</td>
@@ -165,7 +165,7 @@
 						<div id="post_content" style="min-height: 300px;"></div>
 					</td>
 				</tr>
-				<c:if test="${postData['POST_FILE_YN'] eq 'Y'}">
+				<c:if test="${boardData['POST_FILE_YN'] eq 'Y'}">
 					<tr id="post_file_yn_div">
 						<td>
 							<span>첨부 파일</span>
@@ -205,7 +205,7 @@
 	let searchVal = '';
 	
 	$(function() {
-		if('${postData["BRD_NM"]}' == '') {
+		if('${boardData["BRD_NM"]}' == '') {
 			alert('선택한 게시물이 존재하지 않습니다.');
 			
 			let pagePrams = [];

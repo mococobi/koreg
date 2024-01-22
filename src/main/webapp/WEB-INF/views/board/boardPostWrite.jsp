@@ -29,7 +29,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>${postData['BRD_NM']} - 작성</title>
+	<title>${boardData['BRD_NM']} - 작성</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
@@ -71,8 +71,8 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 
 	<div id="boardPost_div" class="container py-4" style="max-width: 100%;">
-		<p class="h3">${postData['BRD_NM']}</p>
-		<p class="h6">${postData['BRD_DESC']}</p>
+		<p class="h3">${boardData['BRD_NM']}</p>
+		<p class="h6">${boardData['BRD_DESC']}</p>
 		<div class="row mb-3">
 			<div class="col">
 				<c:choose>
@@ -81,7 +81,7 @@
 				    	<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
 							<button class="btn btn-secondary btn-sm" onclick="updateBoardPost()">저장</button>
 						<% } else { %>
-							<c:if test="${postData['CRT_USR_ID'] eq mstrUserIdAttr}">
+							<c:if test="${boardData['CRT_USR_ID'] eq mstrUserIdAttr}">
 								<button class="btn btn-secondary btn-sm" onclick="updateBoardPost()">저장</button>
 							</c:if>
 						<% } %>
@@ -91,8 +91,8 @@
 				    	<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
 							<button class="btn btn-secondary btn-sm" onclick='createBoardPost()'>작성</button>
 						<% } else { %>
-							<c:set var="create_auth_check1" value="${fn:indexOf(postData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += mstrUserIdAttr += '\"')}" />
-							<c:set var="create_auth_check2" value="${fn:indexOf(postData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += 'ALL_USER' += '\"')}" />
+							<c:set var="create_auth_check1" value="${fn:indexOf(boardData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += mstrUserIdAttr += '\"')}" />
+							<c:set var="create_auth_check2" value="${fn:indexOf(boardData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += 'ALL_USER' += '\"')}" />
 							<c:if test="${create_auth_check1 gt -1 || create_auth_check2 gt -1}">
 								<button class="btn btn-secondary btn-sm" onclick='createBoardPost()'>작성</button>
 							</c:if>
@@ -150,7 +150,7 @@
 							<span id="post_count"></span>
 						</td>
 					</tr>
-					<c:if test="${postData['POST_POPUP_YN'] eq 'Y'}">
+					<c:if test="${boardData['POST_POPUP_YN'] eq 'Y'}">
 						<tr id="post_popup_yn_div">
 							<td>
 								<span>팝업여부</span>
@@ -171,7 +171,7 @@
 						</tr>
 					</c:if>
 					<tr>
-						<c:if test="${postData['POST_FIX_YN'] eq 'Y'}">
+						<c:if test="${boardData['POST_FIX_YN'] eq 'Y'}">
 							<td id="post_fix_yn_div">
 								<span>상단 고정</span>
 							</td>
@@ -179,7 +179,7 @@
 								<input type="checkbox" id="post_fix_yn" disabled>
 							</td>
 						</c:if>
-						<c:if test="${postData['POST_SECRET_YN'] eq 'Y'}">
+						<c:if test="${boardData['POST_SECRET_YN'] eq 'Y'}">
 							<td id="post_secret_yn_div">
 								<span>비밀글</span>
 							</td>
@@ -188,7 +188,7 @@
 							</td>
 						</c:if>
 					</tr>
-					<c:if test="${postData['BRD_VIEW_AUTH'] eq 'Y'}">
+					<c:if test="${boardData['BRD_VIEW_AUTH'] eq 'Y'}">
 						<td>
 							<span>보기 권한</span>
 						</td>
@@ -204,7 +204,7 @@
 							<div id="post_content" style="min-height: 300px;"></div>
 						</td>
 					</tr>
-					<c:if test="${postData['POST_FILE_YN'] eq 'Y'}">
+					<c:if test="${boardData['POST_FILE_YN'] eq 'Y'}">
 						<tr id="post_file_yn_div">
 							<td>
 								<span>첨부 파일</span>
@@ -234,8 +234,7 @@
 	let deleteFileIds = [];
 	
 	$(function() {
-		console.log('${postData}');
-		if('${postData["BRD_NM"]}' == '') {
+		if('${boardData["BRD_NM"]}' == '') {
 			alert('선택한 게시판이 존재하지 않습니다.');
 			
 			let pagePrams = [];
