@@ -36,20 +36,25 @@ public class MstrController {
     
     @RequestMapping(value = {"/mstr/getReportInfo.json", "/mstr/getEisReportInfo.json"}, method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
-    public Map<String, Object> getReportInfo(@RequestBody final Map<String, Object> param, final HttpServletRequest request) {
-    	LOGGER.debug("=> param : [{}]", param);
+    public Map<String, Object> getReportInfo(final HttpServletRequest request, @RequestBody final Map<String, Object> params) {
+    	LOGGER.debug("=> param : [{}]", params);
 
-        String objectId = (String) param.get("objectId");
-        int type = (int) param.get("type");
+        String objectId = (String) params.get("objectId");
+        int type = (int) params.get("type");
         String uid = HttpUtil.getLoginUserId(request);
 
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
 
         WebIServerSession session = null;
         try {
-            session = MstrUtil.connectTrustSession(CustomProperties.getProperty("mstr.server.name"),
-                    CustomProperties.getProperty("mstr.default.project.name"), uid,
-                    CustomProperties.getProperty("mstr.trust.token"));
+            session = MstrUtil.connectTrustSession(
+        		  CustomProperties.getProperty("mstr.server.name")
+        		, params.get("projectNm") != null ? (String) params.get("projectNm") : CustomProperties.getProperty("mstr.default.project.name")
+        		, Integer.parseInt(CustomProperties.getProperty("mstr.server.port"))
+        		, Integer.parseInt(CustomProperties.getProperty("mstr.session.locale"))
+                , uid
+                , CustomProperties.getProperty("mstr.trust.token")
+            );
             Report report = ReportCharger.chargeObject(session, type, objectId);
 
             LOGGER.debug("==> report: [{}]", report);
@@ -72,15 +77,14 @@ public class MstrController {
     @SuppressWarnings("unchecked")
 	@RequestMapping(value = {"/mstr/getAnswerXML.json", "/mstr/getEisAnswerXML.json"}, method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
-    public Map<String, Object> getAnswerXML(@RequestBody final Map<String, Object> param,
-            final HttpServletRequest request) {
-    	LOGGER.debug("=> param : [{}]", param);
+    public Map<String, Object> getAnswerXML(final HttpServletRequest request, @RequestBody final Map<String, Object> params) {
+    	LOGGER.debug("=> param : [{}]", params);
 
-        String objectId = (String) param.get("objectId");
-        int type = (int) param.get("type");
+        String objectId = (String) params.get("objectId");
+        int type = (int) params.get("type");
         String uid = HttpUtil.getLoginUserId(request);
 
-        Map<String, List<String>> promptVal = (Map<String, List<String>>) param.get("promptVal");
+        Map<String, List<String>> promptVal = (Map<String, List<String>>) params.get("promptVal");
 
         LOGGER.debug("=> promptVal : [{}]", promptVal);
 
@@ -88,14 +92,21 @@ public class MstrController {
 
         WebIServerSession session = null;
         try {
-            session = MstrUtil.connectTrustSession(CustomProperties.getProperty("mstr.server.name"),
-                    CustomProperties.getProperty("mstr.default.project.name"), uid,
-                    CustomProperties.getProperty("mstr.trust.token"));
+            session = MstrUtil.connectTrustSession(
+        		  CustomProperties.getProperty("mstr.server.name")
+        		, params.get("projectNm") != null ? (String) params.get("projectNm") : CustomProperties.getProperty("mstr.default.project.name")
+        		, Integer.parseInt(CustomProperties.getProperty("mstr.server.port"))
+        		, Integer.parseInt(CustomProperties.getProperty("mstr.session.locale"))
+                , uid
+                , CustomProperties.getProperty("mstr.trust.token")
+            );
             String xml = MstrReportUtil.getReportAnswerXML(session, objectId, type, promptVal);
             success.put("xml", xml);
         } catch (WebObjectsException e) {
+        	success = ControllerUtil.getFailMapMessage(e.getMessage());
         	LOGGER.error("!!! error", e);
         } catch (Exception e) {
+        	success = ControllerUtil.getFailMapMessage(e.getMessage());
         	LOGGER.error("!!! error", e);
         } finally {
             MstrUtil.closeISession(session);
@@ -114,23 +125,25 @@ public class MstrController {
 
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         WebIServerSession session = null;
+        
         try {
             String server = MstrUtil.getLiveServer(CustomProperties.getProperty("mstr.server.name"));
-            String project = CustomProperties.getProperty("mstr.default.project.name");
+            String project = params.get("projectNm") != null ? (String) params.get("projectNm") : CustomProperties.getProperty("mstr.default.project.name");
+            int port = Integer.parseInt(CustomProperties.getProperty("mstr.server.port"));
+            int locale = Integer.parseInt(CustomProperties.getProperty("mstr.session.locale"));
             String uid = HttpUtil.getLoginUserId(request);
             String folderId = (String) params.get("folderId");
             String trustToken = CustomProperties.getProperty("mstr.trust.token");
 
-            session = MstrUtil.connectTrustSession(server, project, uid,trustToken);
+            session = MstrUtil.connectTrustSession(server, project, port, locale, uid, trustToken);
             list = MstrFolderBrowseUtil.getFolderTree(session, folderId, -1, Arrays.asList(
                     EnumDSSXMLObjectTypes.DssXmlTypeFolder, EnumDSSXMLObjectTypes.DssXmlTypeReportDefinition,
                     EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition, EnumDSSXMLObjectTypes.DssXmlTypeShortcut));
 
             success.put("folder", list);
         } catch (Exception e) {
+        	success = ControllerUtil.getFailMapMessage(e.getMessage());
         	LOGGER.error("!!! error", e);
-
-            throw new RuntimeException();
         } finally {
             if (session != null) {
                 try {

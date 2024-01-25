@@ -195,7 +195,7 @@
 		
 		if(typeof reportInfo['promptList'] != 'undefined' && reportInfo['promptList'].length == 0) {
 			//프롬프트 없을 경우
-			let inputs = getMstrFormDefinition(type);
+			let inputs = getMstrFormDefinition(objectId, type, isvi);
 			_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', inputs);
 		} else {
 			//프롬프트 있을 경우
@@ -223,7 +223,7 @@
 	    		, dataType: 'json'
 	    		, success: function(data, text, request) {
 		    		// 리포트 실행 시 파라미터로 전달될 promptsAnswerXML의 값을 서버로부터 조회 성공
-		    		let inputs = getMstrFormDefinition(type);
+		    		let inputs = getMstrFormDefinition(objectId, type, isvi);
 		    		$.extend(inputs, {promptsAnswerXML : data['xml']});
 		    		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', inputs);
 		    	}

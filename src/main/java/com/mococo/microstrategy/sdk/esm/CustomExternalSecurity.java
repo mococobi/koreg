@@ -96,8 +96,17 @@ public class CustomExternalSecurity extends AbstractExternalSecurity {
         try {
             MstrUser user = getMstrUser(cntSvcs);
 
-            WebIServerSession session = MstrUtil.connectSession(server, port, project, mstrUserId, user.getPassword(),
-                    user.getAuthMode(), getLocale(), getTrustToken(), getClientID(cntSvcs));
+            WebIServerSession session = MstrUtil.connectSession(
+        		  server
+        		, project
+        		, port
+        		, mstrUserId
+        		, user.getPassword()
+        		, user.getAuthMode()
+        		, getLocale()
+        		, getTrustToken()
+        		, getClientID(cntSvcs)
+            );
 
             setSessionState(cntSvcs, project, session.saveState(EnumWebPersistableState.MAXIMAL_STATE_INFO));
         } catch (Exception e) {

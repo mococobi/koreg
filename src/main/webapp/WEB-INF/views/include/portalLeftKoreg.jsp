@@ -68,7 +68,6 @@
 			let drawHtml = drawMenuParentReport(data['folder'], $('<ul>', {class : 'dep1-ul'}));
 			$('.lnb').append(drawHtml);
 			
-			
 	        /* 메뉴 */
 	        $('.dep2').on('mouseenter', function(e) {
 	        	$('.dep3-wrap').css('position', 'absolute');

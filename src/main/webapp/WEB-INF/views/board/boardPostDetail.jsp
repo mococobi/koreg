@@ -63,7 +63,7 @@
 					<button id="btn_post_modify" class="btn btn-secondary btn-sm" onclick="modifyBoardPost()">수정</button>
 					<button id="btn_post_delete" class="btn btn-secondary btn-sm" onclick="deleteBoardPost()">삭제</button>
 				<% } else { %>
-					<c:if test="${boardData['CRT_USR_ID'] eq mstrUserIdAttr}">
+					<c:if test="${postData['CRT_USR_ID'] eq mstrUserIdAttr}">
 						<button id="btn_post_modify" class="btn btn-secondary btn-sm" onclick="modifyBoardPost()">수정</button>
 						<button id="btn_post_delete" class="btn btn-secondary btn-sm" onclick="deleteBoardPost()">삭제</button>
 					</c:if>
@@ -120,6 +120,7 @@
 						<span id="post_count"></span>
 					</td>
 				</tr>
+				<c:if test="${boardData['POST_POPUP_YN'] eq 'Y'}">
 					<tr id="post_popup_yn_div">
 						<td>
 							<span>팝업여부</span>
@@ -134,6 +135,7 @@
 							<span id="post_popup_dt"></span>
 						</td>
 					</tr>
+				</c:if>
 				<tr>
 					<c:if test="${boardData['POST_FIX_YN'] eq 'Y'}">
 						<td  id="post_fix_yn_div">

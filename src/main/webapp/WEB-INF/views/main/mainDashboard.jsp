@@ -79,7 +79,7 @@
 // 		$(window).resize();
 		
 		//메인 대시보드 실행
-		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mainReport', getMstrFormDefinition(type));
+		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mainReport', getMstrFormDefinition(objectId, type, isvi));
 	}
 	
 

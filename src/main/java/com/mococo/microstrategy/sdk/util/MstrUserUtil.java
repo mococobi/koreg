@@ -39,7 +39,8 @@ import com.microstrategy.webapi.EnumDSSXMLSubscriptionDeliveryType;
 public class MstrUserUtil {
 	
     private static final Logger LOGGER = LoggerFactory.getLogger(MstrUserUtil.class);
-
+    
+    
     /**
      * 사용자 생성
      * 
@@ -49,8 +50,7 @@ public class MstrUserUtil {
      * @throws WebObjectsException
      * @throws WebBeanException
      */
-    public static final WebUser createUser(WebIServerSession session, String userId, String name, String pwd)
-            throws WebObjectsException, WebBeanException {
+    public static final WebUser createUser(WebIServerSession session, String userId, String name, String pwd) throws WebObjectsException, WebBeanException {
         UserBean userBean = (UserBean) BeanFactory.getInstance().newBean("UserBean");
         userBean.setSessionInfo(session);
         userBean.InitAsNew();
@@ -70,7 +70,8 @@ public class MstrUserUtil {
 
         return webUser;
     }
-
+    
+    
     /**
      * 사용자를 추가하고 메일정보를 추가
      * 
@@ -105,8 +106,7 @@ public class MstrUserUtil {
             webUser.populate();
 
             WebSubscriptionUserAddresses addresses = webUser.getAddresses();
-            WebSubscriptionAddress address = addresses
-                    .addNewAddress(EnumDSSXMLSubscriptionDeliveryType.DssXmlDeliveryTypeEmail);
+            WebSubscriptionAddress address = addresses.addNewAddress(EnumDSSXMLSubscriptionDeliveryType.DssXmlDeliveryTypeEmail);
             address.setName(name + "-email");
             address.setValue(email);
             address.setDevice(deviceId); // MSTR '일반 전자 메일' 객체는 '1D2E6D168A7711D4BE8100B0D04B6F0B'
@@ -118,7 +118,8 @@ public class MstrUserUtil {
 
         return webUser;
     }
-
+    
+    
     /**
      * 사용자그룹을 생성
      * 
@@ -129,11 +130,11 @@ public class MstrUserUtil {
      * @throws WebBeanException
      * @throws WebObjectsException
      */
-    public static final WebUserGroup createUserGroup(WebIServerSession session, String userGroupName,
-            String parentObjectId) throws WebBeanException, WebObjectsException {
+    public static final WebUserGroup createUserGroup(WebIServerSession session, String userGroupName, String parentObjectId) throws WebBeanException, WebObjectsException {
         return createUserGroup(session, userGroupName, parentObjectId, null);
     }
-
+    
+    
     /**
      * 사용자그룹을 생성하고 주석을 설정
      * 
@@ -168,7 +169,8 @@ public class MstrUserUtil {
 
         return webUserGroup;
     }
-
+    
+    
     /**
      * 사용자 비활성화
      * 
@@ -177,8 +179,7 @@ public class MstrUserUtil {
      * @return
      * @throws WebObjectsException
      */
-    public static final WebObjectInfo disableUser(WebObjectSource objectSource, String userId)
-            throws WebObjectsException {
+    public static final WebObjectInfo disableUser(WebObjectSource objectSource, String userId) throws WebObjectsException {
         WebUser user = searchUser(objectSource, userId);
 
         if (user != null) {
@@ -189,7 +190,8 @@ public class MstrUserUtil {
             return null;
         }
     }
-
+    
+    
     /**
      * 사용자그룹 오브젝트ID로 사용자그룹 객체를 반환
      * 
@@ -198,14 +200,14 @@ public class MstrUserUtil {
      * @return
      * @throws WebObjectsException
      */
-    public static final WebUserGroup getUserGroup(WebObjectSource objectSource, String userGroupObjectId)
-            throws WebObjectsException {
+    public static final WebUserGroup getUserGroup(WebObjectSource objectSource, String userGroupObjectId) throws WebObjectsException {
         WebUserGroup user = (WebUserGroup) objectSource.getObject(userGroupObjectId,
                 EnumDSSXMLObjectTypes.DssXmlTypeUser, EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup, true);
 
         return user;
     }
-
+    
+    
     /**
      * 파라미터로 전달된 사용자가 소속된 사용자그룹들의 오브젝트ID 리스트를 반환
      * 
@@ -230,7 +232,8 @@ public class MstrUserUtil {
 
         return list;
     }
-
+    
+    
     /**
      * 파라미터로 전달된 사용자가 소속된 사용자그룹들의 표시명 리스트를 반환
      * 
@@ -255,7 +258,8 @@ public class MstrUserUtil {
 
         return list;
     }
-
+    
+    
     /**
      * 파라미터로 전달된 사용자가 소속된 사용자그룹들의 객체 리스트를 반환
      * 
@@ -280,7 +284,8 @@ public class MstrUserUtil {
 
         return list;
     }
-
+    
+    
     /**
      * 파라미터로 전달된 사용자를 사용자그룹에 추가
      * 
@@ -290,14 +295,14 @@ public class MstrUserUtil {
      * @return
      * @throws WebObjectsException
      */
-    public static final void addToUserGroup(WebObjectSource objectSource, WebUser user, String userGroupObjectId)
-            throws WebObjectsException {
+    public static final void addToUserGroup(WebObjectSource objectSource, WebUser user, String userGroupObjectId) throws WebObjectsException {
         WebUserGroup userGroup = (WebUserGroup) objectSource.getObject(userGroupObjectId,
                 EnumDSSXMLObjectTypes.DssXmlTypeUser, EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup, true);
         userGroup.getMembers().add(user);
         objectSource.save(userGroup);
     }
-
+    
+    
     /**
      * 파라미터로 전달된 사용자를 사용자그룹에서 삭제
      * 
@@ -307,14 +312,14 @@ public class MstrUserUtil {
      * @return
      * @throws WebObjectsException
      */
-    public static final void removeFromUserGroup(WebObjectSource objectSource, WebUser user, String userGroupObjectId)
-            throws WebObjectsException {
+    public static final void removeFromUserGroup(WebObjectSource objectSource, WebUser user, String userGroupObjectId) throws WebObjectsException {
         WebUserGroup userGroup = (WebUserGroup) objectSource.getObject(userGroupObjectId,
                 EnumDSSXMLObjectTypes.DssXmlTypeUser, EnumDSSXMLObjectSubTypes.DssXmlSubTypeUserGroup, true);
         userGroup.getMembers().remove(user);
         objectSource.save(userGroup);
     }
-
+    
+    
     /**
      * 사용자 비밀번호를 변경
      * 
@@ -324,15 +329,15 @@ public class MstrUserUtil {
      * @return
      * @throws WebObjectsException
      */
-    public static final void changeUserPassword(WebIServerSession session, String userId, String password)
-            throws WebObjectsException {
+    public static final void changeUserPassword(WebIServerSession session, String userId, String password) throws WebObjectsException {
         WebObjectSource objectSource = session.getFactory().getObjectSource();
         WebUser user = searchUser(objectSource, userId);
         WebStandardLoginInfo standardLoginInfo = user.getStandardLoginInfo();
         standardLoginInfo.setPassword(password);
         objectSource.save(user);
     }
-
+    
+    
     /**
      * 파라미터로 전달된 사용자ID로 사용자를 검색하고 비밀번호를 변경
      * 
@@ -342,8 +347,7 @@ public class MstrUserUtil {
      * @return 사용자검색 실패 시 false 반환
      * @throws WebObjectsException
      */
-    public static boolean findUserAndchangeUserPassword(WebIServerSession session, String userId, String password)
-            throws WebObjectsException {
+    public static boolean findUserAndchangeUserPassword(WebIServerSession session, String userId, String password) throws WebObjectsException {
         boolean result = false;
 
         WebObjectSource objectSource = session.getFactory().getObjectSource();
@@ -357,7 +361,8 @@ public class MstrUserUtil {
 
         return result;
     }
-
+    
+    
     /**
      * 사용자ID로 사용자 검색
      * 
@@ -380,7 +385,8 @@ public class MstrUserUtil {
 
         return user;
     }
-
+    
+    
     /**
      * 사용자로 전달된 WebSearch객체로부터 사용자ID로 검색
      * 
@@ -402,7 +408,8 @@ public class MstrUserUtil {
 
         return user;
     }
-
+    
+    
     /**
      * 사용자객체의 오브젝트ID로 사용자 생성
      * 
@@ -412,12 +419,12 @@ public class MstrUserUtil {
      * @throws WebObjectsException
      */
     public static final WebUser getUser(WebObjectSource objectSource, String userObjectId) throws WebObjectsException {
-        WebUser user = (WebUser) objectSource.getObject(userObjectId, EnumDSSXMLObjectTypes.DssXmlTypeUser,
-                EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser, true);
+        WebUser user = (WebUser) objectSource.getObject(userObjectId, EnumDSSXMLObjectTypes.DssXmlTypeUser, EnumDSSXMLObjectSubTypes.DssXmlSubTypeUser, true);
 
         return user;
     }
-
+    
+    
     /**
      * 사용자그룹명으로 사용자그룹 검색
      * 
@@ -426,8 +433,7 @@ public class MstrUserUtil {
      * @return
      * @throws WebObjectsException
      */
-    public static final WebUserGroup searchUserGroup(WebSearch search, String userGroupName)
-            throws WebObjectsException {
+    public static final WebUserGroup searchUserGroup(WebSearch search, String userGroupName) throws WebObjectsException {
         search.setNamePattern(userGroupName);
         search.submit();
         WebFolder folder = search.getResults();
@@ -440,7 +446,8 @@ public class MstrUserUtil {
 
         return userGroup;
     }
-
+    
+    
     /**
      * 사용자그룹 검색 객체 반환
      * 
@@ -455,7 +462,8 @@ public class MstrUserUtil {
 
         return search;
     }
-
+    
+    
     /**
      * 사용자그룹 검색객체 반환
      * 
@@ -470,7 +478,8 @@ public class MstrUserUtil {
 
         return search;
     }
-
+    
+    
     /**
      * 활성화된 사용자 수 반환
      * 
@@ -498,7 +507,8 @@ public class MstrUserUtil {
         }
         return totalCount;
     }
-
+    
+    
     /**
      * 모든 사용자그룹에 대하여 사용자그룹명, 사용자그룹 오브젝트ID 구성된 맵을 반환
      * 
@@ -522,7 +532,8 @@ public class MstrUserUtil {
         }
         return result;
     }
-
+    
+    
     /**
      * 파라미터로 전달된 오브젝트ID를 갖는 사용자그룹의 하위 사용자그룹, 사용자 정보를 사용자그룹명/사용자그룹 오브젝트ID로 구성된 맵,
      * 사용자ID/사용자 오브젝트ID로 구성된 맵, 사용자그룸명/소속 사용자 오브젝트ID 리스스로 구성된 맵을 반환
@@ -593,7 +604,8 @@ public class MstrUserUtil {
 
         return result;
     }
-
+    
+    
     /**
      * 파라미터로 전달된 오브젝트ID를 갖는 사용자그룹의 하위 사용자그룹, 사용자 정보를 사용자그룹명/사용자그룹 오브젝트ID로 구성된 맵을 반환
      * 

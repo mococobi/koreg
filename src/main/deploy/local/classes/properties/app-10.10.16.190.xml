@@ -2,8 +2,8 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 	<!-- 어플리케이션 관련 -->
-	<entry key="portal.application.file.name">Koreg</entry> 								<!-- 어플리케이션 Gcgf, Koreg 선택 -->
-	<entry key="portal.main.display">MAIN</entry>											<!-- 메인화면 MSTR_DASHBOARD, MAIN 선택 -->
+	<entry key="portal.application.file.name">Gcgf</entry> 								<!-- 어플리케이션 Gcgf, Koreg 선택 -->
+	<entry key="portal.main.display">MSTR_DASHBOARD</entry>											<!-- 메인화면 MSTR_DASHBOARD, MAIN 선택 -->
 	<entry key="enc.token">mococoportal2023</entry>											<!-- 암호화 키 변경 X -->
 	
 	
@@ -24,8 +24,8 @@
 	
 	<entry key="mstr.menu.folder.id">032A5E114A59D28267BDD8B6D9E58B22</entry>				<!-- 왼쪽 메뉴 폴더 ID -->
 	<entry key="portal.iframe.page.move.yn">N</entry>										<!-- 리포트 클릭시 화면 전환 -->
-	<entry key="portal.main.dashboard.id">4DBD67E243DB89B5B9BCC3BEB8FE2CFF</entry>			<!-- 메인화면 표시 대표 대시보드(MSTR_DASHBOARD일 경우) -->
-	<entry key="portal.main.dashboard.type">551</entry>										<!-- 메인화면 표시 대표 대시보드 타입(MSTR_DASHBOARD일 경우) -->
+	<entry key="portal.main.dashboard.id">4DBD67E243DB89B5B9BCC3BEB8FE2CFF</entry>			<!-- 메인화면 표시 대표 대시보드 -->
+	<entry key="portal.main.dashboard.type">551</entry>										<!-- 메인화면 표시 대표 대시보드 타입 -->
 	
 	
 	<!-- SSO 관련 -->

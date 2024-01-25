@@ -67,6 +67,18 @@ public class LoginController {
     
     
     /**
+     * 세션 테스트 화면 이동
+     * @return
+     */
+    @RequestMapping(value = "/login/sessionTest.do", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView sessionTest(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView view = new ModelAndView("login/sessionTest");
+        
+        return view;
+    }
+    
+    
+    /**
      * SSO 로그인 화면 이동
      * @return
      */
@@ -209,10 +221,12 @@ public class LoginController {
 			MstrUtil.cleanOtherUserMstrSession(request.getSession(), userId);
 			
 			isession = MstrUtil.connectSession(
-				CustomProperties.getProperty("mstr.server.name"),
-				CustomProperties.getProperty("mstr.default.project.name"),
-				userId,
-				userPwd
+				  CustomProperties.getProperty("mstr.server.name")
+				, CustomProperties.getProperty("mstr.default.project.name")
+				, Integer.parseInt(CustomProperties.getProperty("mstr.server.port"))
+				, Integer.parseInt(CustomProperties.getProperty("mstr.session.locale"))
+				, userId
+				, userPwd
 			);
 			
 			//로그인 프로세스 처리(데이터 및 로그 기록시)
@@ -264,10 +278,12 @@ public class LoginController {
 			MstrUtil.cleanOtherUserMstrSession(request.getSession(), userId);
 			
 			isession = MstrUtil.connectTrustSession(
-				CustomProperties.getProperty("mstr.server.name"),
-				CustomProperties.getProperty("mstr.default.project.name"),
-				userId,
-				CustomProperties.getProperty("mstr.trust.token")
+				  CustomProperties.getProperty("mstr.server.name")
+				, CustomProperties.getProperty("mstr.default.project.name")
+				, Integer.parseInt(CustomProperties.getProperty("mstr.server.port"))
+				, Integer.parseInt(CustomProperties.getProperty("mstr.session.locale"))
+				, userId
+				, CustomProperties.getProperty("mstr.trust.token")
 			);
 			
 			//로그인 프로세스 처리(데이터 및 로그 기록시)

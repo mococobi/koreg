@@ -328,98 +328,105 @@ function commonMultiSelectLanguage() {
 
 
 //MSTR Form 데이터 정의
-function getMstrFormDefinition(type) {
+function getMstrFormDefinition(tmpObjectId, tmpType, tmpIsVi, mstrProjectNm) {
 	let rtnInput;
 	
 	let formDefs = {
 		common : {
 			  server: __mstrServerName
 			, port: __mstrServerPort
-			, project: __mstrDefaultProjectName
+			, project: mstrProjectNm ? mstrProjectNm : __mstrDefaultProjectName
 			, hiddenSections: 'path,header,footer,dockLeft'
 			, promptAnswerMode: '2'
 		}
 		, report : {
 			  evt: '4001'
 			, src: 'mstrWeb.4001'
-			, reportID: objectId
+			, reportID: tmpObjectId
 		}
 		, Gcgf_report : {
 			  evt: '4001'
 			, src: 'mstrWeb.4001'
-			, reportID: objectId
+			, reportID: tmpObjectId
 		}
 		, Koreg_report : {
 			  evt: '4001'
 			, src: 'mstrWeb.4001'
-			, reportID: objectId
+			, reportID: tmpObjectId
 			, hiddenSections : 'path'
 		}
 		, document : {
 	          evt: '2048001'
 	        , src: 'mstrWeb.2048001'
-	        , documentID: objectId
+	        , documentID: tmpObjectId
 	        , share: '1'
 	    	, hiddenSections: 'dockTop,path,header,footer'
 		}
 		, Gcgf_document : {
 	          evt: '2048001'
 	        , src: 'mstrWeb.2048001'
-	        , documentID: objectId
+	        , documentID: tmpObjectId
 	        , share: '1'
 	    	, hiddenSections: 'header,footer'
 		}
 		, Koreg_document : {
 	          evt: '2048001'
 	        , src: 'mstrWeb.2048001'
-	        , documentID: objectId
+	        , documentID: tmpObjectId
 	        , share: '1'
 	    	, hiddenSections: 'dockTop,path,header,footer'
 		}
 		, dossier: {
 	          evt: '3140'
 	        , src: 'mstrWeb.3140'
-	        , documentID: objectId
+	        , documentID: tmpObjectId
 	        , share: '1'
 	    	, hiddenSections: 'dockTop,path,header,footer'
 		}
 		, Gcgf_dossier : {
 	          evt: '3140'
 	        , src: 'mstrWeb.3140'
-	        , documentID: objectId
+	        , documentID: tmpObjectId
 	    	, hiddenSections: 'path,header,footer'
 		}
 		, Gcgf_dossier_main : {
 	          evt: '3140'
 	        , src: 'mstrWeb.3140'
-	        , documentID: objectId
+	        , documentID: tmpObjectId
 	        , share: '1'
-	    	, hiddenSections: 'path,header,footer'
+	    	, hiddenSections: 'dockTop,path,header,footer'
 		}
 		, Koreg_dossier: {
 	          evt: '3140'
 	        , src: 'mstrWeb.3140'
-	        , documentID: objectId
+	        , documentID: tmpObjectId
 	        , share: '1'
 	    	, hiddenSections: 'path,header,footer'
+		}
+		, Koreg_dossier_main : {
+	          evt: '3140'
+	        , src: 'mstrWeb.3140'
+	        , documentID: tmpObjectId
+	        , share: '1'
+	    	, hiddenSections: 'dockTop,path,header,footer'
 		}
 	}
 	
 	rtnInput = $.extend({}, formDefs['common']);
 	
-	switch (type) {
+	switch (tmpType) {
 		case 3:
 			$.extend(rtnInput, formDefs[__portalAppName + '_report']);
 			break;
 		case 55:
-	        if (isvi == true) {
+	        if (tmpIsVi == true) {
 	        	$.extend(rtnInput, formDefs[__portalAppName + '_dossier']);
 	        } else {
 	        	$.extend(rtnInput, formDefs[__portalAppName + '_document']);
 	        }
 			break;
 		case 551:
-	        if (isvi == true) {
+	        if (tmpIsVi == true) {
 	        	$.extend(rtnInput, formDefs[__portalAppName + '_dossier_main']);
 	        } else {
 	        	$.extend(rtnInput, formDefs[__portalAppName + '_document']);

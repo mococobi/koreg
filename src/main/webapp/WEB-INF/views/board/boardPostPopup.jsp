@@ -15,7 +15,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>공지사항</title>
+	<title>${boardData['BRD_NM']}</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
@@ -98,7 +98,9 @@
 					<td>
 						<span id="post_count"></span>
 					</td>
+					
 				</tr>
+				<c:if test="${boardData['POST_POPUP_YN'] eq 'Y'}">
 					<tr id="post_popup_yn_div">
 						<td>
 							<span>팝업여부</span>
@@ -113,8 +115,9 @@
 							<span id="post_popup_dt"></span>
 						</td>
 					</tr>
+				</c:if>
 				<tr>
-					<c:if test="${postData['data']['POST_FIX_YN'] eq 'Y'}">
+					<c:if test="${boardData['POST_FIX_YN'] eq 'Y'}">
 						<td  id="post_fix_yn_div">
 							<span>상단 고정</span>
 						</td>
@@ -122,7 +125,7 @@
 							<input type="checkbox" id="post_fix_yn" disabled>
 						</td>
 					</c:if>
-					<c:if test="${postData['data']['POST_SECRET_YN'] eq 'Y'}">
+					<c:if test="${boardData['POST_SECRET_YN'] eq 'Y'}">
 						<td id="post_secret_yn_div">
 							<span>비밀글</span>
 						</td>
@@ -130,14 +133,6 @@
 							<input type="checkbox" id="post_secret_yn" disabled>
 						</td>
 					</c:if>
-				</tr>
-					<c:if test="${postData['data']['BRD_VIEW_AUTH'] eq 'Y'}">
-						<td>
-							<span>보기 권한</span>
-						</td>
-						<td colspan="7"></td>
-					</c:if>
-				<tr>
 				</tr>
 				<tr>
 					<td>
@@ -147,7 +142,7 @@
 						<div id="post_content" style="min-height: 300px;"></div>
 					</td>
 				</tr>
-				<c:if test="${postData['data']['POST_FILE_YN'] eq 'Y'}">
+				<c:if test="${boardData['POST_FILE_YN'] eq 'Y'}">
 					<tr id="post_file_yn_div">
 						<td>
 							<span>첨부 파일</span>
@@ -189,7 +184,7 @@
 			let postData = data['data'];
 			let postFile = data['file'];
 			
-			document.title = '공지사항 - ' + postData['POST_TITLE'];
+			document.title = '${boardData["BRD_NM"]} - ' + postData['POST_TITLE'];
 			
 			displayContents(postData, postFile);
 		});

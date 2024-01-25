@@ -7,6 +7,12 @@
 
 	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
 	pageContext.setAttribute("portalAppName", portalAppName);
+	
+	String MainDashboardId = (String)CustomProperties.getProperty("portal.main.dashboard.id");
+	pageContext.setAttribute("MainDashboardId", MainDashboardId);
+	
+	String MainDashboardType = (String)CustomProperties.getProperty("portal.main.dashboard.type");
+	pageContext.setAttribute("MainDashboardType", Integer.parseInt(MainDashboardType));
 %>
 <!DOCTYPE html>
 <html>
@@ -47,8 +53,14 @@
 <div>
 	<div id="main_div" class="container py-1" style="max-width: 100%;">
 		<!-- 이미지 영역 -->
-		<div class="mb-4 bg-body-tertiary rounded-3">
+		<div class="mb-4 bg-body-tertiary rounded-3" style="height: calc(33vh);">
+			<%--
 			<img alt="메인 이미지" src="${pageContext.request.contextPath}/_custom/image/main/mainImage.png?v=20231123001" style="width: 100%; height: calc(33vh);">
+			--%>
+			<iframe name="mainReport" id="mainReport" src=""
+				style="width: 100%; height: 100%; overflow: hidden; margin: 0px; background: #fff; border-radius: 8px; border: 1px solid #c8d8ec;"
+				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="no">
+			</iframe>
 		</div>
 
 		<!-- 그리드 영역 -->
@@ -164,6 +176,7 @@
 	
 	//초기 함수
 	function fnMainInit() {
+		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mainReport', getMstrFormDefinition('${MainDashboardId}', ${MainDashboardType}, true));
 		getBoardList('1', 'board_div_1');
 		getBoardList('2', 'board_div_2');
 		getPopupList();

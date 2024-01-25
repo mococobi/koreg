@@ -84,7 +84,7 @@
 				    	<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
 							<button class="btn btn-secondary btn-sm" onclick="updateBoardPost()">저장</button>
 						<% } else { %>
-							<c:if test="${boardData['CRT_USR_ID'] eq mstrUserIdAttr}">
+							<c:if test="${postData['CRT_USR_ID'] eq mstrUserIdAttr}">
 								<button class="btn btn-secondary btn-sm" onclick="updateBoardPost()">저장</button>
 							</c:if>
 						<% } %>

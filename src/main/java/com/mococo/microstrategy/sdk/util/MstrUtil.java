@@ -32,14 +32,18 @@ import com.mococo.web.util.SpringUtil;
 
 public class MstrUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(MstrUtil.class);
-
+    
+    
     private MstrUtil() {
+    	
     }
-
+    
+    
     public static String getLiveServer() throws WebObjectsException {
         return getLiveServer(null);
     }
-
+    
+    
     public static String getLiveServer(String defaultServer) throws WebObjectsException {
         WebClusterAdmin admin = WebObjectsFactory.getInstance().getClusterAdmin();
         admin.refreshAllClusters();
@@ -56,9 +60,9 @@ public class MstrUtil {
 
         return serverName;
     }
-
-    public static WebIServerSession connectSession(String server, int port, String project, String uid, String pwd,
-            int authMode, int localeNum, String trustToken, String clientId) throws WebObjectsException {
+    
+    
+    public static WebIServerSession connectSession(String server, String project, int port, String uid, String pwd, int authMode, int localeNum, String trustToken, String clientId) throws WebObjectsException {
         WebIServerSession session = null;
 
         String serverName = getLiveServer(server);
@@ -107,25 +111,30 @@ public class MstrUtil {
 
         return session;
     }
-
+    
+    
+    /*
     public static WebIServerSession connectSession(String server, String project, String uid, String pwd) throws WebObjectsException {
         return connectSession(server, 0, project, uid, pwd, EnumDSSXMLAuthModes.DssXmlAuthStandard, 1042, null, null);
     }
+    */
 
-    public static WebIServerSession connectSession(String server, String project, int port, String uid, String pwd) throws WebObjectsException {
-        return connectSession(server, port, project, uid, pwd, EnumDSSXMLAuthModes.DssXmlAuthStandard, 1042, null,
-                null);
+    
+    public static WebIServerSession connectSession(String server, String project, int port, int locale, String uid, String pwd) throws WebObjectsException {
+        return connectSession(server, project, port, uid, pwd, EnumDSSXMLAuthModes.DssXmlAuthStandard, locale, null, null);
     }
 
-    public static WebIServerSession connectSession(String server, String project, int port, String uid, String pwd, String clientId) throws WebObjectsException {
-        return connectSession(server, port, project, uid, pwd, EnumDSSXMLAuthModes.DssXmlAuthStandard, 1042, null, clientId);
+    
+    public static WebIServerSession connectSession(String server, String project, int port, int locale, String uid, String pwd, String clientId) throws WebObjectsException {
+        return connectSession(server, project, port, uid, pwd, EnumDSSXMLAuthModes.DssXmlAuthStandard, locale, null, clientId);
     }
 
-    public static WebIServerSession connectTrustSession(String server, String project, String uid, String trustToken) throws WebObjectsException {
-        return connectSession(server, 0, project, uid, null, EnumDSSXMLAuthModes.DssXmlAuthSimpleSecurityPlugIn, 1042,
-                trustToken, null);
+    
+    public static WebIServerSession connectTrustSession(String server, String project, int port, int locale, String uid, String trustToken) throws WebObjectsException {
+        return connectSession(server, project, port, uid, null, EnumDSSXMLAuthModes.DssXmlAuthSimpleSecurityPlugIn, locale, trustToken, null);
     }
 
+    
     public static WebIServerSession reconnectSession(String sessionState) throws WebObjectsException {
         if (StringUtils.isEmpty(sessionState)) {
             return null;
@@ -140,34 +149,8 @@ public class MstrUtil {
 
         return session;
     }
-
-    public static void closeISession(WebIServerSession wss) throws SdkRuntimeException {
-        try {
-            if (wss != null)
-                wss.closeSession();
-        } catch (WebObjectsException e) {
-            if (e.getErrorCode() != -2147205069) {
-                LOGGER.error("error !!!", e);
-            }
-        } catch (Exception e) {
-            LOGGER.error("error !!!", e);
-            throw new SdkRuntimeException(e);
-        }
-    }
-
-    public static void closeISession(String sessionState) {
-        try {
-            WebIServerSession session = WebObjectsFactory.getInstance().getIServerSession();
-            session.restoreState(sessionState);
-
-            if (session.isAlive()) {
-                session.closeSession();
-            }
-        } catch (WebObjectsException e) {
-        	LOGGER.error("!!! error", e);
-        }
-    }
-
+    
+    
     public static String logWebElements(WebElements webElements) {
         StringBuilder builder = new StringBuilder();
         Enumeration<WebElement> e = webElements.elements();
@@ -183,7 +166,8 @@ public class MstrUtil {
         return builder.toString();
 
     }
-
+    
+    
     public static Map<String, Object> getLongDesc(WebObjectInfo object, WebIServerSession session) {
         WebObjectSource source = session.getFactory().getObjectSource();
         source.setFlags(source.getFlags() | EnumDSSXMLObjectFlags.DssXmlObjectComments);
@@ -226,8 +210,37 @@ public class MstrUtil {
     	
 		return mstrUserVo.getMstrSession(); 
 	}
-	
-	
+    
+    
+    public static void closeISession(WebIServerSession wss) throws SdkRuntimeException {
+        try {
+            if (wss != null)
+                wss.closeSession();
+        } catch (WebObjectsException e) {
+            if (e.getErrorCode() != -2147205069) {
+                LOGGER.error("error !!!", e);
+            }
+        } catch (Exception e) {
+            LOGGER.error("error !!!", e);
+            throw new SdkRuntimeException(e);
+        }
+    }
+    
+    
+    public static void closeISession(String sessionState) {
+        try {
+            WebIServerSession session = WebObjectsFactory.getInstance().getIServerSession();
+            session.restoreState(sessionState);
+
+            if (session.isAlive()) {
+                session.closeSession();
+            }
+        } catch (WebObjectsException e) {
+        	LOGGER.error("!!! error", e);
+        }
+    }
+    
+    
 	/**
 	 * MSTR 유저 세션 초기화
 	 * @param session

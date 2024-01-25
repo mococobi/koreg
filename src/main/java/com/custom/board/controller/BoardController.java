@@ -649,8 +649,9 @@ public class BoardController {
         Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         
         try {
-        	Map<String, Object> boardMap = boardService.boardPostDetail(request, response, params);
-    		view.addObject("postData", boardMap);
+        	Map<String, Object> postMap = boardService.boardPostDetail(request, response, params);
+    		view.addObject("boardData", postMap.get("boardData"));
+    		view.addObject("postData", postMap.get("data"));
 		} catch (Exception e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
 			view.addObject("data", rtnMap);

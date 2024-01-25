@@ -110,6 +110,8 @@ public class SyncUser {
 			serverSession = MstrUtil.connectSession(
 	    		  CustomProperties.getProperty("mstr.server.name")
 	    		, CustomProperties.getProperty("mstr.default.project.name")
+	    		, Integer.parseInt(CustomProperties.getProperty("mstr.server.port"))
+	    		, Integer.parseInt(CustomProperties.getProperty("mstr.session.locale"))
 	    		, CustomProperties.getProperty("mstr.admin.user.id")
 	    		, EncryptUtil.decrypt(CustomProperties.getProperty("mstr.admin.user.pwd"))
 	    	);

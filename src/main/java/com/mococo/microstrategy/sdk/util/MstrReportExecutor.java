@@ -35,6 +35,7 @@ import com.microstrategy.web.objects.WebPrompts;
 import com.microstrategy.web.objects.WebReportInstance;
 import com.microstrategy.web.objects.WebReportSource;
 import com.microstrategy.webapi.EnumDSSXMLStatus;
+import com.mococo.web.util.CustomProperties;
 
 /**
  * command line : java -cp
@@ -379,6 +380,8 @@ public class MstrReportExecutor {
         Map<String, Object> config = executor.getConfig();
         String server = (String) config.get("server");
         String project = (String) config.get("project");
+        int port = Integer.parseInt(CustomProperties.getProperty("mstr.server.port"));
+        int locale = Integer.parseInt(CustomProperties.getProperty("mstr.session.locale"));
         String uid = (String) config.get("uid");
         String pwd = (String) config.get("pwd");
 
@@ -387,7 +390,7 @@ public class MstrReportExecutor {
         WebIServerSession session = null;
         try {
             List<Map<String, Object>> reportInfoList = (List<Map<String, Object>>) config.get("reportInfo");
-            session = MstrUtil.connectSession(server, project, uid, pwd);
+            session = MstrUtil.connectSession(server, project, port, locale, uid, pwd);
             for (Map<String, Object> reportInfo : reportInfoList) {
                 String objectId = (String) reportInfo.get("objectId");
                 int type = (Integer) reportInfo.get("type");

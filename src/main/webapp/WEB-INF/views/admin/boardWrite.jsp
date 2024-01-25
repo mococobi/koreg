@@ -252,8 +252,13 @@
 		$('#board_nm').val(boardData['BRD_NM']);
 		$('#board_desc').val(boardData['BRD_DESC']);
 		$('input:radio[name="board_type"]:radio[value="'+ boardData['BRD_TYPE'] +'"]').prop('checked', true);
-		$('#board_create_auth').text(getUserListSpanName(boardData['BRD_CRT_AUTH']));
-		modalUserList = boardData['BRD_CRT_AUTH'];
+		
+		let boardCreateAuth = boardData['BRD_CRT_AUTH'];
+		if(boardData['BRD_CRT_AUTH'] == null || boardData['BRD_CRT_AUTH'] == 'null') {
+			boardCreateAuth = [];
+		}
+		$('#board_create_auth').text(getUserListSpanName(boardCreateAuth));
+		modalUserList = boardCreateAuth;
 		
 		$('#board_create_date').text(changeDisplayDate(boardData['CRT_DT_TM'], 'YYYY-MM-DD'));
 		$('#board_create_user_id').text(boardData['CRT_USR_ID']);

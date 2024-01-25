@@ -224,7 +224,12 @@
 		$('input:radio[name="board_type"]:radio[value="'+ boardData['BRD_TYPE'] +'"]').prop('checked', true);
 		
 		let authUserNm = '';
-		JSON.parse(boardData['BRD_CRT_AUTH']).forEach((authMap, idx) => {
+		let boardCreateAuth = boardData['BRD_CRT_AUTH'];
+		if(boardData['BRD_CRT_AUTH'] == null || boardData['BRD_CRT_AUTH'] == 'null') {
+			boardCreateAuth = [];
+		}
+		
+		JSON.parse(boardCreateAuth).forEach((authMap, idx) => {
 			if(authUserNm == '') {
 				authUserNm += authMap['AUTH_NAME'];
 			} else {

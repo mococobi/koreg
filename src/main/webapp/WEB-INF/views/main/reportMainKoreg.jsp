@@ -93,7 +93,7 @@
 	function fnReportInit() {
 		$('#portal-loading').show();
 		
-		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', getMstrFormDefinition(type));
+		_submit('${pageContext.request.contextPath}/servlet/mstrWeb', 'mstrReport', getMstrFormDefinition(objectId, type, isvi));
 	}
 	
 	
