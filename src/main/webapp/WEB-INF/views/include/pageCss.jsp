@@ -5,28 +5,28 @@
     String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
     pageContext.setAttribute("portalAppName", portalAppName);
 %>
-
-<!-- Bootstrap Css -->
+ 
+<%-- Bootstrap Css --%>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/bootstrap-5.3.2-dist/css/bootstrap.min.css?v=20240115001" >
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/image/bootstrap-icons-1.11.2/font/bootstrap-icons.min.css?v=20240115001">
 
-<!-- Jquery Css -->
+<%-- Jquery Css --%>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/jquery-ui/themes/start/jquery-ui.css?v=20240115001" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/jquery-easyui-1.10.18/themes/default/easyui.css?v=20240115001" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/jquery-easyui-1.10.18/themes/icon.css?v=20240115001" />
 
-<!-- dataTables -->
+<%-- dataTables --%>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/DataTables-1.13.8/css/dataTables.bootstrap5.min.css?v=20240115001"></script>
 
-<!-- Air Datepicker -->
+<%-- Air Datepicker --%>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/air-datepicker-3/dist/air-datepicker.css?v=20240115001"></script>
 
-<!-- Portal Css -->
+<%-- Portal Css --%>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/gcgf/layout.css?v=20240115001" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/gcgf/style${portalAppName}.css?v=20240115001" />
 
-<!-- Application Css -->
+<%-- Application Css --%>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/style/common.css?v=20240115001" />
 
-<!-- 파비콘 -->
+<%-- 파비콘 --%>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/_custom/image/favicon/favicon.ico?v=20240115001">

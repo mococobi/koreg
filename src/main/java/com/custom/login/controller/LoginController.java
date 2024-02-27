@@ -8,14 +8,15 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,16 +26,17 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.custom.admin.service.AdminService;
 import com.custom.log.service.LogService;
-import com.custom.login.service.LoginService;
 import com.microstrategy.utils.serialization.EnumWebPersistableState;
 import com.microstrategy.web.objects.WebIServerSession;
 import com.microstrategy.web.objects.WebObjectsException;
@@ -46,33 +48,70 @@ import com.mococo.microstrategy.sdk.util.MstrUtil;
 import com.mococo.web.util.ControllerUtil;
 import com.mococo.web.util.CustomProperties;
 import com.mococo.web.util.HttpUtil;
+import com.mococo.web.util.LoginRsaUtil;
+import com.mococo.web.util.PortalCodeUtil;
 
+/**
+ * LoginController
+ * @author mococo
+ *
+ */
 @Controller
 @RequestMapping("/login/*")
 public class LoginController {
 	
-    final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
     
-    private static String RSA_WEB_KEY = "_RSA_SF_KEY_"; // 개인키 session key
-    private static String RSA_INSTANCE = "RSA"; // rsa transformation
+    /**
+     * logService
+     */
+    /* default */ @Autowired /* default */ LogService logService;
     
-    @Autowired
-    LoginService loginService;
+    /**
+     * adminService
+     */
+    /* default */ @Autowired /* default */ AdminService adminService;
     
-    @Autowired
-    LogService logService;
     
-    @Autowired
-    AdminService adminService;
+    /**
+     * LoginController
+     */
+    public LoginController() {
+    	logger.debug("LoginController");
+    }
     
     
     /**
      * 세션 테스트 화면 이동
      * @return
      */
-    @RequestMapping(value = "/login/sessionTest.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView sessionTest(HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView view = new ModelAndView("login/sessionTest");
+    @GetMapping("/login/sessionTest.do")
+    public ModelAndView sessionTestGet(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView("login/sessionTest");
+    }
+    
+    
+    /**
+     * SSO 로그인 화면 이동
+     * @return
+     */
+    @GetMapping("/login/ssoUserView.do")
+    public ModelAndView ssoUserViewGet(HttpServletRequest request, HttpServletResponse response) {
+    	final ModelAndView view = new ModelAndView("login/ssoUser");
+    	
+    	switch (CustomProperties.getProperty("portal.application.file.name")) {
+			case "Gcgf":
+				view.setViewName("login/ssoUserGcgf");
+				break;
+			case "Koreg":
+				view.setViewName("login/ssoUserKoreg");
+				break;
+			default:
+				break;
+		}
         
         return view;
     }
@@ -82,11 +121,42 @@ public class LoginController {
      * SSO 로그인 화면 이동
      * @return
      */
-    @RequestMapping(value = "/login/ssoUserView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView ssoUserView(HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView view = new ModelAndView("login/ssoUser");
+    @PostMapping("/login/ssoUserView.do")
+    public ModelAndView ssoUserViewPost(HttpServletRequest request, HttpServletResponse response) {
+    	final ModelAndView view = new ModelAndView("login/ssoUser");
+    	
+    	switch (CustomProperties.getProperty("portal.application.file.name")) {
+			case "Gcgf":
+				view.setViewName("login/ssoUserGcgf");
+				break;
+			case "Koreg":
+				view.setViewName("login/ssoUserKoreg");
+				break;
+			default:
+				break;
+		}
         
         return view;
+    }
+    
+    
+    /**
+     * SSO EIS 로그인 화면 이동
+     * @return
+     */
+    @GetMapping("/login/ssoUserEisView.do")
+    public ModelAndView ssoUserEisViewGet(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView("login/ssoUserEisKoreg");
+    }
+    
+    
+    /**
+     * SSO EIS 로그인 화면 이동
+     * @return
+     */
+    @PostMapping("/login/ssoUserEisView.do")
+    public ModelAndView ssoUserEisViewPost(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView("login/ssoUserEisKoreg");
     }
     
     
@@ -94,11 +164,19 @@ public class LoginController {
      * 로그인 화면 이동
      * @return
      */
-    @RequestMapping(value = "/login/loginUserView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView loginUserView(HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView view = new ModelAndView("login/loginUser");
-        
-        return view;
+    @GetMapping("/login/loginUserView.do")
+    public ModelAndView loginUserViewGet(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView(PortalCodeUtil.loginLoginUser);
+    }
+    
+    
+    /**
+     * 로그인 화면 이동
+     * @return
+     */
+    @PostMapping("/login/loginUserView.do")
+    public ModelAndView loginUserViewPost(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView(PortalCodeUtil.loginLoginUser);
     }
     
     
@@ -106,11 +184,19 @@ public class LoginController {
      * EIS 로그인 화면 이동
      * @return
      */
-    @RequestMapping(value = "/login/loginUserEisView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView loginUserEisView(HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView view = new ModelAndView("login/loginUserEis");
-        
-        return view;
+    @GetMapping("/login/loginUserEisView.do")
+    public ModelAndView loginUserEisViewGet(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView("login/loginUserEis");
+    }
+    
+    
+    /**
+     * EIS 로그인 화면 이동
+     * @return
+     */
+    @PostMapping("/login/loginUserEisView.do")
+    public ModelAndView loginUserEisViewPost(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView("login/loginUserEis");
     }
     
     
@@ -119,78 +205,39 @@ public class LoginController {
      * 
      * @param request
      */
-    @RequestMapping(value = "/login/createLoginKey.json", method = { RequestMethod.POST })
+    @PostMapping("/login/createLoginKey.json")
     @ResponseBody
-    public Map<String, Object> initRSA(HttpServletRequest request, HttpServletResponse response) {
+    public Map<String, Object> initRSA(final HttpServletRequest request, final HttpServletResponse response) {
         
-        Map<String, Object> rstMap = new HashMap<String, Object>();
+    	final Map<String, Object> rstMap = new ConcurrentHashMap<>();
         
-        HttpSession session = request.getSession();
+    	final HttpSession session = request.getSession();
         try {
             KeyPairGenerator generator;
             
-            generator = KeyPairGenerator.getInstance(LoginController.RSA_INSTANCE);
-            generator.initialize(1024);
+            generator = KeyPairGenerator.getInstance(LoginRsaUtil.rsaInstance);
+            generator.initialize(2048);
             
-            KeyPair keyPair = generator.genKeyPair();
-            KeyFactory keyFactory = KeyFactory.getInstance(LoginController.RSA_INSTANCE);
-            PublicKey publicKey = keyPair.getPublic();
-            PrivateKey privateKey = keyPair.getPrivate();
+            final KeyPair keyPair = generator.genKeyPair();
+            final KeyFactory keyFactory = KeyFactory.getInstance(LoginRsaUtil.rsaInstance);
+            final PublicKey publicKey = keyPair.getPublic();
+            final PrivateKey privateKey = keyPair.getPrivate();
             
-            session.setAttribute(LoginController.RSA_WEB_KEY, privateKey); // session에 RSA 개인키를 세션에 저장
+            session.setAttribute(LoginRsaUtil.rsaWebKey, privateKey); // session에 RSA 개인키를 세션에 저장
             
-            RSAPublicKeySpec publicSpec = (RSAPublicKeySpec) keyFactory.getKeySpec(publicKey, RSAPublicKeySpec.class);
-            String publicKeyModulus = publicSpec.getModulus().toString(16);
-            String publicKeyExponent = publicSpec.getPublicExponent().toString(16);
+            final RSAPublicKeySpec publicSpec = keyFactory.getKeySpec(publicKey, RSAPublicKeySpec.class);
+            final String publicKeyModulus = publicSpec.getModulus().toString(16);
+            final String publicKeyExponent = publicSpec.getPublicExponent().toString(16);
             
             rstMap.put("RSAModulus", publicKeyModulus);
             rstMap.put("RSAExponent", publicKeyExponent);
             
-        } catch (Exception e) {
-            LOGGER.error("initRsa error!! : {}", e.getMessage());
-            throw new BizException("error");
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+        	logger.error("initRsa error!! ", e);
+            throw new BizException(e);
         }
         
         return rstMap;
-    }
-    
-    
-    /**
-     * 로그인 RSA 복호화
-     * @param privateKey
-     * @param securedValue
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     * @throws UnsupportedEncodingException
-     */
-    private String decryptRsa(PrivateKey privateKey, String securedValue) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
-        Cipher cipher = Cipher.getInstance(LoginController.RSA_INSTANCE);
-        byte[] encryptedBytes = hexToByteArray(securedValue);
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
-        String decryptedValue = new String(decryptedBytes, "utf-8"); // 문자 인코딩 주의.
-        return decryptedValue;
-    }
-    
-    
-    /**
-     * 16진 문자열을 byte 배열로 변환
-     * @param hex
-     * @return
-     */
-    private static byte[] hexToByteArray(String hex) {
-        if (hex == null || hex.length() % 2 != 0) { return new byte[] {}; }
-        
-        byte[] bytes = new byte[hex.length() / 2];
-        for (int i = 0; i < hex.length(); i += 2) {
-            byte value = (byte) Integer.parseInt(hex.substring(i, i + 2), 16);
-            bytes[(int) Math.floor(i / 2)] = value;
-        }
-        return bytes;
     }
     
     
@@ -201,58 +248,53 @@ public class LoginController {
 	 * @param param
 	 * @return
 	 */
-	@RequestMapping(value = {"/login/loginUser.do", "/login/loginUserEis.do"}, method = {RequestMethod.GET, RequestMethod.POST})
+    @PostMapping({"/login/loginUser.do", "/login/loginUserEis.do"})
 	@ResponseBody
-	public ModelAndView loginUser(HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-		ModelAndView view = new ModelAndView("login/loginUser");
+	public ModelAndView loginUser(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	final ModelAndView view = new ModelAndView(PortalCodeUtil.loginLoginUser);
 		
-		HttpSession session = request.getSession(false);
-		WebIServerSession isession = null;
-		String userId = (String)request.getParameter("encAcntID");
-		String userPwd = (String)request.getParameter("encAcntPW");
-		String screenId = (String)request.getParameter("screenId");
+		final HttpSession httpSession = request.getSession(false);
+		WebIServerSession session = null;
+		String userId = params.get("encAcntID").toString();
+		String userPwd = params.get("encAcntPW").toString();
+		final String screenId = params.get("screenId").toString();
 		
 		try {
 			// 복호화
-            PrivateKey privateKey = (PrivateKey) session.getAttribute(LoginController.RSA_WEB_KEY);
-            userId = decryptRsa(privateKey, userId);
-            userPwd = decryptRsa(privateKey, userPwd);
+			final PrivateKey privateKey = (PrivateKey) httpSession.getAttribute(LoginRsaUtil.rsaWebKey);
+			
+            userId = LoginRsaUtil.decryptRsa(privateKey, userId);
+            userPwd = LoginRsaUtil.decryptRsa(privateKey, userPwd);
 			
 			MstrUtil.cleanOtherUserMstrSession(request.getSession(), userId);
 			
-			isession = MstrUtil.connectSession(
-				  CustomProperties.getProperty("mstr.server.name")
-				, CustomProperties.getProperty("mstr.default.project.name")
-				, Integer.parseInt(CustomProperties.getProperty("mstr.server.port"))
-				, Integer.parseInt(CustomProperties.getProperty("mstr.session.locale"))
-				, userId
-				, userPwd
-			);
+			final Map<String, Object> connData = new ConcurrentHashMap<>();
+			connData.put("server", CustomProperties.getProperty("mstr.server.name"));
+			connData.put("project", CustomProperties.getProperty("mstr.default.project.name"));
+			connData.put("port", Integer.parseInt(CustomProperties.getProperty("mstr.server.port")));
+			connData.put("localeNum", Integer.parseInt(CustomProperties.getProperty("mstr.session.locale")));
+			connData.put("uid", userId);
+			connData.put("pwd", userPwd);
+			session = MstrUtil.connectStandardSession(connData);
 			
 			//로그인 프로세스 처리(데이터 및 로그 기록시)
-			loginSessionProcess(request, response, isession, view, userId);
+			loginSessionProcess(request, response, session, userId, screenId);
 			
 			//정상 로그인 - 메인 화면 이동
-			if(screenId.equals("EIS")) {
+			if(PortalCodeUtil.EIS.equals(screenId)) {
 				view.setViewName("redirect:/app/main/mainEisView.do");
 			} else {
 				view.setViewName("redirect:/app/main/mainView.do");
 			}
 			
-		} catch (BizException e) {
-			LOGGER.debug("=> 요청 사용자 : [{}]", userId);
-			LOGGER.error("!!! loginUser BizException", e);
-			view.addObject("errorMessage", e.getMessage());
-		} catch(WebObjectsException e) {
-			LOGGER.debug("=> 요청 사용자 : [{}]", userId);
-			LOGGER.error("!!! loginUser WebObjectsException", e);
-			view.addObject("errorMessage", e.getMessage());
-		} catch (Exception e) {
-			LOGGER.debug("=> 요청 사용자 : [{}]", userId);
-			LOGGER.error("!!! loginUser Exception", e);
-			view.addObject("errorMessage", e.getMessage());
+		} catch (BizException | WebObjectsException | BadSqlGrammarException | SQLException 
+				| NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException 
+				| IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+			logger.error("!!! loginUser Exception", e);
+			view.addObject(PortalCodeUtil.errorMessage, e.getMessage());
 		} finally {
-			MstrUtil.closeISession(isession);
+			MstrUtil.closeISession(session);
 		}
 		
 		return view;
@@ -266,46 +308,44 @@ public class LoginController {
 	 * @param params
 	 * @return
 	 */
-	@RequestMapping(value = "/login/loginTrust.do", method = {RequestMethod.GET, RequestMethod.POST})
+    @PostMapping("/login/loginTrust.do")
 	@ResponseBody
-	public ModelAndView loginUserTrust(HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-		ModelAndView view = new ModelAndView("login/loginUser");
+	public ModelAndView loginUserTrust(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	final ModelAndView view = new ModelAndView(PortalCodeUtil.loginLoginUser);
 		
-		WebIServerSession isession = null;
-		String userId = (String)request.getParameter("userId");
+		WebIServerSession session = null;
+		final String userId = params.get("encAcntID").toString();
+		final String screenId = params.get("screenId").toString();
 		
 		try {
 			MstrUtil.cleanOtherUserMstrSession(request.getSession(), userId);
 			
-			isession = MstrUtil.connectTrustSession(
-				  CustomProperties.getProperty("mstr.server.name")
-				, CustomProperties.getProperty("mstr.default.project.name")
-				, Integer.parseInt(CustomProperties.getProperty("mstr.server.port"))
-				, Integer.parseInt(CustomProperties.getProperty("mstr.session.locale"))
-				, userId
-				, CustomProperties.getProperty("mstr.trust.token")
-			);
+			final Map<String, Object> connData = new ConcurrentHashMap<>();
+			connData.put("server", CustomProperties.getProperty("mstr.server.name"));
+			connData.put("project", CustomProperties.getProperty("mstr.default.project.name"));
+			connData.put("port", Integer.parseInt(CustomProperties.getProperty("mstr.server.port")));
+			connData.put("localeNum", Integer.parseInt(CustomProperties.getProperty("mstr.session.locale")));
+			connData.put("uid", userId);
+			connData.put("trustToken", CustomProperties.getProperty("mstr.trust.token"));
+			session = MstrUtil.connectStandardSession(connData);
 			
 			//로그인 프로세스 처리(데이터 및 로그 기록시)
-			loginSessionProcess(request, response, isession, view, userId);
+			loginSessionProcess(request, response, session, userId, screenId);
 			
 			//정상 로그인 - 메인 화면 이동
-			view.setViewName("redirect:/app/main/mainView.do");
+			if(PortalCodeUtil.EIS.equals(screenId)) {
+				view.setViewName("redirect:/app/main/mainEisView.do");
+			} else {
+				view.setViewName("redirect:/app/main/mainView.do");
+			}
 			
-		} catch (BizException e) {
-			LOGGER.debug("=> 요청 사용자 : [{}]", userId);
-			LOGGER.error("!!! loginUser BizException", e);
-			view.addObject("errorMessage", e.getMessage());
-		} catch(WebObjectsException e) {
-			LOGGER.debug("=> 요청 사용자 : [{}]", userId);
-			LOGGER.error("!!! loginUser WebObjectsException", e);
-			view.addObject("errorMessage", e.getMessage());
-		} catch (Exception e) {
-			LOGGER.debug("=> 요청 사용자 : [{}]", userId);
-			LOGGER.error("!!! loginUser Exception", e);
-			view.addObject("errorMessage", e.getMessage());
+		} catch (BizException | WebObjectsException | BadSqlGrammarException | SQLException e) {
+//			logger.debug("=> 요청 사용자 : [{}]", userId.replaceAll("[\r\n]",""));
+			logger.error("!!! loginUser Exception", e);
+			view.addObject(PortalCodeUtil.errorMessage, e.getMessage());
 		} finally {
-			MstrUtil.closeISession(isession);
+			MstrUtil.closeISession(session);
 		}
 		
 		return view;
@@ -320,63 +360,62 @@ public class LoginController {
 	 * @return
 	 * @throws WebObjectsException
 	 */
-	private Map<String, Object> loginSessionProcess(HttpServletRequest request, HttpServletResponse response, WebIServerSession isession, ModelAndView view, String userId) throws WebObjectsException, Exception {
-		Map<String, Object> resultMap = new HashMap<String, Object>();
-		WebUser user = (WebUser) isession.getUserInfo();
+	private Map<String, Object> loginSessionProcess(final HttpServletRequest request, final HttpServletResponse response, final WebIServerSession session, final String userId, final String screenId) throws WebObjectsException, SQLException {
+		Map<String, Object> resultMap = new ConcurrentHashMap<>();
+		final WebUser user = (WebUser) session.getUserInfo();
+		final HttpSession httpSession = request.getSession();
 		
 		if (user == null) {
 			//MSTR 사용자가 없을 경우
 			resultMap = ControllerUtil.getFailMap("error.no.user.found");
 			resultMap.put("userId", userId);
 			
-			request.getSession().setAttribute("mstr-user-vo", null);
+			httpSession.setAttribute("mstr-user-vo", null);
 			
-			request.getSession().setAttribute("mstrUserIdAttr", "");
-			request.getSession().setAttribute("mstrUserNameAttr", "");
-			request.getSession().setAttribute("mstrGroupIdMapAttr", "");
+			httpSession.setAttribute("mstrUserIdAttr", "");
+			httpSession.setAttribute("mstrUserNameAttr", "");
+			httpSession.setAttribute("mstrGroupIdMapAttr", "");
 		} else {
 			//정상 로그인 처리
-			String screenId = (String)request.getParameter("screenId");
 			
 			//MSTR 그룹 확인
-			Map<String, String> groupIdMap = new HashMap<String, String>();
-			String userIp = HttpUtil.getClientIP(request);
+			Map<String, String> groupIdMap = new ConcurrentHashMap<>();
+			final String userIp = HttpUtil.getClientIP(request);
 			
-			if(isession != null) {
-				groupIdMap = MstrUserUtil.applyIsImpttTerminal(isession, user, userIp);
+			if(session != null) {
+				groupIdMap = MstrUserUtil.applyIsImpttTerminal(session, user, userIp);
 			}
 			
 			//사용자 정보 세션 저장
-			MstrUser mstrUser = new MstrUser(user.getAbbreviation());
+			final MstrUser mstrUser = new MstrUser(user.getAbbreviation());
             mstrUser.setClientIp(userIp);
-            mstrUser.setServer(isession.getServerName());
-            mstrUser.setPort(isession.getServerPort());
-            mstrUser.setProject(isession.getProjectName());
-            mstrUser.setProjectSession(isession.getProjectName(), isession.saveState(EnumWebPersistableState.MAXIMAL_STATE_INFO));
-            request.getSession().setAttribute("mstr-user-vo", mstrUser);
-            request.getSession().setAttribute("portal-screen-id", screenId);
+            mstrUser.setServer(session.getServerName());
+            mstrUser.setPort(session.getServerPort());
+            mstrUser.setProject(session.getProjectName());
+            mstrUser.setProjectSession(session.getProjectName(), session.saveState(EnumWebPersistableState.MAXIMAL_STATE_INFO));
+            httpSession.setAttribute("mstr-user-vo", mstrUser);
+            httpSession.setAttribute("portal-screen-id", screenId);
             
-			request.getSession().setAttribute("mstrUserIdAttr", user.getAbbreviation());
-			request.getSession().setAttribute("mstrUserNameAttr", user.getDisplayName());
-			request.getSession().setAttribute("mstrGroupIdMapAttr", groupIdMap);
+            httpSession.setAttribute("mstrUserIdAttr", user.getAbbreviation());
+            httpSession.setAttribute("mstrUserNameAttr", user.getDisplayName());
+            httpSession.setAttribute("mstrGroupIdMapAttr", groupIdMap);
 			
 			//포탈 관리자 정보
-			Map<String, Object> params = new HashMap<String, Object>();
-			List<Map<String, Object>> authListMap = adminService.adminAuthList(request, response, params);
-			List<String> authList = new ArrayList<>();
-			for(int i=0; i<authListMap.size(); i++) {
-				authList.add(authListMap.get(i).get("ADM_CD").toString());
+            final Map<String, Object> params = new ConcurrentHashMap<>();
+			final List<Map<String, Object>> authListMap = adminService.adminAuthList(request, response, params);
+			final List<String> authList = new ArrayList<>();
+			for(final Map<String, Object> authMap : authListMap) {
+				authList.add(authMap.get("ADM_CD").toString());
 			}
-			request.getSession().setAttribute("PORTAL_AUTH", authList);
-			
-//			resultMap.put("mstrUserIdAttr", request.getSession().getAttribute("mstrUserIdAttr"));
-//			resultMap.put("mstrUserNameAttr", request.getSession().getAttribute("mstrUserNameAttr"));
-//			resultMap.put("mstrGroupIdMapAttr", request.getSession().getAttribute("mstrGroupIdMapAttr"));
+			httpSession.setAttribute("PORTAL_AUTH", authList);
 			
 			//포탈 로그 기록(로그인)
 			logService.addPortalLog(request, screenId, screenId, "LOGIN", null);
+			final String userInfoId = user.getAbbreviation().replaceAll("[\r\n]","");
+			final String userInfoNm = user.getDisplayName().replaceAll("[\r\n]","");
+			final String userInfoGroup = groupIdMap.toString().replaceAll("[\r\n]","");
 			
-			LOGGER.info("MSTR 사용자 로그인 [{}][{}][{}]", request.getSession().getAttribute("mstr-user-vo"), request.getSession().getAttribute("mstrUserNameAttr"), request.getSession().getAttribute("mstrGroupIdMapAttr"));
+			logger.info("MSTR 사용자 로그인 [{}][{}][{}]", userInfoId, userInfoNm, userInfoGroup);
 		}
 		
 		return resultMap;
@@ -390,15 +429,17 @@ public class LoginController {
 	 * @param param
 	 * @return
 	 */
-	@RequestMapping(value = "/login/logoutUser.do", method = {RequestMethod.GET, RequestMethod.POST})
+	@PostMapping("/login/logoutUser.do")
 	@ResponseBody
-	public ModelAndView logoutUser(HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> param) throws Exception {
-		ModelAndView view = null;
-		String screenId = (String)request.getSession().getAttribute("portal-screen-id");
-		if(screenId.equals("EIS")) {
-			view = new ModelAndView("login/loginUserEis");
+	public ModelAndView logoutUser(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> param) throws SQLException {
+		final ModelAndView view = new ModelAndView(PortalCodeUtil.loginLoginUser);
+		final HttpSession httpSession = request.getSession();
+		final String screenId = (String)httpSession.getAttribute("portal-screen-id");
+		
+		if(PortalCodeUtil.EIS.equals(screenId)) {
+			view.setViewName("login/loginUserEis");
 		} else {
-			view = new ModelAndView("login/loginUser");
+			view.setViewName(PortalCodeUtil.loginLoginUser);
 		}
 		
 		//포탈 로그 기록(로그아웃)
@@ -408,15 +449,15 @@ public class LoginController {
 		}
 		
 		//MSTR 세션 제거
-		MstrUtil.cleanMstrSession(request.getSession());
+		MstrUtil.cleanMstrSession(httpSession);
 		
 		//포탈 세션 제거
-		request.getSession().setAttribute("mstr-user-vo", null);
-		request.getSession().setAttribute("portal-screen-id", "");
+		httpSession.setAttribute("mstr-user-vo", null);
+		httpSession.setAttribute("portal-screen-id", "");
 		
-		request.getSession().setAttribute("mstrUserIdAttr", "");
-		request.getSession().setAttribute("mstrUserNameAttr", "");
-		request.getSession().setAttribute("mstrGroupIdMapAttr", "");
+		httpSession.setAttribute("mstrUserIdAttr", "");
+		httpSession.setAttribute("mstrUserNameAttr", "");
+		httpSession.setAttribute("mstrGroupIdMapAttr", "");
 		
 		return view;
 	}

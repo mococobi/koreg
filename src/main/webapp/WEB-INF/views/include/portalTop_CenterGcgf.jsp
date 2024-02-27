@@ -8,14 +8,12 @@
 	String mstrServerName = CustomProperties.getProperty("mstr.server.name");
 	String mstrServerPort = CustomProperties.getProperty("mstr.server.port");
 	String mstrDefaultProjectName = CustomProperties.getProperty("mstr.default.project.name");
-	
-	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
 %>
 <!DOCTYPE html>
 <html>
 	<head>
 		<style type="text/css">
-			#portal-loading {
+			.portal-loading {
 				width: 100%;
 				height: 100%;
 				/*
@@ -32,7 +30,7 @@
 				text-align: center;
 			}
 			
-			#loading-image {
+			.loading-image {
 				position: absolute;
 				top: 31%;
     			left: 39%;

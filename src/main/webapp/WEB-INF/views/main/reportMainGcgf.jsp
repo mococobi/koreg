@@ -8,7 +8,7 @@
 <%
 	String objectId = "";
     String type = "";
-    boolean isvi = StringUtils.equalsIgnoreCase("y", request.getParameter("isvi"));
+    boolean isvi = StringUtils.equalsIgnoreCase("true", request.getParameter("isvi"));
     String title = StringUtils.defaultString(request.getParameter("title"));
     title = URLDecoder.decode(title, "UTF-8");
     
@@ -19,6 +19,8 @@
     	objectId = StringUtils.defaultString((String)request.getAttribute("portalMainDashboardId"));
     	type = ((Integer)request.getAttribute("type")).toString();
     	isvi = (Boolean)request.getAttribute("isvi");
+    } else {
+    	type = "0";
     }
     
     String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
@@ -28,8 +30,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>${title}</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/_custom/javascript/jquery-multiselect/jquery.multiselect.css?v=20240115001" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	

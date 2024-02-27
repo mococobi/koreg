@@ -1,20 +1,17 @@
 package com.mococo.microstrategy.sdk.util;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.microstrategy.web.objects.SimpleList;
 import com.microstrategy.web.objects.WebDisplayUnit;
 import com.microstrategy.web.objects.WebDisplayUnitEntry;
@@ -30,17 +27,55 @@ import com.microstrategy.webapi.EnumDSSXMLObjectFlags;
 import com.microstrategy.webapi.EnumDSSXMLObjectTypes;
 import com.microstrategy.webapi.EnumDSSXMLViewMedia;
 
+/**
+ * MstrFolderBrowseUtil
+ * @author mococo
+ *
+ */
 public class MstrFolderBrowseUtil {
-    private static final Logger logger = LoggerFactory.getLogger(MstrFolderBrowseUtil.class);
-
-    private MstrFolderBrowseUtil() {
+	
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LogManager.getLogger(MstrFolderBrowseUtil.class);
+	
+	
+    /**
+     * MstrFolderBrowseUtil
+     */
+    public MstrFolderBrowseUtil() {
+    	logger.debug("MstrFolderBrowseUtil");
     }
-
+    
+    
+	@SuppressWarnings("unused")
+	private void sample() {
+    	logger.debug("MstrFolderBrowseUtil");
+    }
+	
+	
+    /**
+     * StackedUnits
+     * @author mococo
+     *
+     */
     private static class StackedUnits {
+    	/**
+    	 * elements
+    	 */
         private final Enumeration<WebDisplayUnit> elements;
+        
+        /**
+         * list
+         */
         private final List<Map<String, Object>> list;
-
-        public StackedUnits(Enumeration<WebDisplayUnit> elements, List<Map<String, Object>> list) {
+        
+        /**
+         * elements
+         * @param elements
+         * @param list
+         */
+        public StackedUnits(final Enumeration<WebDisplayUnit> elements, final List<Map<String, Object>> list) {
             this.elements = elements;
             this.list = list;
         }
@@ -53,153 +88,156 @@ public class MstrFolderBrowseUtil {
             return list;
         }
     }
-
+    
+    
     @SuppressWarnings("unchecked")
-    private static String getPath(WebDisplayUnit unit) {
-        SimpleList simpleList = ((WebObjectInfo) unit).getAncestors();
+    private static String getPath(final WebDisplayUnit unit) {
+    	final SimpleList simpleList = ((WebObjectInfo) unit).getAncestors();
 
-        StringBuilder path = new StringBuilder();
-        Enumeration<WebFolder> e = simpleList.elements();
-        while (e.hasMoreElements()) {
-            WebFolder f = e.nextElement();
-            path.append(StringUtils.isEmpty(path.toString()) ? "" : "/").append(f.getDisplayName());
+        final StringBuilder path = new StringBuilder();
+        final Enumeration<WebFolder> enumFolder = simpleList.elements();
+        while (enumFolder.hasMoreElements()) {
+        	final WebFolder folder = enumFolder.nextElement();
+            path.append(StringUtils.isEmpty(path.toString()) ? "" : "/").append(folder.getDisplayName());
         }
         return path.toString();
     }
-
+    
+    
     @SuppressWarnings("unchecked")
-    private static Map<String, Object> getParents(WebDisplayUnit unit) {
-        SimpleList simpleList = ((WebObjectInfo) unit).getAncestors();
+    private static Map<String, Object> getParents(final WebDisplayUnit unit) {
+    	final SimpleList simpleList = ((WebObjectInfo) unit).getAncestors();
 
-        Map<String, Object> parents = new HashMap<String, Object>();
-        Enumeration<WebFolder> e = simpleList.elements();
-        while (e.hasMoreElements()) {
-            WebFolder f = e.nextElement();
-            parents.put("name", f.getDisplayName());
-            parents.put("id", f.getID());
+        final Map<String, Object> parents = new ConcurrentHashMap<>();
+        final Enumeration<WebFolder> enumFolder = simpleList.elements();
+        while (enumFolder.hasMoreElements()) {
+        	final WebFolder folder = enumFolder.nextElement();
+            parents.put("name", folder.getDisplayName());
+            parents.put("id", folder.getID());
 
         }
         return parents;
     }
+    
+    
+    /**
+     * DisplayNameComparator
+     *
+     */
+    public static class DisplayNameComparator implements Comparator<Object> {
+    	@Override
+        public int compare(final Object obj1, final Object obj2) {
+            String str1 = "";
+            String str2 = "";
 
-    private static class DisplayNameComparator implements Comparator<Object> {
-        public int compare(Object o1, Object o2) {
-            String s1 = "";
-            String s2 = "";
-
-            if (o1 instanceof WebDisplayUnitEntry && o2 instanceof WebDisplayUnitEntry) {
-                s1 = ((WebDisplayUnitEntry) o1).getValue().getDisplayName();
-                s2 = ((WebDisplayUnitEntry) o2).getValue().getDisplayName();
+            if (obj1 instanceof WebDisplayUnitEntry && obj2 instanceof WebDisplayUnitEntry) {
+            	str1 = ((WebDisplayUnitEntry) obj1).getValue().getDisplayName();
+            	str2 = ((WebDisplayUnitEntry) obj2).getValue().getDisplayName();
             }
-            return s1.compareTo(s2);
+            return str1.compareTo(str2);
         }
     }
-
+    
+    
     /**
      * 지정폴더의 하위 객체 검색
-     * 
      * @param session
      * @param rootId
      * @param depth
-     * @return List<Map<String, String|Integer|..|List<...> 의 tree구조
-     * @throws WebObjectsException
-     * @throws IllegalArgumentException
-     * @throws JsonGenerationException
-     * @throws JsonMappingException
-     * @throws IOException
+     * @param objectTypes
+     * @return
      */
-    public static List<Map<String, Object>> getFolderTree(WebIServerSession session, String rootId, int depth,
-            List<Integer> objectTypes) throws WebObjectsException, IllegalArgumentException, JsonGenerationException,
-            JsonMappingException, IOException {
-        WebObjectSource source = session.getFactory().getObjectSource();
+    public static List<Map<String, Object>> getFolderTree(final WebIServerSession session, final String rootId, final int depth, final List<Integer> objectTypes) throws WebObjectsException {
+    	final WebObjectSource source = session.getFactory().getObjectSource();
         source.setFlags(source.getFlags() | EnumDSSXMLObjectFlags.DssXmlObjectComments);
-        WebObjectInfo info = source.getObject(rootId, EnumDSSXMLObjectTypes.DssXmlTypeFolder, true);
-        WebFolder folder = (WebFolder) info;
+        final WebObjectInfo info = source.getObject(rootId, EnumDSSXMLObjectTypes.DssXmlTypeFolder, true);
+        final WebFolder folder = (WebFolder) info;
         folder.populate();
         WebDisplayUnits childUnits = folder.getChildUnits();
+        final Comparator<?> childSort = new DisplayNameComparator();
 
-        List<Map<String, Object>> tree = new ArrayList<Map<String, Object>>();
-        if (childUnits == null) {
-            return tree;
-        }
-        childUnits.sort(new DisplayNameComparator());
-
-        int currentDepth = 1;
-        List<Map<String, Object>> currentList = tree;
-        Enumeration<WebDisplayUnit> currentElements = childUnits.elements();
-
-        LinkedList<StackedUnits> stack = new LinkedList<StackedUnits>();
-        while (true) {
-            if (!currentElements.hasMoreElements()) {
-                while (!stack.isEmpty()) {
-                    StackedUnits units = stack.pop();
-                    currentElements = units.getElements();
-                    currentList = units.getList();
-                    currentDepth--;
-                    if (currentElements.hasMoreElements()) {
-                        break;
-                    }
-                }
-            }
-
-            if (stack.isEmpty() && !currentElements.hasMoreElements()) {
-                break;
-            }
-
-            WebDisplayUnit currentUnit = currentElements.nextElement();
-
-            // 처리레벨이 정해져 있다면, 해당 레벨의 폴더는 표시하지 않고, 다음 sibling을 처리한다.
-            if (currentDepth > depth && depth != -1) {
-                continue;
-            }
-            if (objectTypes != null && !objectTypes.contains(currentUnit.getDisplayUnitType())) {
-                continue;
-            }
-
-            Map<String, Object> map = new HashMap<String, Object>();
-            Map<String, Object> parents = getParents(currentUnit);
-            map.put("name", currentUnit.getDisplayName());
-            map.put("path", getPath(currentUnit));
-            map.put("parentsName", parents.get("name"));
-            map.put("parentsID", parents.get("id"));
-            if (currentUnit.getDisplayUnitType() == EnumDSSXMLObjectTypes.DssXmlTypeShortcut
-                    || currentUnit.isObjectInfo()) {
-                WebObjectInfo objectInfo = null;
-                if (currentUnit.getDisplayUnitType() == EnumDSSXMLObjectTypes.DssXmlTypeShortcut) {
-                    WebShortcut shortcut = (WebShortcut) source.getObject(currentUnit.getID(),
-                            EnumDSSXMLObjectTypes.DssXmlTypeShortcut, true);
-                    objectInfo = shortcut.getTarget();
-                } else {
-                    objectInfo = (WebObjectInfo) currentUnit;
-                }
-                map.put("id", objectInfo.getID());
-                map.put("type", objectInfo.getType());
-                map.put("subType", objectInfo.getSubType());
-                WebViewMediaSettings settings = objectInfo.getViewMediaSettings();
-                // 도큐먼트와 VI는 getType()으로 구분할 수 없어, getDefaultMode()를 이용하여 VI, 됴큐먼트를 구분
-                // map.put("isVI", (EnumDSSXMLViewMedia.DSSXmlViewMediaHTML5Dashboard &
-                // settings.getDefaultMode()) == EnumDSSXMLViewMedia.DssXmlViewMediaExportHTML);
-                map.put("isVI", (EnumDSSXMLViewMedia.DSSXmlViewMediaHTML5Dashboard
-                        & settings.getDefaultMode()) == EnumDSSXMLViewMedia.DSSXmlViewMediaHTML5Dashboard);
-            } else {
-                map.put("id", currentUnit.getID());
-                map.put("type", currentUnit.getDisplayUnitType());
-            }
-            // logger.debug(map.get("path") + " ==> " + map);
-            currentList.add(map);
-
-            if (currentUnit.getDisplayUnitType() == EnumDSSXMLObjectTypes.DssXmlTypeFolder) {
-                stack.push(new StackedUnits(currentElements, currentList));
-                ((WebFolder) currentUnit).populate();
-                childUnits = currentUnit.getChildUnits();
-                childUnits.sort(new DisplayNameComparator());
-                currentElements = childUnits.elements();
-
-                List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
-                map.put("child", childList);
-                currentList = childList;
-                currentDepth++;
-            }
+        final List<Map<String, Object>> tree = new ArrayList<>();
+        
+        if (childUnits != null) {
+        	childUnits.sort(new DisplayNameComparator());
+        	
+        	int currentDepth = 1;
+        	List<Map<String, Object>> currentList = tree;
+        	Enumeration<WebDisplayUnit> currentElements = childUnits.elements();
+        	
+        	final LinkedList<StackedUnits> stack = new LinkedList<>();
+        	while (true) {
+        		if (!currentElements.hasMoreElements()) {
+        			while (!stack.isEmpty()) {
+        				final StackedUnits units = stack.pop();
+        				currentElements = units.getElements();
+        				currentList = units.getList();
+        				currentDepth--;
+        				if (currentElements.hasMoreElements()) {
+        					break;
+        				}
+        			}
+        		}
+        		
+        		if (stack.isEmpty() && !currentElements.hasMoreElements()) {
+        			break;
+        		}
+        		
+        		final WebDisplayUnit currentUnit = currentElements.nextElement();
+        		
+        		// 처리레벨이 정해져 있다면, 해당 레벨의 폴더는 표시하지 않고, 다음 sibling을 처리한다.
+        		if (currentDepth > depth && depth != -1) {
+        			continue;
+        		}
+        		if (objectTypes != null && !objectTypes.contains(currentUnit.getDisplayUnitType())) {
+        			continue;
+        		}
+        		
+        		final Map<String, Object> map = new ConcurrentHashMap<>();
+        		final Map<String, Object> parents = getParents(currentUnit);
+        		map.put("name", currentUnit.getDisplayName());
+        		map.put("depth", currentDepth);
+        		map.put("path", getPath(currentUnit));
+        		map.put("parentsName", parents.get("name"));
+        		map.put("parentsID", parents.get("id"));
+        		if (currentUnit.getDisplayUnitType() == EnumDSSXMLObjectTypes.DssXmlTypeShortcut || currentUnit.isObjectInfo()) {
+        			WebObjectInfo objectInfo;
+        			if (currentUnit.getDisplayUnitType() == EnumDSSXMLObjectTypes.DssXmlTypeShortcut) {
+        				final WebShortcut shortcut = (WebShortcut) source.getObject(currentUnit.getID(),
+        						EnumDSSXMLObjectTypes.DssXmlTypeShortcut, true);
+        				objectInfo = shortcut.getTarget();
+        			} else {
+        				objectInfo = (WebObjectInfo) currentUnit;
+        			}
+        			map.put("id", objectInfo.getID());
+        			map.put("type", objectInfo.getType());
+        			map.put("subType", objectInfo.getSubType());
+        			final WebViewMediaSettings settings = objectInfo.getViewMediaSettings();
+        			// 도큐먼트와 VI는 getType()으로 구분할 수 없어, getDefaultMode()를 이용하여 VI, 됴큐먼트를 구분
+        			// map.put("isVI", (EnumDSSXMLViewMedia.DSSXmlViewMediaHTML5Dashboard &
+        			// settings.getDefaultMode()) == EnumDSSXMLViewMedia.DssXmlViewMediaExportHTML);
+        			map.put("isVI", (EnumDSSXMLViewMedia.DSSXmlViewMediaHTML5Dashboard
+        					& settings.getDefaultMode()) == EnumDSSXMLViewMedia.DSSXmlViewMediaHTML5Dashboard);
+        		} else {
+        			map.put("id", currentUnit.getID());
+        			map.put("type", currentUnit.getDisplayUnitType());
+        		}
+        		// logger.debug(map.get("path") + " ==> " + map);
+        		currentList.add(map);
+        		
+        		if (currentUnit.getDisplayUnitType() == EnumDSSXMLObjectTypes.DssXmlTypeFolder) {
+        			stack.push(new StackedUnits(currentElements, currentList));
+        			((WebFolder) currentUnit).populate();
+        			childUnits = currentUnit.getChildUnits();
+        			childUnits.sort(childSort);
+        			currentElements = childUnits.elements();
+        			
+        			final List<Map<String, Object>> childList = new ArrayList<>();
+        			map.put("child", childList);
+        			currentList = childList;
+        			currentDepth++;
+        		}
+        	}
         }
 
         return tree;

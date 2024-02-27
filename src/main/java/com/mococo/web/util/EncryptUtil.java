@@ -8,119 +8,118 @@
 */
 package com.mococo.web.util;
 
-import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * EncryptUtil
+ * @author mococo
+ *
+ */
 public class EncryptUtil {
-	private static final Logger LOGGER = LogManager.getLogger(EncryptUtil.class);
-	private static String iv;
-	private static Key keySpec;
 	
-	static {
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LogManager.getLogger(EncryptUtil.class);
+	
+	/**
+	 * encToken
+	 */
+	private static byte[] encToken = PortalCodeUtil.encToken.getBytes();
+	
+	/**
+	 * GCM_IV_LENGTH
+	 */
+	public static final int GCM_IV_LENGTH = 16;
+	
+	/**
+	 * GCM_TAG_LENGTH
+	 */
+    public static final int GCM_TAG_LENGTH = 128;
+    
+    
+    /**
+     * EncryptUtil
+     */
+    public EncryptUtil() {
+    	logger.debug("EncryptUtil");
+    }
+    
+    
+	@SuppressWarnings("unused")
+	private void sample() {
+    	logger.debug("EncryptUtil");
+    }
+	
+    
+    /**
+     * 암호화
+     * @param plaintext
+     * @return
+     */
+	public static String encrypt(final String plaintext) {
+		String rtnText = "";
+		
 		try {
-			String key = CustomProperties.getProperty("enc.token");
-			iv = key.substring(0, 16);
-			
-			byte[] b = key.getBytes("UTF-8");
-			int len = b.length;
-			
-			byte[] keyBytes = new byte[32];
-			if(len > keyBytes.length) {
-				len = keyBytes.length;
-			}
-			
-			System.arraycopy(b, 0, keyBytes, 0, len);
-			keySpec = new SecretKeySpec(keyBytes, "AES");
-		} catch (IOException e) {
-			LOGGER.error("!!! error", e);
+			final byte[] gcmIv = Arrays.copyOfRange(encToken, 0, GCM_IV_LENGTH);
+			final SecretKeySpec keySpec = new SecretKeySpec(encToken, "AES");
+			final Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+			final GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, gcmIv);
+			cipher.init(Cipher.ENCRYPT_MODE, keySpec, gcmParameterSpec);
+			final byte[] cipherText = cipher.doFinal(plaintext.getBytes());
+			rtnText = new String(Base64.getEncoder().encode(concatenate(gcmIv, cipherText)));
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException
+			| 	IllegalBlockSizeException | BadPaddingException e) {
+			logger.error("!!! ", e);
 		}
+		
+		return rtnText;
 	}
 	
 	
 	/**
-	 * <pre>
-	 * 목적 : 문자열 암호화
-	 * 매개변수 : 
-	 * 	String token
-	 * 반환값 : java.lang.String
-	 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-	 * </pre>
+	 * 복호화
+	 * @param str
+	 * @return
 	 */
-	public static String encrypt(String token) {
-		String result = null;
+	public static String decrypt(final String str) {
+		String rtnText = "";
 		
 		try {
-			Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
-			c.init(Cipher.ENCRYPT_MODE, keySpec, new IvParameterSpec(iv.getBytes()));
-			byte[] encrypted = c.doFinal(token.getBytes("UTF-8"));
-			result = new String(Base64.getEncoder().encodeToString(encrypted));
-		} catch (IOException e) {
-			LOGGER.error("!!! error", e);
-		} catch (NoSuchAlgorithmException e) {
-			LOGGER.error("!!! error", e);
-		} catch (NoSuchPaddingException e) {
-			LOGGER.error("!!! error", e);
-		} catch (InvalidKeyException e) {
-			LOGGER.error("!!! error", e);
-		} catch (InvalidAlgorithmParameterException e) {
-			LOGGER.error("!!! error", e);
-		} catch (IllegalBlockSizeException e) {
-			LOGGER.error("!!! error", e);
-		} catch (BadPaddingException e) {
-			LOGGER.error("!!! error", e);
+			final byte[] ciphertext = Base64.getDecoder().decode(str.getBytes());
+			final byte[] gcmIv = Arrays.copyOfRange(ciphertext, 0, GCM_IV_LENGTH);
+			final byte[] cipherText = Arrays.copyOfRange(ciphertext, GCM_IV_LENGTH, ciphertext.length);
+			final SecretKeySpec keySpec = new SecretKeySpec(encToken, "AES");
+			final Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+			final GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, gcmIv);
+			cipher.init(Cipher.DECRYPT_MODE, keySpec, gcmParameterSpec);
+			rtnText = new String(cipher.doFinal(cipherText));
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException
+			| 	IllegalBlockSizeException | BadPaddingException e) {
+			logger.error("!!! ", e);
 		}
 		
-		return result;
+		return rtnText;
 	}
 	
 	
-	/**
-	 * <pre>
-	 * 목적 : 문자열 복호화
-	 * 매개변수 : 
-	 * 	String token
-	 * 반환값 : java.lang.String
-	 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-	 * </pre>
-	 */
-	public static String decrypt(String token) { 
-		String result = null;
-		
-		try {
-			Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
-			c.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(iv.getBytes()));
-			byte[] byteStr = Base64.getDecoder().decode(token.getBytes());
-			result = new String(c.doFinal(byteStr), "UTF-8");
-		} catch (IOException e) {
-			LOGGER.error("!!! error", e);
-		} catch (NoSuchAlgorithmException e) {
-			LOGGER.error("!!! error", e);
-		} catch (NoSuchPaddingException e) {
-			LOGGER.error("!!! error", e);
-		} catch (InvalidKeyException e) {
-			LOGGER.error("!!! error", e);
-		} catch (InvalidAlgorithmParameterException e) {
-			LOGGER.error("!!! error", e);
-		} catch (IllegalBlockSizeException e) {
-			LOGGER.error("!!! error", e);
-		} catch (BadPaddingException e) {
-			LOGGER.error("!!! error", e);
-		}
-		
+	private static byte[] concatenate(final byte[] firstArray, final byte[] secondArray) {
+		final byte[] result = Arrays.copyOf(firstArray, firstArray.length + secondArray.length);
+		System.arraycopy(secondArray, 0, result, firstArray.length, secondArray.length);
 		return result;
 	}
 }

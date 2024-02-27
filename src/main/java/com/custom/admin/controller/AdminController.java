@@ -1,6 +1,6 @@
 package com.custom.admin.controller;
 
-import java.util.HashMap;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -10,10 +10,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -21,54 +23,87 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.custom.admin.service.AdminService;
 import com.mococo.web.util.ControllerUtil;
+import com.mococo.web.util.PortalCodeUtil;
 
+/**
+ * AdminController
+ * @author mococo
+ *
+ */
 @Controller
 @RequestMapping("/admin/*")
 public class AdminController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
+	
+	/**
+	 * 로그
+	 */
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
     
-    @Autowired
-    AdminService adminService;
+    /**
+     * adminService
+     */
+    /* default */ @Autowired /* default */ AdminService adminService;
     
     
     /**
-     * 어드민 화면 이동
+     * AdminController
+     */
+    public AdminController() {
+    	logger.debug("AdminController");
+    }
+    
+    
+    /**
+     * 포탈 관리자 권한 체크
+     * @param request
      * @return
      */
-    @RequestMapping(value = "/admin/adminPage.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView adminPage(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
+	private Boolean checkPortalAdmin(final HttpServletRequest request) {
+    	Boolean rtnCheck = false;
     	
-    	String movePageName = params.get("page").toString();
-    	ModelAndView view = new ModelAndView("admin/boardList");
-    	
-    	{
-    		//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
-	    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-	    		view.setViewName("error/auth");
-	    		return view;
-	    	}
+    	//포탈 관리자 권한 체크
+		final List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
+    	if(portalAuthList.contains(PortalCodeUtil.ptlSysAdmin)) {
+    		rtnCheck = true;
     	}
     	
-    	switch (movePageName) {
-			case "BOARD_ADMIN":
-				view.setViewName("admin/boardList");
-				break;
-			case "LOGIN_LOG_ADMIN":
-				view.setViewName("admin/logList");
-				view.addObject("LOG_TYPE", "LOGIN");
-				view.addObject("LOG_TYPE_NM", "로그인");
-				break;
-			case "BOARD_LOG_ADMIN":
-				view.setViewName("admin/logList");
-				view.addObject("LOG_TYPE", "BOARD");
-				view.addObject("LOG_TYPE_NM", "게시판");
-				break;
-			default:
-				break;
-		}
+		return rtnCheck;
+    }
+    
+    
+    /**
+     * 관리자 화면 이동
+     * @return
+     */
+    @PostMapping("/admin/adminPage.do")
+    public ModelAndView adminPage(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	
+    	final String movePageName = params.get("page").toString();
+    	final ModelAndView view = new ModelAndView("admin/boardList");
+    	
+    	//관리자 권한 체크
+    	if(checkPortalAdmin(request)) {
+    		switch (movePageName) {
+				case "BOARD_ADMIN":
+					view.setViewName("admin/boardList");
+					break;
+				case "LOGIN_LOG_ADMIN":
+					view.setViewName("admin/logList");
+					view.addObject("LOG_TYPE", "LOGIN");
+					view.addObject("LOG_TYPE_NM", "로그인");
+					break;
+				case "BOARD_LOG_ADMIN":
+					view.setViewName("admin/logList");
+					view.addObject("LOG_TYPE", "BOARD");
+					view.addObject("LOG_TYPE_NM", "게시판");
+					break;
+				default:
+					break;
+			}
+    	} else {
+    		view.setViewName(PortalCodeUtil.errAuth);
+    	}
     	
         return view;
     }
@@ -78,29 +113,24 @@ public class AdminController {
      * 게시판 - 리스트 조회 - 그리드
      * @return
      */
-    @RequestMapping(value = "/admin/boardListGrid.json", method = { RequestMethod.POST })
-    public Map<String, Object> boardListGrid(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    @PostMapping("/admin/boardListGrid.json")
+    public Map<String, Object> boardListGrid(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
     	params.put("PORTAL_LOG", false);
-    	LOGGER.debug("params : [{}]", params);
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
-    	{
-    		//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
-	    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-	    		rtnMap = ControllerUtil.getFailMap("portal.admin.auth.error");
-	    		return rtnMap;
-	    	}
+    	//관리자 권한 체크
+    	if(checkPortalAdmin(request)) {
+    		try {
+        		final Map<String, Object> rtnList = adminService.boardList(request, response, params);
+        		rtnMap.putAll(rtnList);
+    		} catch (BadSqlGrammarException | SQLException e) {
+    			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+    			logger.error("boardListGrid Exception", e);
+    		}
+    	} else {
+    		rtnMap = ControllerUtil.getFailMap(PortalCodeUtil.portalError01);
     	}
-    	
-    	try {
-    		Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = adminService.boardList(request, response, params);
-    		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardListGrid Exception", e);
-		}
     	
     	return rtnMap;
     }
@@ -110,19 +140,33 @@ public class AdminController {
      * 게시판 - 작성 화면 이동
      * @return
      */
-    @RequestMapping(value = "/admin/boardWriteView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView boardWriteView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("admin/boardWrite");
+    @GetMapping("/admin/boardWriteView.do")
+    public ModelAndView boardWriteViewGet(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	final ModelAndView view = new ModelAndView("admin/boardWrite");
         
-    	{
-    		//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
-	    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-	    		view.setViewName("error/auth");
-	    		return view;
-	    	}
-    	}
+    	//관리자 권한 체크
+		if(!checkPortalAdmin(request)) {
+			view.setViewName(PortalCodeUtil.errAuth);
+		}
+        
+        return view;
+    }
+    
+    
+    /**
+     * 게시판 - 작성 화면 이동
+     * @return
+     */
+    @PostMapping("/admin/boardWriteView.do")
+    public ModelAndView boardWriteViewPost(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	final ModelAndView view = new ModelAndView("admin/boardWrite");
+        
+    	//관리자 권한 체크
+		if(!checkPortalAdmin(request)) {
+			view.setViewName("error/auth");
+		}
         
         return view;
     }
@@ -132,19 +176,33 @@ public class AdminController {
      * 게시판 - 상세 화면 이동
      * @return
      */
-    @RequestMapping(value = "/admin/boardDetailView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView boardDetailView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("admin/boardDetail");
+    @GetMapping("/admin/boardDetailView.do")
+    public ModelAndView boardDetailViewGet(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	final ModelAndView view = new ModelAndView("admin/boardDetail");
         
-    	{
-    		//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
-	    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-	    		view.setViewName("error/auth");
-	    		return view;
-	    	}
-    	}
+    	//관리자 권한 체크
+		if(!checkPortalAdmin(request)) {
+			view.setViewName("error/auth");
+		}
+        
+        return view;
+    }
+    
+    
+    /**
+     * 게시판 - 상세 화면 이동
+     * @return
+     */
+    @PostMapping("/admin/boardDetailView.do")
+    public ModelAndView boardDetailViewPost(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+        final ModelAndView view = new ModelAndView("admin/boardDetail");
+        
+    	//관리자 권한 체크
+		if(!checkPortalAdmin(request)) {
+			view.setViewName("error/auth");
+		}
         
         return view;
     }
@@ -154,30 +212,25 @@ public class AdminController {
      * 게시판 - 상세 조회
      * @return
      */
-    @RequestMapping(value = "/admin/boardDetail.json", method = { RequestMethod.GET, RequestMethod.POST })
+    @PostMapping("/admin/boardDetail.json")
     @ResponseBody
-    public Map<String, Object> boardDetail(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
+    public Map<String, Object> boardDetail(final HttpServletRequest request, final HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
-    	{
-    		//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
-	    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-	    		rtnMap = ControllerUtil.getFailMap("portal.admin.auth.error");
-	    		return rtnMap;
-	    	}
-    	}
-    	
-    	try {
-    		Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = adminService.boardDetail(request, response, params);
-    		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardDetail Exception", e);
+    	//관리자 권한 체크
+		if(checkPortalAdmin(request)) {
+			try {
+				final Map<String, Object> rtnList = adminService.boardDetail(request, response, params);
+	    		rtnMap.putAll(rtnList);
+			} catch (BadSqlGrammarException | SQLException e) {
+				rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+				logger.error("boardDetail Exception", e);
+			}
+		} else {
+			rtnMap = ControllerUtil.getFailMap(PortalCodeUtil.portalError01);
 		}
-    	
+		
     	return rtnMap;
     }
     
@@ -188,28 +241,23 @@ public class AdminController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/admin/boardInsert.json", method = {RequestMethod.GET, RequestMethod.POST})
+    @PostMapping("/admin/boardInsert.json")
 	@ResponseBody
-	public Map<String, Object> boardInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
+	public Map<String, Object> boardInsert(final MultipartHttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
 		
-    	{
-    		//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
-	    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-	    		rtnMap = ControllerUtil.getFailMap("portal.admin.auth.error");
-	    		return rtnMap;
-	    	}
-    	}
-    	
-		try {
-			Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = adminService.boardInsert(request, response, params);
-    		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardInsert Exception", e);
+    	//관리자 권한 체크
+		if(checkPortalAdmin(request)) {
+			try {
+				final Map<String, Object> rtnList = adminService.boardInsert(request, response, params);
+	    		rtnMap.putAll(rtnList);
+			} catch (BadSqlGrammarException | SQLException e) {
+				rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+				logger.error("boardInsert Exception", e);
+			}
+		} else {
+			rtnMap = ControllerUtil.getFailMap(PortalCodeUtil.portalError01);
 		}
 		
 		return rtnMap;
@@ -222,28 +270,23 @@ public class AdminController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/admin/boardUpdate.json", method = {RequestMethod.GET, RequestMethod.POST})
+    @PostMapping("/admin/boardUpdate.json")
 	@ResponseBody
-	public Map<String, Object> boardUpdate(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
+	public Map<String, Object> boardUpdate(final MultipartHttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
 		
-    	{
-    		//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
-	    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-	    		rtnMap = ControllerUtil.getFailMap("portal.admin.auth.error");
-	    		return rtnMap;
-	    	}
-    	}
-    	
-		try {
-			Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = adminService.boardUpdate(request, response, params);
-    		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardUpdate Exception", e);
+    	//관리자 권한 체크
+		if(checkPortalAdmin(request)) {
+			try {
+				final Map<String, Object> rtnList = adminService.boardUpdate(request, response, params);
+	    		rtnMap.putAll(rtnList);
+			} catch (BadSqlGrammarException | SQLException e) {
+				rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+				logger.error("boardUpdate Exception", e);
+			}
+		} else {
+			rtnMap = ControllerUtil.getFailMap(PortalCodeUtil.portalError01);
 		}
 		
 		return rtnMap;
@@ -252,30 +295,28 @@ public class AdminController {
     
     /**
      * 로그 - 리스트 조회 - 그리드
+     * @param request
+     * @param response
+     * @param params
      * @return
      */
-    @RequestMapping(value = "/admin/logListGrid.json", method = { RequestMethod.POST })
-    public Map<String, Object> logListGrid(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    @PostMapping("/admin/logListGrid.json")
+    public Map<String, Object> logListGrid(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
     	params.put("PORTAL_LOG", false);
-    	LOGGER.debug("params : [{}]", params);
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
-    	{
-    		//관리자 권한 체크
-	    	List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
-	    	if(!portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-	    		rtnMap = ControllerUtil.getFailMap("portal.admin.auth.error");
-	    		return rtnMap;
-	    	}
-    	}
-    	
-    	try {
-    		Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = adminService.logList(request, response, params);
-    		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("logListGrid Exception", e);
+    	//관리자 권한 체크
+		if(checkPortalAdmin(request)) {
+			try {
+				final Map<String, Object> rtnList = adminService.logList(request, response, params);
+	    		rtnMap.putAll(rtnList);
+			} catch (BadSqlGrammarException | SQLException e) {
+				rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+				logger.error("logListGrid Exception", e);
+			}
+		} else {
+			rtnMap = ControllerUtil.getFailMap(PortalCodeUtil.portalError01);
 		}
     	
     	return rtnMap;

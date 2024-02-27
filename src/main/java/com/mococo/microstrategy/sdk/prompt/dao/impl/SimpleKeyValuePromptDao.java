@@ -12,29 +12,35 @@ import com.mococo.microstrategy.sdk.prompt.vo.PromptElement;
 
 /**
  * 프롬프트 DAO 중 단순 키,값 및 기본선택값 목록을 반환하는 DAO
- * 
- * 확장 속성 예시 ... { "project":"*", ... "objectId":"V111", ... "elementSource":{
- * "className":"com.mocomsys.microstrategy.sdk.dao.impl.SimpleKeyValuePromptDao",
- * "param1":{ "pin":1, "min":"5", "max":"10", "isSingle":true, "isRequired":true
- * }, "param2":[ {"key":"1", "value":"report 1", "isDefault": true}, {"key":"2",
- * "value":"report 2"}, {"key": "3", "value": "report 3"} ] }, ... }, ...
- * 
- * @author hyoungilpark
- *
+ * @author mococo
  */
 public class SimpleKeyValuePromptDao extends CustomPromptDao<Map<String, Object>, List<Map<String, Object>>> {
+	
+	/**
+	 * 로그
+	 */
     private static final Logger logger = LoggerFactory.getLogger(SimpleKeyValuePromptDao.class);
-
-    public SimpleKeyValuePromptDao(Map<String, Object> param1, List<Map<String, Object>> param2) {
+    
+    
+    /**
+     * SimpleKeyValuePromptDao
+     * @param param1
+     * @param param2
+     */
+    public SimpleKeyValuePromptDao(final Map<String, Object> param1, final List<Map<String, Object>> param2) {
         super(param1, param2);
     }
-
+    
+    
+    /**
+     * getDefaultAnswers
+     */
     @Override
     public List<PromptElement> getDefaultAnswers() {
-        List<PromptElement> promptElementList = new ArrayList<PromptElement>();
+    	final List<PromptElement> promptElementList = new ArrayList<>();
 
-        List<Map<String, Object>> paramList = getParam2();
-        for (Map<String, Object> param : paramList) {
+        final List<Map<String, Object>> paramList = getParam2();
+        for (final Map<String, Object> param : paramList) {
             if (param.get("isDefault") != null && (Boolean) param.get("isDefault")) {
                 promptElementList.add(new PromptElement((String) param.get("key"), (String) param.get("value")));
             }
@@ -42,59 +48,109 @@ public class SimpleKeyValuePromptDao extends CustomPromptDao<Map<String, Object>
         logger.debug("==> promptElementList: [{}]", promptElementList);
         return promptElementList;
     }
-
+    
+    
+    /**
+     * getDefaultAnswer
+     */
     @Override
     public String getDefaultAnswer() {
         return null;
     }
-
+    
+    
+    /**
+     * getSuggestedAnswers
+     */
     @Override
     public List<PromptElement> getSuggestedAnswers() {
-        List<PromptElement> promptElementList = new ArrayList<PromptElement>();
+    	final List<PromptElement> promptElementList = new ArrayList<>();
 
-        List<Map<String, Object>> paramList = getParam2();
-        for (Map<String, Object> param : paramList) {
+        final List<Map<String, Object>> paramList = getParam2();
+        for (final Map<String, Object> param : paramList) {
             promptElementList.add(new PromptElement((String) param.get("key"), (String) param.get("value")));
         }
         logger.debug("==> promptElementList: [{}]", promptElementList);
         return promptElementList;
     }
-
+    
+    
+    /**
+     * getSuggestedAnswers
+     */
     @Override
     public List<PromptElement> getSuggestedAnswers(int level, String selectedElemId) {
-        return null;
+//        return null;
+        return new ArrayList<>();
     }
-
+    
+    
+    /**
+     * isSingle
+     */
     @Override
     public boolean isSingle() {
-        Map<String, Object> param1 = getParam1();
-        Boolean isSingle = (Boolean) param1.get("isSingle");
-        return isSingle == null ? true : isSingle;
+    	Boolean rtnCheck;
+    	
+    	final Map<String, Object> param1 = getParam1();
+    	final Boolean isSingle = (Boolean) param1.get("isSingle");
+        
+        if(isSingle == null) {
+    		rtnCheck = true;
+    	} else {
+    		rtnCheck = isSingle;
+    	}
+    	
+        return rtnCheck;
     }
-
+    
+    
+    /**
+     * isRequired
+     */
     @Override
     public boolean isRequired() {
-        Map<String, Object> param1 = getParam1();
-        Boolean isRequired = (Boolean) param1.get("isRequired");
-        return isRequired == null ? false : isRequired;
+    	Boolean rtnCheck;
+    	final Map<String, Object> param1 = getParam1();
+    	final Boolean isRequired = (Boolean) param1.get("isRequired");
+    	
+    	if(isRequired == null) {
+    		rtnCheck = false;
+    	} else {
+    		rtnCheck = isRequired;
+    	}
+    	
+        return rtnCheck;
     }
-
+    
+    
+    /**
+     * getPin
+     */
     @Override
     public int getPin() {
-        Map<String, Object> param1 = getParam1();
-        Integer pin = (Integer) param1.get("pin");
+    	final Map<String, Object> param1 = getParam1();
+    	final Integer pin = (Integer) param1.get("pin");
         return pin == null ? -1 : pin;
     }
-
+    
+    
+    /**
+     * getMin
+     */
     @Override
     public String getMin() {
-        Map<String, Object> param1 = getParam1();
+    	final Map<String, Object> param1 = getParam1();
         return (String) param1.get("min");
     }
-
+    
+    
+    /**
+     * getMax
+     */
     @Override
     public String getMax() {
-        Map<String, Object> param1 = getParam1();
+    	final Map<String, Object> param1 = getParam1();
         return (String) param1.get("max");
     }
 }

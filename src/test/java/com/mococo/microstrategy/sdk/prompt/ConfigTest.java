@@ -27,7 +27,9 @@ public class ConfigTest {
 			
 			if (config != null && config.keySet() != null) {
 				for (String key : config.keySet()) {
-					logger.debug("==> key: [{}], value: [{}]", key, config.get(key));
+					String logTmp1 = key.replaceAll("[\r\n]","");
+					String logTmp2 = config.get(key).toString().replaceAll("[\r\n]","");
+					logger.debug("==> key: [{}], value: [{}]", logTmp1, logTmp2);
 				}
 			}
 		}

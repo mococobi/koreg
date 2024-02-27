@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpSession;
 
@@ -26,31 +27,65 @@ import com.microstrategy.web.objects.WebObjectsFactory;
 import com.microstrategy.webapi.EnumDSSXMLApplicationType;
 import com.microstrategy.webapi.EnumDSSXMLAuthModes;
 import com.microstrategy.webapi.EnumDSSXMLObjectFlags;
+import com.mococo.biz.exception.BizException;
 import com.mococo.microstrategy.sdk.esm.vo.MstrUser;
 import com.mococo.microstrategy.sdk.exception.SdkRuntimeException;
 import com.mococo.web.util.SpringUtil;
 
+/**
+ * MstrUtil
+ * @author mococo
+ *
+ */
 public class MstrUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MstrUtil.class);
-    
-    
-    private MstrUtil() {
-    	
+	
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LoggerFactory.getLogger(MstrUtil.class);
+	
+	/**
+	 * authMode
+	 */
+	private static final String authMode = "authMode";
+	
+    /**
+     * MstrUtil
+     */
+    public MstrUtil() {
+    	logger.debug("MstrUtil");
     }
     
     
+	@SuppressWarnings("unused")
+	private void sample() {
+    	logger.debug("MstrUtil");
+    }
+    
+    
+	/**
+	 * getLiveServer
+	 * @return
+	 * @throws WebObjectsException
+	 */
     public static String getLiveServer() throws WebObjectsException {
         return getLiveServer(null);
     }
     
     
-    public static String getLiveServer(String defaultServer) throws WebObjectsException {
-        WebClusterAdmin admin = WebObjectsFactory.getInstance().getClusterAdmin();
+    /**
+     * getLiveServer
+     * @param defaultServer
+     * @return
+     * @throws WebObjectsException
+     */
+    public static String getLiveServer(final String defaultServer) throws WebObjectsException {
+        final WebClusterAdmin admin = WebObjectsFactory.getInstance().getClusterAdmin();
         admin.refreshAllClusters();
         String serverName = defaultServer;
-        Enumeration<WebCluster> clusters = admin.getClusters().elements();
+        final Enumeration<WebCluster> clusters = admin.getClusters().elements();
         if (clusters.hasMoreElements()) {
-            WebCluster cluster = clusters.nextElement();
+        	final WebCluster cluster = clusters.nextElement();
             
             if(cluster.size() > 0) {
             	serverName = cluster.get(0).getNodeName();
@@ -62,25 +97,40 @@ public class MstrUtil {
     }
     
     
-    public static WebIServerSession connectSession(String server, String project, int port, String uid, String pwd, int authMode, int localeNum, String trustToken, String clientId) throws WebObjectsException {
-        WebIServerSession session = null;
-
-        String serverName = getLiveServer(server);
-        LOGGER.debug("server [{}]", server);
+    /**
+     * connectSession
+     */
+    private static WebIServerSession connectSession(final Map<String, Object> connData) throws WebObjectsException {
+    	final String server = (String) connData.get("server");
+    	final String project = (String) connData.get("project");
+    	final int port = (int) connData.get("port");
+    	final int authMode = (int) connData.get(MstrUtil.authMode);
+    	final int localeNum = (int) connData.get("localeNum");
+    	final String uid = (String) connData.get("uid");
+    	final String pwd = (String) connData.get("pwd");
+    	final String trustToken = (String) connData.get("trustToken");
+    	final String clientId = (String) connData.get("clientId");
+    	
+        final String serverName = getLiveServer(server);
+        final String logTmp1 = server.replaceAll("[\r\n]","");
+        logger.debug("server [{}]", logTmp1);
 
         if(StringUtils.isEmpty(serverName)) {
-            throw new RuntimeException(SpringUtil.getMessage("login.error.no.server"));
+//            throw new RuntimeException(SpringUtil.getMessage("login.error.no.server"));
+            throw new BizException(SpringUtil.getMessage("login.error.no.server"));
         }
         
         if(StringUtils.isEmpty(uid)) {
-        	throw new RuntimeException(SpringUtil.getMessage("login.error.no.id"));
+//        	throw new RuntimeException(SpringUtil.getMessage("login.error.no.id"));
+        	throw new BizException(SpringUtil.getMessage("login.error.no.id"));
         }
         
         if(authMode == EnumDSSXMLAuthModes.DssXmlAuthSimpleSecurityPlugIn && StringUtils.isEmpty(trustToken)) {
-        	throw new RuntimeException(SpringUtil.getMessage("login.error.no.token"));
+//        	throw new RuntimeException(SpringUtil.getMessage("login.error.no.token"));
+        	throw new BizException(SpringUtil.getMessage("login.error.no.token"));
         }
 
-        session = WebObjectsFactory.getInstance().getIServerSession();
+        final WebIServerSession session = WebObjectsFactory.getInstance().getIServerSession();
         session.setServerName(serverName);
         session.setServerPort(port);
         if (StringUtils.isNotEmpty(project)) {
@@ -90,20 +140,22 @@ public class MstrUtil {
         session.setAuthMode(authMode);
 
         switch (authMode) {
-        case EnumDSSXMLAuthModes.DssXmlAuthStandard:
-        case EnumDSSXMLAuthModes.DssXmlAuthLDAP:
-            session.setPassword(pwd);
-            break;
-        case EnumDSSXMLAuthModes.DssXmlAuthSimpleSecurityPlugIn:
-            session.setTrustToken(trustToken);
-            break;
+	        case EnumDSSXMLAuthModes.DssXmlAuthStandard:
+	        case EnumDSSXMLAuthModes.DssXmlAuthLDAP:
+	            session.setPassword(pwd);
+	            break;
+	        case EnumDSSXMLAuthModes.DssXmlAuthSimpleSecurityPlugIn:
+	            session.setTrustToken(trustToken);
+	            break;
+	        default:
+	        	break;
         }
 
-        Locale locale = LocaleInfo.getInstance(localeNum).getLocale();
+        final Locale locale = LocaleInfo.getInstance(localeNum).getLocale();
         session.setDisplayLocale(locale);
         session.setLocale(locale);
         session.setApplicationType(EnumDSSXMLApplicationType.DssXmlApplicationDSSWeb);
-        // session.setApplicationType(com.microstrategy.webapi.EnumDSSXMLApplicationType.DssXmlApplicationCustomApp);
+        //EnumDSSXMLApplicationType.DssXmlApplicationCustomApp
         if (StringUtils.isNotEmpty(clientId)) {
             session.setClientID(clientId);
         }
@@ -113,82 +165,111 @@ public class MstrUtil {
     }
     
     
-    /*
-    public static WebIServerSession connectSession(String server, String project, String uid, String pwd) throws WebObjectsException {
-        return connectSession(server, 0, project, uid, pwd, EnumDSSXMLAuthModes.DssXmlAuthStandard, 1042, null, null);
+    /**
+     * connectStandardSession
+     * @param connData
+     * @return
+     * @throws WebObjectsException
+     */
+    public static WebIServerSession connectStandardSession(final Map<String, Object> connData) throws WebObjectsException {
+    	if(connData.get(authMode) == null) {
+    		connData.put(authMode, EnumDSSXMLAuthModes.DssXmlAuthStandard);
+    	} else {
+    		connData.put(authMode, connData.get(authMode));
+    	}
+    	
+        return connectSession(connData);
     }
-    */
-
     
-    public static WebIServerSession connectSession(String server, String project, int port, int locale, String uid, String pwd) throws WebObjectsException {
-        return connectSession(server, project, port, uid, pwd, EnumDSSXMLAuthModes.DssXmlAuthStandard, locale, null, null);
+    
+    /**
+     * connectTrustSession
+     * @param connData
+     * @return
+     * @throws WebObjectsException
+     */
+    public static WebIServerSession connectTrustSession(final Map<String, Object> connData) throws WebObjectsException {
+    	if(connData.get(authMode) == null) {
+    		connData.put(authMode, EnumDSSXMLAuthModes.DssXmlAuthSimpleSecurityPlugIn);
+    	} else {
+    		connData.put(authMode, connData.get(authMode));
+    	}
+    	
+        return connectSession(connData);
     }
-
     
-    public static WebIServerSession connectSession(String server, String project, int port, int locale, String uid, String pwd, String clientId) throws WebObjectsException {
-        return connectSession(server, project, port, uid, pwd, EnumDSSXMLAuthModes.DssXmlAuthStandard, locale, null, clientId);
-    }
-
     
-    public static WebIServerSession connectTrustSession(String server, String project, int port, int locale, String uid, String trustToken) throws WebObjectsException {
-        return connectSession(server, project, port, uid, null, EnumDSSXMLAuthModes.DssXmlAuthSimpleSecurityPlugIn, locale, trustToken, null);
-    }
+    /**
+     * reconnectSession
+     * @param sessionState
+     * @return
+     * @throws WebObjectsException
+     */
+    public static WebIServerSession reconnectSession(final String sessionState) throws WebObjectsException {
+    	WebIServerSession rtnSession = null; 
+    			
+        if (!StringUtils.isEmpty(sessionState)) {
+        	rtnSession = WebObjectsFactory.getInstance().getIServerSession();
 
-    
-    public static WebIServerSession reconnectSession(String sessionState) throws WebObjectsException {
-        if (StringUtils.isEmpty(sessionState)) {
-            return null;
+        	rtnSession.restoreState(sessionState);
+            if (!rtnSession.isAlive()) {
+            	rtnSession.reconnect();
+            }
         }
-
-        WebIServerSession session = WebObjectsFactory.getInstance().getIServerSession();
-
-        session.restoreState(sessionState);
-        if (!session.isAlive()) {
-            session.reconnect();
-        }
-
-        return session;
+        
+        return rtnSession;
     }
     
     
-    public static String logWebElements(WebElements webElements) {
-        StringBuilder builder = new StringBuilder();
-        Enumeration<WebElement> e = webElements.elements();
-
-        builder.append("{");
-        while (e.hasMoreElements()) {
-            WebElement webElement = e.nextElement();
-            builder.append("id:").append(webElement.getID()).append(", elementId:").append(webElement.getElementID())
-                    .append(", displayName:").append(webElement.getDisplayName());
+    /**
+     * logWebElements
+     * @param webElements
+     * @return
+     */
+    public static String logWebElements(final WebElements webElements) {
+    	final StringBuilder builder = new StringBuilder(200);
+    	final Enumeration<WebElement> enumWeb = webElements.elements();
+        
+        builder.append('{');
+        while (enumWeb.hasMoreElements()) {
+        	final WebElement webElement = enumWeb.nextElement();
+            builder.append("id:").append(webElement.getID())
+            	.append(", elementId:").append(webElement.getElementID())
+            	.append(", displayName:").append(webElement.getDisplayName());
         }
-        builder.append("}");
+        builder.append('}');
 
         return builder.toString();
 
     }
     
     
-    public static Map<String, Object> getLongDesc(WebObjectInfo object, WebIServerSession session) {
-        WebObjectSource source = session.getFactory().getObjectSource();
+    /**
+     * getLongDesc
+     * @param object
+     * @param session
+     * @return
+     */
+    public static Map<String, Object> getLongDesc(final WebIServerSession session, final WebObjectInfo object) {
+    	final WebObjectSource source = session.getFactory().getObjectSource();
         source.setFlags(source.getFlags() | EnumDSSXMLObjectFlags.DssXmlObjectComments);
 
         Map<String, Object> configInfo = null;
         if (object != null) {
             try {
-                WebObjectInfo info = source.getObject(object.getID(), object.getType(), true);
+            	final WebObjectInfo info = source.getObject(object.getID(), object.getType(), true);
 
                 if (info.getComments() != null && info.getComments().length > 0) {
-                    String json = info.getComments()[0];
+                	final String json = info.getComments()[0];
 
                     if (StringUtils.isNotEmpty(json)) {
-                        configInfo = new ObjectMapper().readValue(json, new TypeReference<Map<String, Object>>() {
-                        });
+                        configInfo = new ObjectMapper().readValue(json, new TypeReference<>() {});
                     }
                 }
             } catch (WebObjectsException | IllegalArgumentException e) {
-            	LOGGER.error("!!! error", e);
+            	logger.error("!!! error", e);
             } catch (IOException e) {
-            	LOGGER.error("!!! json [{}] parsing error", e);
+            	logger.error("!!! json [{}] parsing error", e);
             }
 
         }
@@ -202,41 +283,50 @@ public class MstrUtil {
 	 * @param session
 	 * @return
 	 */
-    public static Map<String, String> getSessionStateMap(HttpSession session) {
-    	MstrUser mstrUserVo = (MstrUser)session.getAttribute("mstr-user-vo");
-    	if(mstrUserVo == null) {
-    		return null;
+    public static Map<String, String> getSessionStateMap(final HttpSession session) {
+    	Map<String, String> rtnMap = new ConcurrentHashMap<>();
+    	
+    	final MstrUser mstrUserVo = (MstrUser)session.getAttribute("mstr-user-vo");
+    	if(mstrUserVo != null) {
+    		rtnMap = mstrUserVo.getMstrSession();
     	}
     	
-		return mstrUserVo.getMstrSession(); 
+		return rtnMap; 
 	}
     
     
-    public static void closeISession(WebIServerSession wss) throws SdkRuntimeException {
+    /**
+     * closeISession
+     * @param wss
+     * @throws SdkRuntimeException
+     */
+    public static void closeISession(final WebIServerSession wss) {
         try {
-            if (wss != null)
-                wss.closeSession();
-        } catch (WebObjectsException e) {
-            if (e.getErrorCode() != -2147205069) {
-                LOGGER.error("error !!!", e);
+            if (wss != null) {
+            	wss.closeSession();
             }
-        } catch (Exception e) {
-            LOGGER.error("error !!!", e);
-            throw new SdkRuntimeException(e);
+        } catch (WebObjectsException e) {
+            if (e.getErrorCode() != -2_147_205_069) {
+            	logger.error("error !!!", e);
+            }
         }
     }
     
     
-    public static void closeISession(String sessionState) {
+    /**
+     * closeISession
+     * @param sessionState
+     */
+    public static void closeISession(final String sessionState) {
         try {
-            WebIServerSession session = WebObjectsFactory.getInstance().getIServerSession();
+        	final WebIServerSession session = WebObjectsFactory.getInstance().getIServerSession();
             session.restoreState(sessionState);
 
             if (session.isAlive()) {
                 session.closeSession();
             }
         } catch (WebObjectsException e) {
-        	LOGGER.error("!!! error", e);
+        	logger.error("!!! error", e);
         }
     }
     
@@ -247,39 +337,36 @@ public class MstrUtil {
 	 * @param userId
 	 * @return
 	 */
-	public static Boolean cleanOtherUserMstrSession(HttpSession session, String userId) {
+	public static Boolean cleanOtherUserMstrSession(final HttpSession httpSession, final String userId) {
 		Boolean cleanCheck = true;
 		
-		Map<String, String> sessionStateMap = getSessionStateMap(session);
-		
-		LOGGER.debug("=> sessionStateMap:[{}]", sessionStateMap);
+		final Map<String, String> sessionStateMap = getSessionStateMap(httpSession);
+//		logger.debug("=> sessionStateMap:[{}]", sessionStateMap);
 		
 		if (sessionStateMap != null) {
-			for (String project : sessionStateMap.keySet()) {
-				String sessionState = sessionStateMap.get(project);
-				
-	            final WebIServerSession isession = WebObjectsFactory.getInstance().getIServerSession();
+			for (final String project : sessionStateMap.keySet()) {
+				final String sessionState = sessionStateMap.get(project);
+	            final WebIServerSession session = WebObjectsFactory.getInstance().getIServerSession();
 
 	            try {
-	            	isession.restoreState(sessionState);
+	            	session.restoreState(sessionState);
 	            	
-					if (!isession.isAlive()) { 
-					    isession.reconnect();
+					if (!session.isAlive()) { 
+						session.reconnect();
 					}
 
-					// LOGGER.debug("=> userId:[{}], session userId:[{}]", userId, isession.getUserInfo().getAbbreviation());
-					if (!StringUtils.equalsIgnoreCase(userId, isession.getUserInfo().getAbbreviation())) {
-						MstrUtil.closeISession(sessionState);			
-						LOGGER.debug("=> close session:[{}]", project);
+					if (!StringUtils.equalsIgnoreCase(userId, session.getUserInfo().getAbbreviation())) {
+						closeISession(sessionState);
+						final String logTmp1 = project.replaceAll("[\r\n]","");
+						logger.debug("=> close session:[{}]", logTmp1);
 					}
 				} catch (WebObjectsException e) {
-					LOGGER.error("!!! error", e);
+					logger.error("!!! error", e);
 					cleanCheck = false;
-					return cleanCheck;
 				}
-				
 			}
 		}
+		
 		return cleanCheck;
 	}
 	
@@ -288,17 +375,18 @@ public class MstrUtil {
 	 * MSTR 세션 초기화
 	 * @param session
 	 */
-	public static void cleanMstrSession(HttpSession session) {
-		Map<String, String> sessionStateMap = getSessionStateMap(session);
-		
-		LOGGER.debug("=> sessionStateMap:[{}]", sessionStateMap);
+	public static void cleanMstrSession(final HttpSession session) {
+		final Map<String, String> sessionStateMap = getSessionStateMap(session);
+//		logger.debug("=> sessionStateMap:[{}]", sessionStateMap);
 		
 		if (sessionStateMap != null) {
-			for (String project : sessionStateMap.keySet()) {
-				LOGGER.debug("=> close session:[{}]", project);
-				String sessionState = sessionStateMap.get(project);
+			for (final String project : sessionStateMap.keySet()) {
 				
-				MstrUtil.closeISession(sessionState);			
+				final String logTmp1 = project.replaceAll("[\r\n]","");
+				logger.debug("=> close session:[{}]", logTmp1);
+				
+				final String sessionState = sessionStateMap.get(project);
+				closeISession(sessionState);
 			}
 		}		
 	}

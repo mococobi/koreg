@@ -1,27 +1,22 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
 <%@ page import="com.mococo.web.util.CustomProperties" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
+	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
+	pageContext.setAttribute("portalAppName", portalAppName);
+
 	String boardId = (String)request.getParameter("BRD_ID");
 	String postId = (String)request.getParameter("POST_ID");
-	pageContext.setAttribute("postId", postId);
 	
 	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
+	Boolean portalAdminAuth = PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN");
 	
 	String attachBaseFileSize = (String)CustomProperties.getProperty("attach.base.file.size");
 	String attachBaseFileExtension = (String)CustomProperties.getProperty("attach.base.file.extension");
 	
 	pageContext.setAttribute("attachBaseFileSize", attachBaseFileSize);
 	pageContext.setAttribute("attachBaseFileExtension", attachBaseFileExtension);
-	
-	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
-	pageContext.setAttribute("portalAppName", portalAppName);
-	
-	String mstrUserIdAttr = (String)session.getAttribute("mstrUserIdAttr");
-	pageContext.setAttribute("mstrUserIdAttr", mstrUserIdAttr);
 %>
 <!DOCTYPE html>
 <html>
@@ -29,7 +24,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>${boardData['BRD_NM']} - 작성</title>
+	<title>작성</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
@@ -39,9 +34,6 @@
 	<script type="text/javascript" charset="UTF-8"  src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/daterangepicker.js"></script>
 	<script type="text/javascript" charset="UTF-8"  src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/moment.min.js"></script>
 	<script type="text/javascript" charset="UTF-8"  src="${pageContext.request.contextPath}/_custom/javascript/toastui-editor/toastui-editor-all.min.js"></script>
-	
-	<!-- 게시판 JS -->
-	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/portal/boardCommon.js?v=20240122001"></script>
 	
 	<style type="text/css">
 		#board_table th, #board_table td {
@@ -74,34 +66,12 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 
 	<div id="boardPost_div" class="container py-4" style="max-width: 100%;">
-		<p class="h3">${boardData['BRD_NM']}</p>
-		<p class="h6">${boardData['BRD_DESC']}</p>
+		<p id="brd_nm" class="h3"></p>
+		<p id="brd_desc" class="h6"></p>
 		<div class="row mb-3">
 			<div class="col">
-				<c:choose>
-				    <c:when test="${not empty postId}">
-				    	<!-- 수정 -->
-				    	<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
-							<button class="btn btn-secondary btn-sm" onclick="updateBoardPost()">저장</button>
-						<% } else { %>
-							<c:if test="${postData['CRT_USR_ID'] eq mstrUserIdAttr}">
-								<button class="btn btn-secondary btn-sm" onclick="updateBoardPost()">저장</button>
-							</c:if>
-						<% } %>
-				    </c:when>
-				    <c:otherwise>
-				    	<!-- 신규 -->
-				    	<% if(PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN")) { %>
-							<button class="btn btn-secondary btn-sm" onclick='createBoardPost()'>작성</button>
-						<% } else { %>
-							<c:set var="create_auth_check1" value="${fn:indexOf(boardData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += mstrUserIdAttr += '\"')}" />
-							<c:set var="create_auth_check2" value="${fn:indexOf(boardData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += 'ALL_USER' += '\"')}" />
-							<c:if test="${create_auth_check1 gt -1 || create_auth_check2 gt -1}">
-								<button class="btn btn-secondary btn-sm" onclick='createBoardPost()'>작성</button>
-							</c:if>
-						<% } %>
-				    </c:otherwise>
-				</c:choose>
+				<button id="btn_post_create" class="btn btn-secondary btn-sm" onclick="changeBoardPost('CREATE')" style="display: none;">작성</button>
+				<button id="btn_post_modify" class="btn btn-secondary btn-sm" onclick="changeBoardPost('UPDATE')" style="display: none;">저장</button>
 			</div>
 			<div class="col text-end">
 				<button class="btn btn-secondary btn-sm" onclick="moveCommunityPage(<%=boardId%>)">목록</button>
@@ -153,51 +123,44 @@
 							<span id="post_count"></span>
 						</td>
 					</tr>
-					<c:if test="${boardData['POST_POPUP_YN'] eq 'Y'}">
-						<tr id="post_popup_yn_div">
-							<td>
-								<span>팝업여부</span>
-							</td>
-							<td class="text-center">
-								<input type="checkbox" id="popup_yn" value="" onclick="checkPopUp(this)">
-							</td>
-							<td>
-								<span>팝업일자</span>
-							</td>
-							<td colspan="5">
-								<span id="post_popup_dt"> 
-									<img src="${pageContext.request.contextPath}/_custom/image/bootstrap-icons-1.11.2/calendar-fill.svg" id="datefilter" name="datefilter" style="width: 20px; pointer-events:none;" />
-									<input type="text" name="startDateInput" id="startDateInput" value="" readonly style="width: 200px;" readonly /> 
-									<input type="text" name="endDateInput" id="endDateInput" value="" readonly	style="width: 200px;" readonly />
-								</span>
-							</td>
-						</tr>
-					</c:if>
-					<tr>
-						<c:if test="${boardData['POST_FIX_YN'] eq 'Y'}">
-							<td id="post_fix_yn_div">
-								<span>상단 고정</span>
-							</td>
-							<td>
-								<input type="checkbox" id="post_fix_yn" disabled>
-							</td>
-						</c:if>
-						<c:if test="${boardData['POST_SECRET_YN'] eq 'Y'}">
-							<td id="post_secret_yn_div">
-								<span>비밀글</span>
-							</td>
-							<td>
-								<input type="checkbox" id="post_secret_yn" disabled>
-							</td>
-						</c:if>
-					</tr>
-					<c:if test="${boardData['BRD_VIEW_AUTH'] eq 'Y'}">
+					<tr id="post_type_yn" style="display: none;">
 						<td>
-							<span>보기 권한</span>
+							<span>분류</span>
 						</td>
-						<td colspan="7"></td>
-					</c:if>
-					<tr>
+						<td colspan="7">
+							<select id="post_type" class="form-select form-select-sm" style="width: 29%;">
+								<option>메뉴얼</option>
+								<option>용어사전</option>
+								<option>동영상교육</option>
+								<option>지점안내</option>
+				            </select>
+						</td>
+					</tr>
+					<tr id="post_popup_yn" style="display: none;">
+						<td>
+							<span>팝업여부</span>
+						</td>
+						<td class="text-center">
+							<input type="checkbox" id="popup_yn" value="" onclick="checkPopUp(this)">
+						</td>
+						<td>
+							<span>팝업일자</span>
+						</td>
+						<td colspan="5">
+							<span id="post_popup_dt"> 
+								<img src="${pageContext.request.contextPath}/_custom/image/bootstrap-icons-1.11.2/calendar-fill.svg" id="datefilter" name="datefilter" style="width: 20px; pointer-events:none;" />
+								<input type="text" name="startDateInput" id="startDateInput" value="" readonly style="width: 200px;" readonly /> 
+								<input type="text" name="endDateInput" id="endDateInput" value="" readonly	style="width: 200px;" readonly />
+							</span>
+						</td>
+					</tr>
+					<tr id="post_fix_yn" style="display: none;">
+						<td id="post_fix_yn_div">
+							<span>고정여부</span>
+						</td>
+						<td class="text-center">
+							<input type="checkbox" id="fix_yn">
+						</td>
 					</tr>
 					<tr>
 						<td>
@@ -207,19 +170,17 @@
 							<div id="post_content" style="min-height: 300px;"></div>
 						</td>
 					</tr>
-					<c:if test="${boardData['POST_FILE_YN'] eq 'Y'}">
-						<tr id="post_file_yn_div">
-							<td>
-								<span>첨부 파일</span>
-							</td>
-							<td colspan="7">
-								<div>
-									<input id="post_file" class="form-control" type="file" multiple>
-								</div>
-								<div id="post_file_output" class="list-group"></div>
-							</td>
-						</tr>
-					</c:if>
+					<tr id="post_file_yn" style="display: none;">
+						<td>
+							<span>첨부 파일</span>
+						</td>
+						<td colspan="7">
+							<div>
+								<input id="post_file" class="form-control" type="file" multiple>
+							</div>
+							<div id="post_file_output" class="list-group"></div>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</form>
@@ -237,21 +198,65 @@
 	let deleteFileIds = [];
 	
 	$(function() {
-		if('${boardData["BRD_NM"]}' == '') {
-			alert('선택한 게시판이 존재하지 않습니다.');
-			
-			let pagePrams = [];
-			pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
-		} else {
-			fnBoardPostInit();
-		}
+		fnBoardPostInit();
 		
 		if(postId != null) {
 			//수정
-			callBoardPostDetail();
+			
+			let callParams = {
+				  BRD_ID : boardId
+				, POST_ID : postId
+			};
+			callAjaxPost('/board/boardPostDetail.json', callParams, function(data) {
+				let postData = data['data'];
+				let postFile = data['file'];
+				let postLocation = data['location'];
+				
+				if(postData['CRT_USR_ID'] == '${mstrUserIdAttr}' || <%=portalAdminAuth%>) {
+					$('#btn_post_modify').show();
+				}
+				
+				if(postData['BRD_NM'] == '') {
+					alert('선택한 게시물이 존재하지 않습니다.');
+					
+					let pagePrams = [];
+					pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
+				} else {
+					displayBoardPostTag(postData, postFile, postLocation);
+					displayBoardPostContents(postData, postFile, postLocation);
+				}
+			});
+			
 		} else {
 			//신규
 			$('#post_write_not').hide();
+			
+			let callParams = {
+				  BRD_ID : boardId
+			};
+			callAjaxPost('/board/boardInfo.json', callParams, function(data) {
+				let postData = data['data'];
+				let postFile = data['file'];
+				let postLocation = data['location'];
+				
+				if(postData['CRT_USR_ID'] == '${mstrUserIdAttr}' 
+					|| <%=portalAdminAuth%>
+					|| postData['BRD_CRT_AUTH'].indexOf('"AUTH_ID":"ALL_USER"') > -1
+					|| postData['BRD_CRT_AUTH'].indexOf('"AUTH_ID":"${mstrUserIdAttr}"') > -1
+				) {
+					$('#btn_post_create').show();
+				}
+				
+				if(postData['BRD_NM'] == '') {
+					alert('선택한 게시물이 존재하지 않습니다.');
+					
+					let pagePrams = [];
+					pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
+				} else {
+					displayBoardPostTag(postData, postFile, postLocation);
+					displayBoardPostContents(postData, postFile, postLocation);
+				}
+			});
 		}
 	});
 	
@@ -268,32 +273,31 @@
 			, previewStyle: 'vertical' // 마크다운 프리뷰 스타일 (tab || vertical)
 		});
 		
-		
 		//달력 지우기
 		$('#datefilter').on('cancel.daterangepicker', function(ev, picker) {
 			$('#startDateInput').val('');
 			$('#endDateInput').val('');
 		});
 		
-		
 		//달력 설정
-		$('#datefilter').daterangepicker({
+		$('#datefilter').daterangepicker(
+			{
 				'locale': {
-			         'format': 'YYYY-MM-DD hh:mm A'
-			        , 'separator': ' ~ '
-			        , 'applyLabel': '확인'
-			        , 'cancelLabel': '지우기'
-			        , 'fromLabel': 'From'
-			        , 'toLabel': 'To'
-			        , 'customRangeLabel': 'Custom'
-			        , 'weekLabel': 'W'
-			        , 'daysOfWeek': ['일', '월', '화', '수', '목', '금', '토']
-					, 'monthNames': ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+			         'format' : 'YYYY-MM-DD hh:mm A'
+			        , 'separator' : ' ~ '
+			        , 'applyLabel' : '확인'
+			        , 'cancelLabel' : '지우기'
+			        , 'fromLabel' : 'From'
+			        , 'toLabel' : 'To'
+			        , 'customRangeLabel' : 'Custom'
+			        , 'weekLabel' : 'W'
+			        , 'daysOfWeek' : ['일', '월', '화', '수', '목', '금', '토']
+					, 'monthNames' : ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
 				}
-				, 'startDate': new Date()
-				, 'endDate': new Date()
-				, 'minDate': moment()
-				, 'drops': 'auto'
+				, 'startDate' : new Date()
+				, 'endDate' : new Date()
+				, 'minDate' : moment()
+				, 'drops' : 'auto'
 			}
 			, function (start, end, label) {
 				$('#startDateInput').val(start.format('YYYY-MM-DD'));
@@ -301,30 +305,137 @@
 			}
 		);
 		
+	}
+	
+	
+	//태그 표시
+	function displayBoardPostTag(postData, postFile, postLocation) {
+		document.title = postData['BRD_NM'] + ' - 상세';
 		
-		//파일 변경
-		$('#post_file').change(function(e) {
-			let files = e.target.files;
+		$('#brd_nm').text(postData['BRD_NM']);
+		$('#brd_desc').text(postData['BRD_DESC']);
+		
+		if(postData['POST_TYPE_YN'] == 'Y') {
+			$('#post_type_yn').show();
+		}
+		
+		if(postData['POST_POPUP_YN'] == 'Y') {
+			$('#post_popup_yn').show();
+		}
+		
+		if(postData['POST_FIX_YN'] == 'Y') {
+			$('#post_fix_yn').show();
+		}
+		
+		if(postData['POST_FILE_YN'] == 'Y') {
+			$('#post_file_yn').show();
 			
-			for (let i=0; i < files.length; i++) {
+			//파일 변경
+			$('#post_file').change(function(e) {
+				let files = e.target.files;
 				
-				let appendCheck = true;
-				let fileExtension = getExtensionOfFilename(files[i]['name']);
-				if(files[i]['size'] > ${attachBaseFileSize}) {
-					appendCheck = false;
-					alert(files[i]['name'] + '의 크기가 제한에 초과되었습니다.\n제한 용량 : ' + formatFileSize(${attachBaseFileSize}) + '\n현재 용량 : ' + formatFileSize(files[i]['size']));
-				} else if('${attachBaseFileExtension}'.indexOf(fileExtension.toLocaleUpperCase()) == -1) {
-					appendCheck = false;
-					alert(files[i]['name'] + '의 확장자가 지원되지 않습니다.\n현재 확장자 : ' + fileExtension);
+				for (let i=0; i < files.length; i++) {
+					let appendCheck = true;
+					let fileExtension = getExtensionOfFilename(files[i]['name']);
+					if(files[i]['size'] > ${attachBaseFileSize}) {
+						appendCheck = false;
+						alert(files[i]['name'] + '의 크기가 제한에 초과되었습니다.\n제한 용량 : ' + formatFileSize(${attachBaseFileSize}) + '\n현재 용량 : ' + formatFileSize(files[i]['size']));
+					} else if('${attachBaseFileExtension}'.indexOf(fileExtension.toLocaleUpperCase()) == -1) {
+						appendCheck = false;
+						alert(files[i]['name'] + '의 확장자가 지원되지 않습니다.\n현재 확장자 : ' + fileExtension);
+					}
+					
+					if(appendCheck) {
+						filesObj[fileObjIndex++] = files[i];
+						
+						let strongHtml = $('<span>', {
+							  class : 'text-gray-dark'
+							, text : files[i]['name'] + '\t' + formatFileSize(files[i]['size'])
+							, title : files[i]['name']
+						});
+						
+						let aHtml = $('<a>', {
+							  class : 'text-gray-dark'
+							, text : '삭제'
+							, title : '삭제'
+							, style : 'cursor:pointer;'
+							, 'data-index' : fileObjIndex - 1
+							, click : function(e) {
+								delete filesObj[$(this).attr('data-index')];
+								$(this).parent().parent().parent().remove();
+							}
+						});
+						
+						let divHtml1 = $('<div>', {
+							class : 'd-flex justify-content-between'
+						}).append(strongHtml).append(aHtml);
+						
+						let divHtml2 = $('<div>', {
+							class : 'pb-3 mb-0 small lh-sm border-bottom w-100'
+						}).append(divHtml1);
+						
+						let divHtml3 = $('<div>', {
+							class : 'd-flex text-body-secondary pt-3'
+						}).append(divHtml2);
+						
+						$('#post_file_output').append(divHtml3);
+					}
 				}
 				
-				if(appendCheck) {
-					filesObj[fileObjIndex++] = files[i];
-					
+				$('#post_file').val('');
+			});
+		}
+	}
+	
+	
+	//내용 표시
+	function displayBoardPostContents(postData, postFile) {
+		$('#post_title').val(postData['POST_TITLE']);
+		$('#post_create_user_id').text(postData['CRT_USR_ID']);
+		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);
+		$('#post_create_date').text(changeDisplayDate(postData['CRT_DT_TM'], 'YYYY-MM-DD'));
+		$('#post_count').text(postData['POST_VIEW_COUNT']);
+		
+		if(postData['POST_TYPE_YN'] == 'Y') {
+			if(postData['POST_TYPE']) {
+				$("#post_type").val(postData['POST_TYPE']).prop("selected", true);
+			}
+		}
+		
+		if(postData['POST_POPUP_YN'] == 'Y') {
+			if(postData['POPUP_YN'] == 'Y') {
+				$('#popup_yn').prop('checked', true);
+				let datefilter_elem = $('#datefilter');
+				datefilter_elem.attr('src', '${pageContext.request.contextPath}/_custom/image/bootstrap-icons-1.11.2/calendar-plus.svg');
+				datefilter_elem.css('pointer-events', 'auto');
+			} else {
+				$('#popup_yn').prop('checked', false);
+			}
+			
+			if(postData['POPUP_START_DT_TM'] || postData['POPUP_END_DT_TM']) {
+				$('#startDateInput').val(changeDisplayDate(postData['POPUP_START_DT_TM'], 'YYYY-MM-DD'));
+				$('#endDateInput').val(changeDisplayDate(postData['POPUP_END_DT_TM'], 'YYYY-MM-DD'));
+			}
+		}
+		
+		if(postData['POST_FIX_YN'] == 'Y') {
+			if(postData['FIX_YN'] == 'Y') {
+				$('#fix_yn').prop('checked', true);
+			} else {
+				$('#fix_yn').prop('checked', false);
+			}
+		}
+		
+		editor.setHTML(postData['POST_CONTENT']);
+		
+		if(postData['POST_FILE_YN'] == 'Y') {
+			//첨부파일 리스트 표시
+			if(postFile) {
+				postFile.forEach((attachFile, idx) => {
 					let strongHtml = $('<span>', {
 						  class : 'text-gray-dark'
-						, text : files[i]['name'] + '\t' + formatFileSize(files[i]['size'])
-						, title : files[i]['name']
+						, text : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT'] + '\t' + formatFileSize(attachFile['FILE_SIZE'])
+						, title : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT']
 					});
 					
 					let aHtml = $('<a>', {
@@ -332,9 +443,8 @@
 						, text : '삭제'
 						, title : '삭제'
 						, style : 'cursor:pointer;'
-						, 'data-index' : fileObjIndex - 1
 						, click : function(e) {
-							delete filesObj[$(this).attr('data-index')];
+							deleteFileIds.push(attachFile['FILE_ID']);
 							$(this).parent().parent().parent().remove();
 						}
 					});
@@ -352,84 +462,8 @@
 					}).append(divHtml2);
 					
 					$('#post_file_output').append(divHtml3);
-				}
+				});
 			}
-			
-			$('#post_file').val('');
-		});
-
-	}
-	
-	
-	//내용 표시
-	function displayBoardPostContents(postData, postFile) {
-		$('#post_title').val(postData['POST_TITLE']);
-		$('#post_create_user_id').text(postData['CRT_USR_ID']);
-		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);
-		$('#post_create_date').text(changeDisplayDate(postData['CRT_DT_TM'], 'YYYY-MM-DD'));
-		$('#post_count').text(postData['POST_VIEW_COUNT']);
-		editor.setHTML(postData['POST_CONTENT']);
-		
-		if(postData['POPUP_YN'] == 'Y') {
-			$('#popup_yn').prop('checked', true);
-			let datefilter_elem = $('#datefilter');
-			datefilter_elem.attr('src', '${pageContext.request.contextPath}/_custom/image/bootstrap-icons-1.11.2/calendar-plus.svg');
-			datefilter_elem.css('pointer-events', 'auto');
-		} else {
-			$('#popup_yn').prop('checked', false);
-		}
-		
-		if(postData['POPUP_START_DT_TM'] || postData['POPUP_END_DT_TM']) {
-			$('#startDateInput').val(changeDisplayDate(postData['POPUP_START_DT_TM'], 'YYYY-MM-DD'));
-			$('#endDateInput').val(changeDisplayDate(postData['POPUP_END_DT_TM'], 'YYYY-MM-DD'));
-		}
-		
-		if(postData['SECRET_YN'] == 'Y') {
-			$('#post_secret_yn').prop('checked', true);
-		} else {
-			$('#post_secret_yn').prop('checked', false);
-		}
-		
-		if(postData['FIX_YN'] == 'Y') {
-			$('#post_fix_yn').prop('checked', true);
-		} else {
-			$('#post_fix_yn').prop('checked', false);
-		}
-		
-		//첨부파일 리스트 표시
-		if(postFile) {
-			postFile.forEach((attachFile, idx) => {
-				let strongHtml = $('<span>', {
-					  class : 'text-gray-dark'
-					, text : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT'] + '\t' + formatFileSize(attachFile['FILE_SIZE'])
-					, title : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT']
-				});
-				
-				let aHtml = $('<a>', {
-					  class : 'text-gray-dark'
-					, text : '삭제'
-					, title : '삭제'
-					, style : 'cursor:pointer;'
-					, click : function(e) {
-						deleteFileIds.push(attachFile['FILE_ID']);
-						$(this).parent().parent().parent().remove();
-					}
-				});
-				
-				let divHtml1 = $('<div>', {
-					class : 'd-flex justify-content-between'
-				}).append(strongHtml).append(aHtml);
-				
-				let divHtml2 = $('<div>', {
-					class : 'pb-3 mb-0 small lh-sm border-bottom w-100'
-				}).append(divHtml1);
-				
-				let divHtml3 = $('<div>', {
-					class : 'd-flex text-body-secondary pt-3'
-				}).append(divHtml2);
-				
-				$('#post_file_output').append(divHtml3);
-			});
 		}
 	}
 	
@@ -460,5 +494,78 @@
 	}
 	
 	
+	//입력 정보 확인 체크
+	function checkPostInput() {
+		let rtnCheck = true;
+		
+		if($('#post_title').val() == '') {
+			alert('제목을 입력하세요');
+			$('#post_title').focus();
+			return false;
+		}
+		
+		if(editor.getHTML() == '') {
+			alert('내용을 입력하세요');
+			editor.getHTML().focus();
+			return false;
+		}
+		
+		if($('#popup_yn').val() == 'Y' && $('#startDateInput').val() == '') {
+			alert('팝업일자를 선택하세요');
+			return false;
+		}
+
+		return rtnCheck;
+	}
+	
+	
+	//게시글 등록 및 수정
+	function changeBoardPost(changeType) {
+		let checkVal = checkPostInput();
+		
+		let changeNm = '';
+		let changeQuery = '';
+		if(changeType == 'CREATE') {
+			changeNm = '등록';
+			changeQuery = 'boardPostInsert';
+		} else if(changeType == 'UPDATE') {
+			changeNm = '수정';
+			changeQuery = 'boardPostUpdate';
+		}
+		
+		if(checkVal) {
+			let msg = '게시글을 '+ changeNm +'하시겠습니까?';
+			if (confirm(msg)) {
+				let formData = new FormData();
+				
+				formData.append('POST_ID', postId);
+				formData.append('BRD_ID', boardId);
+				formData.append('POST_TYPE', $('#post_type').val());
+				formData.append('POST_TITLE', $('#post_title').val());
+				formData.append('POST_CONTENT', editor.getHTML());
+				formData.append('POPUP_YN', $('#popup_yn').is(':checked') ? 'Y' : 'N');
+				formData.append('FIX_YN', $('#fix_yn').is(':checked') ? 'Y' : 'N');
+				formData.append('POPUP_START_DT_TM', $('#startDateInput').val());
+				formData.append('POPUP_END_DT_TM', $('#endDateInput').val());
+				
+				//multiple 파일 갯수에 만큼 저장
+				Object.values(filesObj).forEach((file, idx) => {
+					formData.append('ATTACH_FILE_' + idx, file);
+				});
+				
+				if(changeType == 'UPDATE') {
+					//삭제 첨부파일 추가
+					deleteFileIds.forEach(id => {
+						formData.append('deleteFileIds', id);
+					});
+				}
+				
+				callAjaxForm('/board/'+changeQuery+'.json', formData, function(data) {
+					alert('게시글이 '+ changeNm +'되었습니다.');
+					detailBoardPost(boardId, data['POST_ID']);//POST_ID 받아오는 값
+				});
+		    }
+		}
+	}
 </script>
 </html>

@@ -128,7 +128,7 @@ var promptRenderer = {
 			
 			//필수 값 체크
 			if($elem.attr('prompt-required') == 'true') {
-				if(promptLength == 0) {
+				if(promptLength === 0) {
 					return '[' + $elem.attr('prompt-title') + ']를 선택하세요';
 				}
 			}
@@ -174,13 +174,13 @@ var promptRenderer = {
 				, selectedDates : [currentDate]
 //				, buttons: ['today', 'clear']
 			    , autoClose : true
-			    , minDate : (data['promptSubType'] == 2565 && data['min']) ? new Date(data['min']) : false
-				, maxDate : (data['promptSubType'] == 2565 && data['max']) ? new Date(data['max']) : new Date()
+			    , minDate : (data['promptSubType'] === 2565 && data['min']) ? new Date(data['min']) : false
+				, maxDate : (data['promptSubType'] === 2565 && data['max']) ? new Date(data['max']) : new Date()
 			});
 			
 			//기본 값 설정
 			if(data['defaultAnswer']) {
-				if(data['promptSubType'] == 2565) {
+				if(data['promptSubType'] === 2565) {
 					//날짜 프롬프트일 경우
 					selectDate.selectDate(new Date(data['defaultAnswer']));
 				} else {
@@ -190,7 +190,7 @@ var promptRenderer = {
 			
 			//엔터키 이벤트
 			$day.on('keyup', function(e) {
-				if(e.keyCode==13) {
+				if(e.keyCode === 13) {
 					let promptVal = $day.val();
 					let promptDate = null;
 					
@@ -210,7 +210,7 @@ var promptRenderer = {
 		, 'selected' : function($elem) {
 			let promptVal = '';
 			
-			if($elem.attr('prompt-promptSubType') == 2565) {
+			if($elem.attr('prompt-promptSubType') === 2565) {
 				//날짜 프롬프트일 경우
 				promptVal = $elem.val();
 			} else {
@@ -246,7 +246,7 @@ var promptRenderer = {
 			//최소 값 체크
 			let promptMinLength = $elem.attr('prompt-min');
 			if(promptMinLength) {
-				if($elem.attr('prompt-promptSubType') == 2565) {
+				if($elem.attr('prompt-promptSubType') === 2565) {
 					//날짜 프롬프트일 경우
 					if(new Date($elem.val()) < new Date(promptMinLength)) {
 						return '[' + $elem.attr('prompt-title') + ']의 최소 날짜는 ' + promptMinLength + '입니다';
@@ -261,7 +261,7 @@ var promptRenderer = {
 			//최대 값 체크
 			let promptMaxLength = $elem.attr('prompt-max');
 			if(promptMaxLength) {
-				if($elem.attr('prompt-promptSubType') == 2565) {
+				if($elem.attr('prompt-promptSubType') === 2565) {
 					//날짜 프롬프트일 경우
 					if(new Date($elem.val()) > new Date(promptMaxLength)) {
 						return '[' + $elem.attr('prompt-title') + ']의 최대 날짜는 ' + promptMaxLength + '입니다';
@@ -306,7 +306,7 @@ var promptRenderer = {
 			
 			//엔터키 이벤트
 			$month.on('keyup', function(e) {
-				if(e.keyCode==13) {
+				if(e.keyCode === 13) {
 					let promptVal = $month.val();
 					let promptDate = null;
 					
@@ -402,7 +402,7 @@ var promptRenderer = {
 			
 			//엔터키 이벤트
 			$year.on('keyup', function(e) {
-				if(e.keyCode==13) {
+				if(e.keyCode === 13) {
 					let promptVal = $year.val();
 					let promptDate = null;
 					
@@ -505,11 +505,12 @@ var promptRenderer = {
 	, 'multiselect-yyyymm' : {
 		  'label' : _defaultElemRenderer['label']
 		, 'body' : function($wrapper, data) {
-			var $select = $('<select ui-type="list-default" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" multiple="multiple"></select>');
+			let $select = $('<select ui-type="list-default" prompt-id="' + data['id'] + '" prompt-tp="' + data['type'] + '" multiple="multiple"></select>');
 			$wrapper.append($select);
 			
-			var to = 2020; from = to - 10;
-			for (var i = to; i > from; i--) {
+			let to = 2020; 
+			let from = to - 10;
+			for (let i = to; i > from; i--) {
 				$select.append('<option value="' + String(i) + '">' + String(i) + '</option>');
 			}
 			

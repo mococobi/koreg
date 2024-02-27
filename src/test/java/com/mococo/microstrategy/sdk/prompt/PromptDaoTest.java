@@ -2,6 +2,8 @@ package com.mococo.microstrategy.sdk.prompt;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ import com.mococo.microstrategy.sdk.prompt.dao.impl.MstrObjectsPromptApiDao;
 import com.mococo.microstrategy.sdk.prompt.vo.PromptElement;
 import com.mococo.microstrategy.sdk.util.MstrUtil;
 import com.mococo.web.util.CustomProperties;
+import com.mococo.web.util.EncryptUtil;
 
 public class PromptDaoTest {
 	private static final Logger logger = LoggerFactory.getLogger(PromptDaoTest.class);
@@ -39,26 +42,34 @@ public class PromptDaoTest {
 	
 	public static void doExpression(PromptDao prompt) throws Exception {
         List<PromptElement> topElementList = prompt.getSuggestedAnswers();
-        logger.debug("topElementList: [{}]", topElementList);
+        
+        String logTmp1 = topElementList.toString().replaceAll("[\r\n]","");
+        logger.debug("topElementList: [{}]", logTmp1);
+        
         List<PromptElement> childElementList = prompt.getSuggestedAnswers(0, "8D679D4A11D3E4981000E787EC6DE8A4:20101");
-        logger.debug("childElementList: [{}]", childElementList);
+        String logTmp2 = childElementList.toString().replaceAll("[\r\n]","");
+        logger.debug("childElementList: [{}]", logTmp2);
 	}
 	
 	@Test
 	public void testMstrPromptDao() throws WebObjectsException {
 		WebIServerSession session = null; 
-		List<String> objectIdList = Arrays.asList(new String[] {"882790F211D3EB22C000B4B2D86C964F", "303A10EA40B95D0A4F93D0A018485F75", "75F5E3E448FD44CB4B4BDB8C9AFC76A2"});
+		List<String> objectIdList = Arrays.asList(new String[] {"5604502D4327EE263BFACB93606BC929", "7378908B47B87E0D8405DFBA7F1E4F08", "1288E3B944BFDFA145D55181DC7CD49F"});
 		
 		try {
 		    WebObjectsFactory factory = WebObjectsFactory.getInstance();
-		    session = MstrUtil.connectSession(
-		    		CustomProperties.getProperty("mstr.server.name")
-		    		, CustomProperties.getProperty("mstr.default.project.name")
-		    		, CustomProperties.getProperty("mstr.admin.user.id")
-		    		, CustomProperties.getProperty("mstr.admin.user.pwd")
-		    	);
+		    session = factory.getIServerSession();
 		    
-		    WebReportSource reportSource = factory.getReportSource(); 
+			final Map<String, Object> connData = new ConcurrentHashMap<>();
+			connData.put("server", MstrCnst.SERVER);
+			connData.put("project", MstrCnst.PROJECT);
+			connData.put("port", MstrCnst.PORT);
+			connData.put("localeNum", MstrCnst.LOCALE);
+			connData.put("uid", MstrCnst.USERID);
+			connData.put("pwd", MstrCnst.PWD);
+			session = MstrUtil.connectStandardSession(connData);
+		    
+		    WebReportSource reportSource = session.getFactory().getReportSource(); 
 		    for (String reportId : objectIdList) {
 		    	try {
 				    WebReportInstance reportInstance = reportSource.getNewInstance(reportId);
@@ -68,7 +79,8 @@ public class PromptDaoTest {
 			        	WebPrompt webPrompt = webPrompts.get(i);
 			        	PromptDao promptDao = null;
 			        	
-			        	logger.debug("==> name: [{}]", webPrompt.getName());
+			        	String logTmp1 = webPrompt.getName().replaceAll("[\r\n]","");
+			        	logger.debug("==> name: [{}]", logTmp1);
 			            switch (webPrompt.getPromptType()) {
 			            case EnumWebPromptType.WebPromptTypeConstant:
 			            	logger.debug("WebPromptTypeConstant");
@@ -88,19 +100,19 @@ public class PromptDaoTest {
 			            	break;
 			            case EnumWebPromptType.WebPromptTypeDimty:
 			            	logger.debug("WebPromptTypeDimty");
-			            	throw new RuntimeException("prompt type dimty.");
+//			            	throw new RuntimeException("prompt type dimty.");
 			            case EnumWebPromptType.WebPromptTypeUnsupported:
 			            	logger.debug("WebPromptTypeUnsupported");
-			            	throw new RuntimeException("unsuppoert prompt type.");
+//			            	throw new RuntimeException("unsuppoert prompt type.");
 			            }
 			            
-			            logger.debug("dao class name: [{}]", promptDao.getClass().getName());
-			            logger.debug("defaultAnswer: [{}]", promptDao.getDefaultAnswer());
-			            logger.debug("defaultAnswers: [{}]", promptDao.getDefaultAnswers());
-			            logger.debug("suggestedAnswers: [{}]", promptDao.getSuggestedAnswers());
+//			            logger.debug("dao class name: [{}]", promptDao.getClass().getName().toString().replaceAll("[\r\n]",""));
+//			            logger.debug("defaultAnswer: [{}]", promptDao.getDefaultAnswer());
+//			            logger.debug("defaultAnswers: [{}]", promptDao.getDefaultAnswers());
+//			            logger.debug("suggestedAnswers: [{}]", promptDao.getSuggestedAnswers());
 			        }
 		    	} catch (Exception e) {
-		    		logger.error("!!! error, reportId: [{}]", reportId, e);
+		    		logger.error("testMstrPromptDao Exception", e);
 		    	}
 		    }
 		} catch (Exception e) {
@@ -123,12 +135,14 @@ public class PromptDaoTest {
 		
 		
 		try {
-		    session = MstrUtil.connectSession(
-		    		CustomProperties.getProperty("mstr.server.name"), 
-		    		CustomProperties.getProperty("mstr.default.project.name"), 
-		    		CustomProperties.getProperty("mstr.admin.user.id"), 
-		    		CustomProperties.getProperty("mstr.admin.user.pwd")
-		    	);
+			final Map<String, Object> connData = new ConcurrentHashMap<>();
+			connData.put("server", MstrCnst.SERVER);
+			connData.put("project", MstrCnst.PROJECT);
+			connData.put("port", MstrCnst.PORT);
+			connData.put("localeNum", MstrCnst.LOCALE);
+			connData.put("uid", MstrCnst.USERID);
+			connData.put("pwd", MstrCnst.PWD);
+			session = MstrUtil.connectStandardSession(connData);
 		    
 		    // 78EB1EE14770755DA97A7891280DF4DD 인 경우 Entry Point가 다수이며, '년 개월' 애트리뷰트로 조회된다. -> Entry Point가 1만 필요
 		    // 47943D504389AFD2007557A2D1CAAB52 인 경우 Entry Point가 '연도' 하나이므로, '연도' 애트리뷰트 조회  
@@ -139,12 +153,14 @@ public class PromptDaoTest {
 		    	
 		    	PromptDao promptDao = new MstrExpressionPromptApiDao(session, (WebExpressionPrompt)webObjectInfo);
 		    	for (PromptElement element : promptDao.getSuggestedAnswers()) {
-		    		logger.debug("==> element: [{}]", element);
+		    		String logTmp1 = element.toString().replaceAll("[\r\n]","");
+		    		logger.debug("==> element: [{}]", logTmp1);
 		    		
 		    		PromptDao promptDao2 = new MstrExpressionPromptApiDao(session, (WebExpressionPrompt)webObjectInfo);
 		    		
 		    		for (PromptElement element2 : promptDao2.getSuggestedAnswers(0, element.getId())) {
-		    			logger.debug("==> child element: [{}]", element2);
+		    			String logTmp2 = element2.toString().replaceAll("[\r\n]","");
+		    			logger.debug("==> child element: [{}]", logTmp2);
 		    		}
 		    	}
 		    }

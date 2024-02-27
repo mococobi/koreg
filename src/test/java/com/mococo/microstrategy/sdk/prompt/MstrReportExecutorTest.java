@@ -13,7 +13,9 @@ public class MstrReportExecutorTest {
 	public void testGetConstantValue() {
 		String[] tokens = {"{d}", "{d-10}", "{d-mf}", "{d-bmf}", "{d-bmd}", "hello", "{m}", "{m-1}"};
 		for (String token : tokens) {
-			logger.debug("token:[{}], value:[{}]", token, MstrReportExecutor.getConstantValue(token));
+			String logTmp1 = token.replaceAll("[\r\n]","");
+			String logTmp2 = MstrReportExecutor.getConstantValue(token).toString().replaceAll("[\r\n]","");
+			logger.debug("token:[{}], value:[{}]", logTmp1, logTmp2);
 		}
 	}
 

@@ -1,5 +1,8 @@
 package com.mococo.microstrategy.sdk.prompt;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +27,20 @@ public class ReportChargerTest {
 		WebIServerSession session = null;
 		
 		try {
-		    session = MstrUtil.connectSession(MstrCnst.SERVER, MstrCnst.PROJECT, MstrCnst.USERID, MstrCnst.PWD);
+			final Map<String, Object> connData = new ConcurrentHashMap<>();
+			connData.put("server", MstrCnst.SERVER);
+			connData.put("project", MstrCnst.PROJECT);
+			connData.put("port", MstrCnst.PORT);
+			connData.put("localeNum", MstrCnst.LOCALE);
+			connData.put("uid", MstrCnst.USERID);
+			connData.put("pwd", MstrCnst.PWD);
+			session = MstrUtil.connectStandardSession(connData);
+			
 		    for (Object[] param : params) {
 		    	Report report = ReportCharger.chargeObject(session, (Integer)param[0], (String)param[1]);
 		    	
-		    	logger.debug("==> report: [{}]", report);
+		    	String logTmp1 = report.toString().replaceAll("[\r\n]","");
+		    	logger.debug("==> report: [{}]", logTmp1);
 		    }
 		} catch (Exception e) {
 			logger.error("!!! error", e);

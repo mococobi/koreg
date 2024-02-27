@@ -32,7 +32,8 @@
         <servlet-name>appServlet</servlet-name>
         <url-pattern>/app/*</url-pattern>
     </servlet-mapping>
-	    
+	
+	<!-- 세션 필터 -->
 	<filter>
 		<filter-name>SessionFilter</filter-name>
 		<filter-class>com.mococo.web.filter.SessionFilter</filter-class>
@@ -55,10 +56,26 @@
 	</filter-mapping>
 	
 	
+	<!-- DRM 다운로드 커스텀 적용 -->
+	<!-- 
+  	<filter>
+        <filter-name>DownloadServletFilter</filter-name>
+        <filter-class>com.mococo.web.filter.DownloadServletFilter</filter-class>
+	</filter>
+	<filter-mapping>
+        <filter-name>DownloadServletFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+	-->
+	
 	<!-- 에러 페이지 처리 -->
 	<error-page>
     	<error-code>404</error-code>
     	<location>/app/error/error404</location>
+	</error-page>
+	<error-page>
+    	<error-code>405</error-code>
+    	<location>/app/error/error405</location>
 	</error-page>
     <error-page>
     	<error-code>500</error-code>

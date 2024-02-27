@@ -1,38 +1,78 @@
 package com.mococo.microstrategy.sdk.prompt.vo;
 
+/**
+ * PromptElement
+ * @author mococo
+ *
+ */
 public class PromptElement {
-    // private static final Logger logger =
-    // LoggerFactory.getLogger(PromptElement.class);
-
-    private final String id;
+	
+	/**
+	 * id
+	 */
+    private final String promptElemid;
+    
+    /**
+     * displayName
+     */
     private final String displayName;
+    
+    /**
+     * parentId
+     */
     private final String parentId;
-
-    public PromptElement(String id, String displayName) {
-        this(id, displayName, null);
+    
+    
+    /**
+     * PromptElement
+     * @param id
+     * @param displayName
+     */
+    public PromptElement(final String promptId, final String displayName) {
+        this(promptId, displayName, null);
     }
-
-    public PromptElement(String id, String displayName, String parentId) {
-        this.id = id;
+    
+    
+    /**
+     * PromptElement
+     * @param id
+     * @param displayName
+     * @param parentId
+     */
+    public PromptElement(final String promptId, final String displayName, final String parentId) {
+        this.promptElemid = promptId;
         this.displayName = displayName;
         this.parentId = parentId;
     }
-
+    
+    
+    /**
+     * getId
+     * @return
+     */
     public String getId() {
-        return id;
+        return promptElemid;
     }
-
+    
+    
     public String getDisplayName() {
         return displayName;
     }
-
+    
+    
     public String getParentId() {
         return parentId;
     }
-
+    
+    
     @Override
     public String toString() {
-        return new StringBuilder().append("{id: ").append(id).append(", displayName: ").append(displayName)
-                .append(", parentId: ").append(parentId).append("}").toString();
+        return new StringBuilder()
+			.append('{')
+			.append(" id: ").append(promptElemid)
+			.append(", displayName: ").append(displayName)
+	        .append(", parentId: ").append(parentId)
+	        .append('}')
+	        .toString();
     }
 }

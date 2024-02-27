@@ -9,14 +9,13 @@
 package com.mococo.microstrategy.sdk.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.microstrategy.web.objects.WebIServerSession;
 import com.microstrategy.web.objects.WebObjectsFactory;
 import com.microstrategy.web.objects.admin.WebObjectsAdminException;
 import com.microstrategy.web.objects.admin.monitors.CacheManipulator;
@@ -33,55 +32,69 @@ import com.microstrategy.webapi.EnumDSSXMLLevelFlags;
 import com.microstrategy.webapi.EnumDSSXMLMonitorFilterOperator;
 import com.mococo.web.util.CustomProperties;
 
-
+/**
+ * MstrCubeUtil
+ * @author mococo
+ *
+ */
 public class MstrCubeUtil {
-	private static final Logger LOGGER = LogManager.getLogger(MstrCubeUtil.class);
+	
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LogManager.getLogger(MstrCubeUtil.class);
+	
+	
+    /**
+     * MstrCubeUtil
+     */
+    public MstrCubeUtil() {
+    	logger.debug("MstrCubeUtil");
+    }
+    
+    
+	@SuppressWarnings("unused")
+	private void sample() {
+    	logger.debug("MstrCubeUtil");
+    }
 	
 	
 	/**
-	 * <pre>
-	 * 목적 : MSTR 큐브를 삭제
-	 * 매개변수 : 
-	 * 	WebIServerSession adminSession
-	 * 	String deleteCubeId
-	 * 반환값 : java.util.List : List&lt;Map&lt;String, Object&gt;&gt;
-	 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-	 * </pre>
+	 * MSTR 큐브를 삭제
+	 * @param adminSession
+	 * @param deleteCubeId
+	 * @return
+	 * @throws WebObjectsAdminException
+	 * @throws MonitorManipulationException
 	 */
-	public static List<Map<String, Object>> deleteCube(WebIServerSession adminSession, String deleteCubeId) throws WebObjectsAdminException, MonitorManipulationException {
-		List<Map<String, Object>> rtnList = new ArrayList<Map<String, Object>>();
+	public static List<Map<String, Object>> deleteCube(final WebObjectsFactory factory, final String deleteCubeId) throws WebObjectsAdminException, MonitorManipulationException {
+		final List<Map<String, Object>> rtnList = new ArrayList<>();
 		
 		//create a WebObjectsFactory instance
-		WebObjectsFactory factory = adminSession.getFactory();
+//		final WebObjectsFactory factory = adminSession.getFactory();
 		
 		//get the cache source object for CUBE caches
-		CacheSource cubeCS = (CacheSource) factory.getMonitorSource(EnumWebMonitorType.WebMonitorTypeCubeCache);
+		final CacheSource cubeCS = (CacheSource) factory.getMonitorSource(EnumWebMonitorType.WebMonitorTypeCubeCache);
 		cubeCS.setLevel(EnumDSSXMLLevelFlags.DssXmlDetailLevel);
 		
 		//Obtain the cache manipulator object for reports
-		CacheManipulator cubeCM = cubeCS.getManipulator();
-		
-		CacheResults cubeResults;
-		cubeResults = cubeCS.getCaches();
-		int cubeCachecount = cubeResults.getCount();
-		LOGGER.info("Total Cube caches [{}]", cubeCachecount);
+		final CacheManipulator cubeCM = cubeCS.getManipulator();
+		final CacheResults cubeResults = cubeCS.getCaches();
+		final int cubeCachecount = cubeResults.getCount();
+		logger.info("Total Cube caches [{}]", cubeCachecount);
 		
 		for(int j=0; j<cubeResults.size(); j++) {
 			//Caches are group on Project level, so get the cache collection for each project
-			Caches result = cubeResults.get(j);
+			final Caches result = cubeResults.get(j);
 			
-			if(result.getProjectName().equalsIgnoreCase(CustomProperties.getProperty("mstr.default.project.name"))) {
+			if(result.getProjectName().equals(CustomProperties.getProperty("mstr.default.project.name"))) {
 				for(int i=0; i<result.getCount(); i++) {
-					CubeCache cache = (CubeCache) result.get(i);
+					final CubeCache cache = (CubeCache) result.get(i);
 					
 					if(cache.getCacheSourceID().equals(deleteCubeId)) {
-						Map<String, Object> deleteCubeMap = new HashMap<String, Object>();
-						deleteCubeMap.put("name", cache.getCacheSourceName());
-						deleteCubeMap.put("id", cache.getCacheSourceID());
-						deleteCubeMap.put("instanceId", cache.getID());
-						rtnList.add(deleteCubeMap);
+						rtnList.add(makeCubeMap(cache));
 						
-						MonitorFilter filter = cubeCM.newMonitorFilter();
+						final MonitorFilter filter = cubeCM.newMonitorFilter();
 						filter.add(EnumDSSXMLCubeInfo.DssXmlCubeInfoCubeDefId, EnumDSSXMLMonitorFilterOperator.DssXmlEqual, cache.getCacheSourceID());
 						cubeCM.alter(result.getProjectDSSID(), EnumDSSXMLCubeAdminAction.DeleteCube, filter);
 						
@@ -91,7 +104,18 @@ public class MstrCubeUtil {
 			}
 		}
 		
-		LOGGER.info("Delete Cube [{}]", rtnList);
+		logger.info("Delete Cube [{}]", rtnList);
 		return rtnList;
+	}
+	
+	
+	private static Map<String, Object> makeCubeMap(final CubeCache cache) {
+		final Map<String, Object> deleteCubeMap = new ConcurrentHashMap<>();
+		
+		deleteCubeMap.put("name", cache.getCacheSourceName());
+		deleteCubeMap.put("id", cache.getCacheSourceID());
+		deleteCubeMap.put("instanceId", cache.getID());
+		
+		return deleteCubeMap;
 	}
 }

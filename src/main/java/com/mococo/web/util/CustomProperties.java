@@ -17,47 +17,66 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * Application Scope에서 사용할 porperties를 singleton으로 관리
- * <br/><b>History</b><br/>
- * <pre>
- * 2012. 2. 23. 최초작성
- * </pre>
- * @author 박형일
- * @version 1.0
+ * @author mococo
+ *
  */
 final public class CustomProperties {
-	private static final Logger LOGGER = LogManager.getLogger(CustomProperties.class);
 	
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LogManager.getLogger(CustomProperties.class);
+	
+	/**
+	 * DFT_PTH
+	 */
 	private static final String DFT_PTH = "/properties/";
+	
+	/**
+	 * DFT_NAM
+	 */
 	private static final String DFT_NAM = "app-" + getHostIp() + ".xml";
+	
+	/**
+	 * DFT_RTN
+	 */
 	private static final String DFT_RTN = "";
 	
-	
-	private static PropertiesHolder<CustomProperties> holder = new PropertiesHolder<CustomProperties>(
+	/**
+	 * holder
+	 */
+	private static PropertiesHolder<CustomProperties> holder = new PropertiesHolder<>(
 		new CustomProperties(),
 		new PropertiesHolder.AbstractPropertiesLoader() {
 			@Override
 			public Properties load() {
-				LOGGER.debug("=> config file : [{}]", DFT_PTH + DFT_NAM);
+				logger.debug("=> config file : [{}][{}]", DFT_PTH, DFT_NAM);
 				return PropertiesHolder.loadFromXml(DFT_PTH + DFT_NAM);  
 			}			
 		},
-		CustomProperties.DFT_RTN
+		DFT_RTN
 	);
 	
 	
+	/**
+	 * getHostIp
+	 * @return
+	 */
 	public static String getHostIp() {
 		String result = null;
 		try {
 			result = InetAddress.getLocalHost().getHostAddress();
 		} catch (UnknownHostException e) {
-			LOGGER.error("!!! error", e);
+			logger.error("!!! error", e);
 		}
 		
 		return result;
 	}
 	
 	
-	private CustomProperties() { }
+	private CustomProperties() {
+		
+	}
 	
 	
 	/**

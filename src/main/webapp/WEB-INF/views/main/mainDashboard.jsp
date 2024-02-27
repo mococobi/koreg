@@ -6,7 +6,7 @@
 <%
 	String objectId = "";
     String tmpType = "";
-    boolean isvi = StringUtils.equalsIgnoreCase("y", request.getParameter("isvi"));
+    boolean isvi = StringUtils.equalsIgnoreCase("true", request.getParameter("isvi"));
     
     if(request.getParameter("objectId") != null) {
     	objectId = StringUtils.defaultString(request.getParameter("objectId"));

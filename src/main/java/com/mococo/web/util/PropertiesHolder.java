@@ -5,23 +5,34 @@ import java.io.InputStream;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
+import com.mococo.biz.exception.BizException;
+
 /**
- * Properties관리 class에서 초기화시 수행될 method의 전달 기능 수행 <br/>
- * <b>History</b><br/>
- * 
- * <pre>
- * 2012. 2. 24. 최초작성
- * </pre>
- * 
- * @author hipark
- * @version 1.0
+ * Properties관리 class에서 초기화시 수행될 method의 전달 기능 수행
+ * @author mococo
+ *
  * @param <T>
  */
 public class PropertiesHolder<T> {
-
+	
+	/**
+	 * properties
+	 */
     private transient Properties properties;
+    
+    /**
+     * holder
+     */
     final private transient T holder;
+    
+    /**
+     * defaultValue
+     */
     final private transient String defaultValue;
+    
+    /**
+     * loader
+     */
     final private AbstractPropertiesLoader loader;
 
     /**
@@ -38,58 +49,61 @@ public class PropertiesHolder<T> {
         this.defaultValue = DefaultValue;
         load();
     }
-
-    public void load() {
+    
+    
+    /**
+     * load
+     */
+    private void load() {
         properties = loader.load();
     }
-
+    
+    
     public T getHolder() {
         return holder;
     }
-
+    
+    
     /**
      * .properties 형태로 저장된 property의 loading을 수행할 때 사용
-     * 
      * @param fileName
-     * @return
-     * @throws IOException
-     * @parem
      * @return
      */
     public static Properties load(final String fileName) {
-        final InputStream stream = PropertiesHolder.class.getResourceAsStream(fileName);
         final Properties props = new Properties();
-        try {
+        
+        try (InputStream stream = PropertiesHolder.class.getResourceAsStream(fileName)) {
             props.load(stream);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BizException(e);
         }
+        
         return props;
     }
 
+    
     /**
      * .xml 형태로 저장된 property의 loading을 수행할 때 사용
-     * 
      * @param fileName
-     * @return
-     * @throws InvalidPropertiesFormatException
-     * @throws IOException
-     * @parem
      * @return
      */
     public static Properties loadFromXml(final String fileName) {
-        final InputStream stream = PropertiesHolder.class.getResourceAsStream(fileName);
         final Properties props = new Properties();
-        try {
+        
+        try (InputStream stream = PropertiesHolder.class.getResourceAsStream(fileName)) {
             props.loadFromXML(stream);
-        } catch (InvalidPropertiesFormatException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BizException(e);
         }
         return props;
     }
-
+    
+    
+    /**
+     * getString
+     * @param pid
+     * @return
+     */
     public String getString(final String pid) {
         String result = "";
 
@@ -99,12 +113,28 @@ public class PropertiesHolder<T> {
 
         return result;
     }
-
+    
+    
+    /**
+     * getProperties
+     * @return
+     */
     public Properties getProperties() {
         return properties;
     }
-
+    
+    
+    /**
+     * AbstractPropertiesLoader
+     * @author mococo
+     *
+     */
     public abstract static class AbstractPropertiesLoader {
+    	
+    	/**
+    	 * load
+    	 * @return
+    	 */
         public abstract Properties load();
     }
 }

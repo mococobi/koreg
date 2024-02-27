@@ -1,5 +1,6 @@
 package com.custom.admin.service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -9,19 +10,76 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+/**
+ * AdminService
+ * @author mococo
+ *
+ */
 public interface AdminService {
 	
-	public List<String> getSessionPortalAuthList(HttpServletRequest request);
+	/**
+	 * getSessionPortalAuthList
+	 * @param request
+	 * @return
+	 */
+	List<String> getSessionPortalAuthList(HttpServletRequest request);
 	
-	public List<Map<String, Object>> adminAuthList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params);
+	/**
+	 * adminAuthList
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 */
+	List<Map<String, Object>> adminAuthList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params);
 	
-	public Map<String, Object> boardList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
+	/**
+	 * boardList
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	Map<String, Object> boardList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws SQLException;
 	
-	public Map<String, Object> boardDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
+	/**
+	 * boardDetail
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	Map<String, Object> boardDetail(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws SQLException;
 	
-	public Map<String, Object> boardInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception;
+	/**
+	 * boardInsert
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	Map<String, Object> boardInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws SQLException;
 	
-	public Map<String, Object> boardUpdate(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws Exception;
+	/**
+	 * boardInsert
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	Map<String, Object> boardUpdate(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws SQLException;
 	
-	public Map<String, Object> logList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
+	/**
+	 * logList
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	Map<String, Object> logList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws SQLException;
 }

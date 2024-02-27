@@ -22,16 +22,15 @@
 <body>
 	<div class="d-flex align-items-center justify-content-center vh-100">
 		<div class="text-center">
-            <h1 class="display-1 fw-bold">404</h1>
+            <h1 class="display-1 fw-bold">${STATUS_CODE}</h1>
             <p class="fs-3">
             <%--
             <span class="text-danger">Opps!</span>
             --%> 
             페이지를 찾을 수 없습니다.
             </p>
-            <%--
-            <p class="lead">The page you’re looking for doesn’t exist.</p>
-            --%>
+            <p class="lead">${REQUEST_URI}</p>
+            <p class="lead">${EXCEPTION_MESSAGE}</p>
             <a href="${pageContext.request.contextPath}/app/main/mainView.do" class="btn btn-primary">
             	<i class="bi bi-house-door-fill" style="margin-right: 10px;"></i>홈 화면
             </a>

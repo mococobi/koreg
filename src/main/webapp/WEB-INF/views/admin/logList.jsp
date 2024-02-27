@@ -53,6 +53,7 @@
 					<col width="10%">
 					<col width="10%">
 					<col width="10%">
+					<col width="10%">
 					<col width="">
 					<col width="">
 					<col width="10%">
@@ -62,6 +63,7 @@
     				<tr>
 	     				<th>로그 ID</th>
 	      				<th>사용자 ID</th>
+	      				<th>사용자명</th>
 	      				<th>사용자 IP</th>
 	      				<th>화면 ID</th>
 	      				<th>화면 상세 ID</th>
@@ -156,6 +158,17 @@
 	            }
 				, {
 					  data : 'USR_ID'
+					, className : ''
+					, render : function (data, type, row) {
+						let rtnData = '-';
+						if(data) {
+							rtnData = XSSCheck(data, 0);
+						}
+						return rtnData;
+					}
+	            }
+				, {
+					  data : 'USR_NM'
 					, className : ''
 					, render : function (data, type, row) {
 						let rtnData = '-';

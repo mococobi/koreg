@@ -105,9 +105,9 @@
 					</td>
 					<td>
 						<input name="board_type" type="radio" value="COMMON" class="form-check-input" required="">
-             	 		<label class="form-check-label" for="credit">일반</label>
+             	 		<span class="form-check-label" for="credit">일반</span>
              	 		<input name="board_type" type="radio" value="FAQ" class="form-check-input" required="">
-             	 		<label class="form-check-label" for="credit">FAQ</label>
+             	 		<span class="form-check-label" for="credit">FAQ</span>
 					</td>
 				</tr>
 				<tr>
@@ -153,35 +153,59 @@
 				</tr>
 				<tr>
 					<td>
+						<span>게시물 분류 여부</span>
+					</td>
+					<td>
+						<input name="post_type_yn" type="radio" value="Y" class="form-check-input" required="">
+             	 		<span class="form-check-label" for="credit">가능</span>
+             	 		<input name="post_type_yn" type="radio" value="N" class="form-check-input" required="">
+             	 		<span class="form-check-label" for="credit">불가능</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
 						<span>게시물 파일 첨부 여부</span>
 					</td>
 					<td>
 						<input name="post_file_yn" type="radio" value="Y" class="form-check-input" required="">
-             	 		<label class="form-check-label" for="credit">가능</label>
+             	 		<span class="form-check-label" for="credit">가능</span>
              	 		<input name="post_file_yn" type="radio" value="N" class="form-check-input" required="">
-             	 		<label class="form-check-label" for="credit">불가능</label>
+             	 		<span class="form-check-label" for="credit">불가능</span>
 					</td>
 				</tr>
+				<!-- 
 				<tr>
 					<td>
 						<span>게시물 댓글 가능 여부</span>
 					</td>
 					<td>
 						<input name="post_cmnt_yn" type="radio" value="Y" class="form-check-input" required="">
-             	 		<label class="form-check-label" for="credit">가능</label>
+             	 		<span class="form-check-label" for="credit">가능</span>
              	 		<input name="post_cmnt_yn" type="radio" value="N" class="form-check-input" required="">
-             	 		<label class="form-check-label" for="credit">불가능</label>
+             	 		<span class="form-check-label" for="credit">불가능</span>
 					</td>
 				</tr>
+				-->
 				<tr>
 					<td>
 						<span>게시물 팝업 가능 여부</span>
 					</td>
 					<td>
 						<input name="post_popup_yn" type="radio" value="Y" class="form-check-input" required="">
-             	 		<label class="form-check-label" for="credit">가능</label>
+             	 		<span class="form-check-label" for="credit">가능</span>
              	 		<input name="post_popup_yn" type="radio" value="N" class="form-check-input" required="">
-             	 		<label class="form-check-label" for="credit">불가능</label>
+             	 		<span class="form-check-label" for="credit">불가능</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span>게시물 고정 가능 여부</span>
+					</td>
+					<td>
+						<input name="post_fix_yn" type="radio" value="Y" class="form-check-input" required="">
+             	 		<span class="form-check-label" for="credit">가능</span>
+             	 		<input name="post_fix_yn" type="radio" value="N" class="form-check-input" required="">
+             	 		<span class="form-check-label" for="credit">불가능</span>
 					</td>
 				</tr>
 				<tr>
@@ -190,9 +214,9 @@
 					</td>
 					<td>
 						<input name="del_yn" type="radio" value="Y" class="form-check-input" required="">
-             	 		<label class="form-check-label" for="credit">Y</label>
+             	 		<span class="form-check-label" for="credit">Y</span>
              	 		<input name="del_yn" type="radio" value="N" class="form-check-input" required="">
-             	 		<label class="form-check-label" for="credit">N</label>
+             	 		<span class="form-check-label" for="credit">N</span>
 					</td>
 				</tr>
 			</tbody>
@@ -215,9 +239,12 @@
 			$('#board_id').val('시스템 자동 채번');
 			
 			$("input:radio[name='board_type']:radio[value='COMMON']").prop('checked', true);
+			
+			$("input:radio[name='post_type_yn']:radio[value='N']").prop('checked', true);
 			$("input:radio[name='post_file_yn']:radio[value='N']").prop('checked', true);
 			$("input:radio[name='post_cmnt_yn']:radio[value='N']").prop('checked', true);
 			$("input:radio[name='post_popup_yn']:radio[value='N']").prop('checked', true);
+			$("input:radio[name='post_fix_yn']:radio[value='N']").prop('checked', true);
 			$("input:radio[name='del_yn']:radio[value='N']").prop('checked', true);
 		}
 		
@@ -236,7 +263,7 @@
 	//초기 함수
 	function fnBoardInit() {
 		let callParams = {
-			boardId : boardId
+			BRD_ID : boardId
 		};
 		callAjaxPost('/admin/boardDetail.json', callParams, function(data){
 			let postData = data['data'];
@@ -265,6 +292,14 @@
 		$('#board_modify_date').text(changeDisplayDate(boardData['MOD_DT_TM'], 'YYYY-MM-DD'));
 		$('#board_modify_user_id').text(boardData['MOD_USR_ID']);
 		
+		
+		//Y N 여부 설정
+		if(boardData['POST_TYPE_YN'] == 'Y') {
+			$('input:radio[name="post_type_yn"]:radio[value="Y"]').prop('checked', true);
+		} else {
+			$('input:radio[name="post_type_yn"]:radio[value="N"]').prop('checked', true);
+		}
+		
 		if(boardData['POST_FILE_YN'] == 'Y') {
 			$('input:radio[name="post_file_yn"]:radio[value="Y"]').prop('checked', true);
 		} else {
@@ -281,6 +316,12 @@
 			$('input:radio[name="post_popup_yn"]:radio[value="Y"]').prop('checked', true);
 		} else {
 			$('input:radio[name="post_popup_yn"]:radio[value="N"]').prop('checked', true);
+		}
+		
+		if(boardData['POST_FIX_YN'] == 'Y') {
+			$('input:radio[name="post_fix_yn"]:radio[value="Y"]').prop('checked', true);
+		} else {
+			$('input:radio[name="post_fix_yn"]:radio[value="N"]').prop('checked', true);
 		}
 		
 		if(boardData['DEL_YN'] == 'Y') {
@@ -328,9 +369,15 @@
 				
 				formData.append('BRD_CRT_AUTH', modalUserList);
 				
+				formData.append('POST_TYPE_YN', $('input:radio[name="post_type_yn"]:checked').val());
+				formData.append('POST_TAG_YN', 'N');
 				formData.append('POST_FILE_YN', $('input:radio[name="post_file_yn"]:checked').val());
-				formData.append('POST_CMNT_YN', $('input:radio[name="post_cmnt_yn"]:checked').val());
+				formData.append('POST_CMNT_YN', 'N');
+				formData.append('POST_CMNT_FILE_YN', 'N');
 				formData.append('POST_POPUP_YN', $('input:radio[name="post_popup_yn"]:checked').val());
+				formData.append('POST_SECRET_YN', 'N');
+				formData.append('POST_FIX_YN', $('input:radio[name="post_fix_yn"]:checked').val());
+				
 				formData.append('DEL_YN', $('input:radio[name="del_yn"]:checked').val());
 				
 				if(boardId != null) {

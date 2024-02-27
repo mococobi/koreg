@@ -2,200 +2,481 @@ package com.mococo.microstrategy.sdk.prompt.vo;
 
 import java.util.List;
 
+
+/**
+ * Prompt
+ * @author mococo
+ *
+ */
 public class Prompt {
-    // private static final Logger logger = LoggerFactory.getLogger(Prompt.class);
-
-    private String id = null;
-    private String title = null;
-    private int type = -1;
-    private int pin = -1;
-    private String min = null;
-    private String max = null;
-    private String defaultAnswer = null;
-    private List<PromptElement> defaultAnswers = null;
-    private List<PromptElement> suggestedAnswers = null;
-    private boolean required = false;
-    private String controlType = null;
-
-    private String exUiType = null;
-    private Object exExtUiType = null;
-    private Object exAction = null;
-    private Object exValidation = null;
-
-    private String daoClassName = null;
+	
+	/**
+	 * id
+	 */
+    private final String promptId;
     
+    /**
+     * title
+     */
+    private final String title;
+    
+    /**
+     * type
+     */
+    private int type = -1;
+    
+    /**
+     * pin
+     */
+    private int pin = -1;
+    
+    /**
+     * min
+     */
+    private String min;
+    
+    /**
+     * max
+     */
+    private String max;
+    
+    /**
+     * defaultAnswer
+     */
+    private String defaultAnswer;
+    
+    /**
+     * defaultAnswers
+     */
+    private List<PromptElement> defaultAnswers;
+    
+    /**
+     * suggestedAnswers
+     */
+    private List<PromptElement> suggestedAnswers;
+    
+    /**
+     * required
+     */
+    private boolean required;
+    
+    /**
+     * controlType
+     */
+    private String controlType;
+    
+    /**
+     * exUiType
+     */
+    private String exUiType;
+    
+    /**
+     * exExtUiType
+     */
+    private Object exExtUiType;
+    
+    /**
+     * exAction
+     */
+    private Object exAction;
+    
+    /**
+     * exValidation
+     */
+    private Object exValidation;
+    
+    /**
+     * daoClassName
+     */
+    private String daoClassName;
+    
+    /**
+     * promptType
+     */
     private int promptType = -1;
+    
+    /**
+     * promptSubType
+     */
 	private int promptSubType = -1;
 	
-	private String meaning = null;
-
-	public Prompt(String id, String title) {
-        this.id = id;
+	/**
+	 * meaning
+	 */
+	private String meaning;
+	
+	
+	/**
+	 * Prompt
+	 * @param id
+	 * @param title
+	 */
+	public Prompt(final String promptId, final String title) {
+        this.promptId = promptId;
         this.title = title;
     }
-
-    public Prompt(String id, String title, int type) {
-        this.id = id;
+	
+	
+	/**
+	 * Prompt
+	 * @param id
+	 * @param title
+	 * @param type
+	 */
+    public Prompt(final String promptId, final String title, final int type) {
+        this.promptId = promptId;
         this.title = title;
         this.type = type;
     }
-
-    public void setExProp(String exUiType, Object exExtUiType, Object exAction, Object exValidation) {
+    
+    
+    /**
+     * setExProp
+     * @param exUiType
+     * @param exExtUiType
+     * @param exAction
+     * @param exValidation
+     */
+    public void setExProp(final String exUiType, final Object exExtUiType, final Object exAction, final Object exValidation) {
         this.exUiType = exUiType;
         this.exExtUiType = exExtUiType;
         this.exAction = exAction;
         this.exValidation = exValidation;
     }
-
+    
+    
+    /**
+     * getId
+     * @return
+     */
     public String getId() {
-        return id;
+        return promptId;
     }
-
+    
+    
+    /**
+     * getTitle
+     * @return
+     */
     public String getTitle() {
         return title;
     }
-
+    
+    
+    /**
+     * getType
+     * @return
+     */
     public int getType() {
         return type;
     }
-
-    public void setType(int type) {
+    
+    
+    /**
+     * setType
+     * @param type
+     */
+    public void setType(final int type) {
         this.type = type;
     }
-
+    
+    
+    /**
+     * getPin
+     * @return
+     */
     public int getPin() {
         return pin;
     }
-
-    public void setPin(int pin) {
+    
+    
+    /**
+     * setPin
+     * @param pin
+     */
+    public void setPin(final int pin) {
         this.pin = pin;
     }
-
+    
+    
+    /**
+     * getMin
+     * @return
+     */
     public String getMin() {
         return min;
     }
-
-    public void setMin(String min) {
+    
+    
+    /**
+     * setMin
+     * @param min
+     */
+    public void setMin(final String min) {
         this.min = min;
     }
-
+    
+    
+    /**
+     * getMax
+     * @return
+     */
     public String getMax() {
         return max;
     }
-
-    public void setMax(String max) {
+    
+    
+    /**
+     * setMax
+     * @param max
+     */
+    public void setMax(final String max) {
         this.max = max;
     }
-
+    
+    
+    /**
+     * getDefaultAnswer
+     * @return
+     */
     public String getDefaultAnswer() {
         return defaultAnswer;
     }
-
-    public void setDefaultAnswer(String defaultAnswer) {
+    
+    
+    /**
+     * setDefaultAnswer
+     * @param defaultAnswer
+     */
+    public void setDefaultAnswer(final String defaultAnswer) {
         this.defaultAnswer = defaultAnswer;
     }
-
+    
+    
+    /**
+     * getDefaultAnswers
+     * @return
+     */
     public List<PromptElement> getDefaultAnswers() {
         return defaultAnswers;
     }
-
-    public void setDefaultAnswers(List<PromptElement> defaultAnswers) {
+    
+    
+    /**
+     * setDefaultAnswers
+     * @param defaultAnswers
+     */
+    public void setDefaultAnswers(final List<PromptElement> defaultAnswers) {
         this.defaultAnswers = defaultAnswers;
     }
-
+    
+    
+    /**
+     * getSuggestedAnswers
+     * @return
+     */
     public List<PromptElement> getSuggestedAnswers() {
         return suggestedAnswers;
     }
-
-    public void setSuggestedAnswers(List<PromptElement> suggestedAnswers) {
+    
+    
+    /**
+     * setSuggestedAnswers
+     * @param suggestedAnswers
+     */
+    public void setSuggestedAnswers(final List<PromptElement> suggestedAnswers) {
         this.suggestedAnswers = suggestedAnswers;
     }
-
+    
+    
+    /**
+     * isRequired
+     * @return
+     */
     public boolean isRequired() {
         return required;
     }
-
-    public void setRequired(boolean required) {
+    
+    
+    /**
+     * setRequired
+     * @param required
+     */
+    public void setRequired(final boolean required) {
         this.required = required;
     }
-
+    
+    
+    /**
+     * getControlType
+     * @return
+     */
     public String getControlType() {
         return controlType;
     }
-
-    public void setControlType(String controlType) {
+    
+    
+    /**
+     * setControlType
+     * @param controlType
+     */
+    public void setControlType(final String controlType) {
         this.controlType = controlType;
     }
-
+    
+    
+    /**
+     * getExUiType
+     * @return
+     */
     public String getExUiType() {
         return exUiType;
     }
-
-    public void setExUiType(String exUiType) {
+    
+    
+    /**
+     * setExUiType
+     * @param exUiType
+     */
+    public void setExUiType(final String exUiType) {
         this.exUiType = exUiType;
     }
-
+    
+    
+    /**
+     * getExExtUiType
+     * @return
+     */
     public Object getExExtUiType() {
         return exExtUiType;
     }
-
-    public void setExExtUiType(Object exExtUiType) {
+    
+    
+    /**
+     * setExExtUiType
+     * @param exExtUiType
+     */
+    public void setExExtUiType(final Object exExtUiType) {
         this.exExtUiType = exExtUiType;
     }
-
+    
+    
+    /**
+     * getExAction
+     * @return
+     */
     public Object getExAction() {
         return exAction;
     }
-
-    public void setExAction(Object exAction) {
+    
+    
+    /**
+     * setExAction
+     * @param exAction
+     */
+    public void setExAction(final Object exAction) {
         this.exAction = exAction;
     }
-
+    
+    
+    /**
+     * getExValidation
+     * @return
+     */
     public Object getExValidation() {
         return exValidation;
     }
-
-    public void setExValidation(Object exValidation) {
+    
+    
+    /**
+     * setExValidation
+     * @param exValidation
+     */
+    public void setExValidation(final Object exValidation) {
         this.exValidation = exValidation;
     }
-
+    
+    
+    /**
+     * getDaoClassName
+     * @return
+     */
     public String getDaoClassName() {
         return daoClassName;
     }
-
-    public void setDaoClassName(String daoClassName) {
+    
+    
+    /**
+     * setDaoClassName
+     * @param daoClassName
+     */
+    public void setDaoClassName(final String daoClassName) {
         this.daoClassName = daoClassName;
     }
     
+    
+    /**
+     * getPromptType
+     * @return
+     */
     public int getPromptType() {
 		return promptType;
 	}
-
-	public void setPromptType(int promptType) {
+    
+    
+    /**
+     * setPromptType
+     * @param promptType
+     */
+	public void setPromptType(final int promptType) {
 		this.promptType = promptType;
 	}
-
+	
+	
+	/**
+	 * getPromptSubType
+	 * @return
+	 */
 	public int getPromptSubType() {
 		return promptSubType;
 	}
-
-	public void setPromptSubType(int promptSubType) {
+	
+	
+	/**
+	 * setPromptSubType
+	 * @param promptSubType
+	 */
+	public void setPromptSubType(final int promptSubType) {
 		this.promptSubType = promptSubType;
 	}
 	
+	
+	/**
+	 * getMeaning
+	 * @return
+	 */
     public String getMeaning() {
 		return meaning;
 	}
-
-	public void setMeaning(String meaning) {
+    
+    
+    /**
+     * setMeaning
+     * @param meaning
+     */
+	public void setMeaning(final String meaning) {
 		this.meaning = meaning;
 	}
-
+	
+	
+	/**
+	 * toString
+	 */
     @Override
     public String toString() {
         return new StringBuilder()
-        	.append("{")
-			.append("  id: ").append(id)
+        	.append('{')
+			.append("  id: ").append(promptId)
 			.append(", title: ").append(title)
 			.append(", type: ").append(type)
 			.append(", pin: ").append(pin)
@@ -213,7 +494,7 @@ public class Prompt {
 	        .append(", promptType: ").append(promptType)
 	        .append(", promptSubType: ").append(promptSubType)
 	        .append(", meaning: ").append(meaning)
-	        .append("}").toString();
+	        .append('}').toString();
     }
 
 }

@@ -13,32 +13,42 @@ import com.mococo.microstrategy.sdk.prompt.vo.PromptElement;
 
 /**
  * MSTR 엘리먼트프롬프트의 API를 이용한 프롬프트 목록 DAO
- * 
- * @author hyoungilpark
+ * @author mococo
  *
  */
 public class MstrElementsPromptApiDao extends MstrPromptDao<WebElementsPrompt> {
-
-    public MstrElementsPromptApiDao(WebElementsPrompt prompt) {
+	
+	/**
+	 * MstrElementsPromptApiDao
+	 * @param prompt
+	 */
+    public MstrElementsPromptApiDao(final WebElementsPrompt prompt) {
         super(prompt);
     }
-
+    
+    
+    /**
+     * getDefaultAnswers
+     */
     @Override
     public List<PromptElement> getDefaultAnswers() {
-        List<PromptElement> elementList = new ArrayList<PromptElement>();
-        WebElements elements = getPrompt().getDefaultAnswer();
+    	final List<PromptElement> elementList = new ArrayList<>();
+    	final WebElements elements = getPrompt().getDefaultAnswer();
         for (int i = 0; elements != null && i < elements.size(); i++) {
-            WebElement element = elements.get(i);
+        	final WebElement element = elements.get(i);
             elementList.add(new PromptElement(element.getID(), element.getDisplayName()));
         }
 
         return elementList;
     }
-
+    
+    
+    /**
+     * getSuggestedAnswers
+     */
     @Override
     public List<PromptElement> getSuggestedAnswers() {
-        List<PromptElement> elementList = new ArrayList<PromptElement>();
-
+    	final List<PromptElement> elementList = new ArrayList<>();
         WebElements elements = getPrompt().getSuggestedAnswers();
 
         if (elements == null || elements.size() == 0) {
@@ -50,7 +60,7 @@ public class MstrElementsPromptApiDao extends MstrPromptDao<WebElementsPrompt> {
         }
 
         for (int i = 0; i < elements.size(); i++) {
-            WebElement element = elements.get(i);
+        	final WebElement element = elements.get(i);
             elementList.add(new PromptElement(element.getID(), element.getDisplayName()));
         }
 

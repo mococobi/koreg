@@ -68,7 +68,7 @@ function searchDepthFirst(data, handler, parChildAttrName) {
             }
         }
     }
-    return;
+    return "";
 }
 
 function arrayToTree(data, _option, rootkey) {

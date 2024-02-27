@@ -1,0 +1,26 @@
+@charset "utf-8";
+
+/* 메뉴바 - 기본 */
+.mstrListBlockToolbarListContainer {
+	background: gray;
+}
+
+/* 메뉴바 - 선택 메뉴 */
+.mstrListBlockToolbarItemSelected, .mstrListBlockToolbarItemSelectedHover {
+	background: red;
+}
+
+/* 메뉴바 - 기본 */
+.mstrListBlockToolbarItem, .mstrListBlockToolbarItemHover {
+	background: gray;
+}
+
+/* 아이콘바 - 바탕 */
+.mstrTabbedMenuVBox .mstrViewStack, .mstrDockTop {
+	background: gray;
+}
+
+/* 아이콘바 - 아이콘 */
+.mstrToolbar2End {
+	background: gray;
+}

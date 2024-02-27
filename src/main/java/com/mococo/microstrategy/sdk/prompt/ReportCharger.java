@@ -1,6 +1,7 @@
 package com.mococo.microstrategy.sdk.prompt;
 
-import java.util.Enumeration;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.microstrategy.web.objects.WebDocumentInstance;
 import com.microstrategy.web.objects.WebIServerSession;
 import com.microstrategy.web.objects.WebObjectInfo;
+import com.microstrategy.web.objects.WebObjectsException;
 import com.microstrategy.web.objects.WebPrompt;
 import com.microstrategy.web.objects.WebPrompts;
 import com.microstrategy.web.objects.WebReportInstance;
@@ -22,49 +24,65 @@ import com.mococo.microstrategy.sdk.prompt.vo.Prompt;
 import com.mococo.microstrategy.sdk.prompt.vo.Report;
 import com.mococo.microstrategy.sdk.util.MstrReportUtil;
 
+/**
+ * ReportCharger
+ * @author mococo
+ *
+ */
 public class ReportCharger {
+	
+	/**
+	 * 로그
+	 */
     private static final Logger logger = LoggerFactory.getLogger(ReportCharger.class);
 
-    /*
-     * private static void chargePrompts(Report report, List<Map<String, Object>>
-     * promptIdList) throws Exception { List<Prompt> promptList =
-     * report.getPromptList();
-     * 
-     * if (promptIdList == null || promptIdList.size() == 0) { return; }
-     * 
-     * Prompt promptArray[] = new Prompt[promptIdList.size()];
-     * 
-     * for (Map<String, Object> promptId : promptIdList) { String project =
-     * (String)promptId.get("project"); String objectId =
-     * (String)promptId.get("objectId"); Prompt prompt =
-     * PromptCharger.getChargedPrompt(project, objectId);
-     * promptArray[prompt.getPin()] = prompt; } for (Prompt prompt : promptArray) {
-     * promptList.add(prompt); } }
+    
+    /**
+     * ReportCharger
      */
+    public ReportCharger() {
+    	logger.debug("ReportCharger");
+    }
+    
+    
+	@SuppressWarnings("unused")
+	private void sample() {
+    	logger.debug("ReportCharger");
+    }
+	
+    
+    private static void chargePrompts(final Report report, final List<Map<String, Object>> customPromptList) throws ClassNotFoundException, InstantiationException, IllegalAccessException,  InvocationTargetException, WebObjectsException  {
+    	final List<Prompt> promptList;
+    	promptList = report.getPromptList();
 
-    private static void chargePrompts(Report report, List<Map<String, Object>> customPromptList) throws Exception {
-        List<Prompt> promptList = report.getPromptList();
-
-        if (customPromptList == null || customPromptList.size() == 0) {
+    	if (customPromptList == null || customPromptList.isEmpty()) {
             return;
         }
 
-        Prompt promptArray[] = new Prompt[customPromptList.size()];
-
-        for (Map<String, Object> customPrompt : customPromptList) {
-            Prompt prompt = PromptCharger.getChargedPrompt(new ObjectConfig(customPrompt));
-
+        final Prompt promptArray[] = new Prompt[customPromptList.size()];
+        for (final Map<String, Object> customPrompt : customPromptList) {
+        	final Prompt prompt = PromptCharger.getChargedPrompt(makeObjConfig(customPrompt));
             promptArray[prompt.getPin()] = prompt;
         }
-        for (Prompt prompt : promptArray) {
+        
+        /*
+        for (final Prompt prompt : promptArray) {
             promptList.add(prompt);
         }
+        */
+        
+        final List<Prompt> addPrompt = Arrays.asList(promptArray);
+        promptList.addAll(addPrompt);
     }
-
-    private static void chargePrompts(WebIServerSession session, Report report, WebPrompts prompts)
-            throws IndexOutOfBoundsException, Exception {
-        List<Prompt> promptList = report.getPromptList();
-        System.out.println("mksong : " + promptList.size());
+    
+    
+    private static ObjectConfig makeObjConfig(final Map<String, Object> customPrompt) {
+    	return new ObjectConfig(customPrompt);
+    }
+    
+    
+    private static void chargePrompts(final WebIServerSession session, final Report report, final WebPrompts prompts) throws WebObjectsException, ClassNotFoundException, InstantiationException, InvocationTargetException, IllegalAccessException {
+    	final List<Prompt> promptList = report.getPromptList();
         
         if (promptList == null) {
             return;
@@ -72,8 +90,9 @@ public class ReportCharger {
 
         /* 2024-01-04 mksong 수정 - 프롬프트 순서 체크 */
         for(int i=0; i<prompts.size(); i++) {
-        	WebPrompt prompt = prompts.get(i);
-            logger.debug("=> id: [{}]", prompt.getID());
+        	final WebPrompt prompt = prompts.get(i);
+        	final String logTmp1 = prompt.getID().replaceAll("[\r\n]","");
+            logger.debug("=> id: [{}]", logTmp1);
             
             promptList.add(PromptCharger.getChargedPrompt(session, prompt));
         }
@@ -87,8 +106,9 @@ public class ReportCharger {
         }
         */
     }
-
-    private static void chargeReport(WebIServerSession session, Report report, String objectId) {
+    
+    
+    private static void chargeReport(final WebIServerSession session, final Report report, final String objectId) {
         WebReportInstance reportInstance = null;
 
         try {
@@ -97,16 +117,17 @@ public class ReportCharger {
             if (reportInstance.getStatus() == EnumDSSXMLStatus.DssXmlStatusPromptXML) {
                 chargePrompts(session, report, reportInstance.getPrompts());
             }
-        } catch (Exception e) {
-//            throw new SdkRuntimeException("!!! error on charge report prompts.", e);
-        	throw new SdkRuntimeException(e.getMessage());
+        } catch (WebObjectsException | InterruptedException | IndexOutOfBoundsException | ClassNotFoundException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
+        	throw new SdkRuntimeException(e);
         } finally {
             MstrReportUtil.closeReport(reportInstance);
         }
-        logger.debug("=> reportInstance: [{}]", reportInstance);
+        
+//        logger.debug("=> reportInstance: [{}]", reportInstance);
     }
-
-    private static void chargeDocument(WebIServerSession session, Report report, String objectId) {
+    
+    
+    private static void chargeDocument(final WebIServerSession session, final Report report, final String objectId) {
         WebDocumentInstance docuementInstance = null;
 
         try {
@@ -115,25 +136,33 @@ public class ReportCharger {
             if (docuementInstance.getStatus() == EnumDSSXMLStatus.DssXmlStatusPromptXML) {
                 chargePrompts(session, report, docuementInstance.getPrompts());
             }
-        } catch (Exception e) {
-            throw new SdkRuntimeException("!!! error on charge document prompts.");
+        } catch (WebObjectsException | InterruptedException | IndexOutOfBoundsException | ClassNotFoundException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
+            throw new SdkRuntimeException(e);
         } finally {
             MstrReportUtil.closeDocument(docuementInstance);
         }
     }
-
-    public static Report chargeObject(WebIServerSession session, int type, String id) throws Exception {
-        WebObjectInfo info = session.getFactory().getObjectSource().getObject(id, type, true);
-        Report report = new Report(info.getID(), info.getType(), info.getDisplayName());
+    
+    
+    /**
+     * chargeObject
+     * @param session
+     * @param type
+     * @param id
+     * @return
+     */
+    public static Report chargeObject(final WebIServerSession session, final int type, final String objId) throws WebObjectsException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    	final WebObjectInfo info = session.getFactory().getObjectSource().getObject(objId, type, true);
+    	final Report report = new Report(info.getID(), info.getType(), info.getDisplayName());
 
         switch (type) {
-        case EnumDSSXMLObjectTypes.DssXmlTypeReportDefinition:
-            chargeReport(session, report, id);
-            break;
-        case EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition:
-            chargeDocument(session, report, id);
-            break;
-        default:
+	        case EnumDSSXMLObjectTypes.DssXmlTypeReportDefinition:
+	            chargeReport(session, report, objId);
+	            break;
+	        case EnumDSSXMLObjectTypes.DssXmlTypeDocumentDefinition:
+	            chargeDocument(session, report, objId);
+	            break;
+	        default:
         }
 
         /*
@@ -146,7 +175,7 @@ public class ReportCharger {
          */
 
         // 리포트 가상 프롬프트에 대한 처리
-        ObjectConfig config = ConfigManager.getInstance().getObjectConfig(info, session);
+        final ObjectConfig config = ConfigManager.getInstance().getObjectConfig(info, session);
         if (config != null) {
             chargePrompts(report, config.<List<Map<String, Object>>>get("customPromptList"));
         }

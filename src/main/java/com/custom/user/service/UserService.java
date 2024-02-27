@@ -1,10 +1,16 @@
 package com.custom.user.service;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * UserService
+ * @author mococo
+ *
+ */
 public interface UserService {
 	
 	/**
@@ -15,6 +21,6 @@ public interface UserService {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, Object> userList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws Exception;
+	Map<String, Object> userList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws SQLException;
 	
 }

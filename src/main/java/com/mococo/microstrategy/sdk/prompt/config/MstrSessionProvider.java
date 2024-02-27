@@ -3,12 +3,17 @@ package com.mococo.microstrategy.sdk.prompt.config;
 import com.microstrategy.web.objects.WebIServerSession;
 
 /**
- * 
- * @author hyoungilpark
+ * MstrSessionProvider
+ * @author mococo
  *
  */
 public interface MstrSessionProvider {
-
-    public WebIServerSession getSession() throws Exception;
+	
+	/**
+	 * getSession
+	 * @return
+	 * @throws Exception
+	 */
+    WebIServerSession getSession();
 
 }

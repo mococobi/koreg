@@ -17,37 +17,77 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 import com.mococo.biz.exception.BizException;
 import com.mococo.web.util.HttpUtil;
 
+/**
+ * CustomMappingExceptionResolver
+ * @author mococo
+ *
+ */
 public class CustomMappingExceptionResolver extends SimpleMappingExceptionResolver implements MessageSourceAware {
+	
+	/**
+	 * 로그
+	 */
     private static final Logger logger = LoggerFactory.getLogger(CustomMappingExceptionResolver.class);
-
-    public static final String ERR_ATT_CODE = "code"; // 모델에 포함될 오류코드 애트리뷰트 명
-    public static final String ERR_ATT_MSG = "message"; // 모델에 포함될 오류메세지 애트리뷰트 명
-
+    
+    /**
+     * ERR_ATT_CODE
+     */
+    private static final String ERR_ATT_CODE = "code"; // 모델에 포함될 오류코드 애트리뷰트 명
+    
+    /**
+     * ERR_ATT_MSG
+     */
+    private static final String ERR_ATT_MSG = "message"; // 모델에 포함될 오류메세지 애트리뷰트 명
+    
+    /**
+     * messageSource
+     */
     private MessageSource messageSource;
+    
+    /**
+     * defaultCode
+     */
     private String defaultCode;
-
+    
+    
+    /**
+     * CustomMappingExceptionResolver
+     */
+    public CustomMappingExceptionResolver() {
+    	super();
+    	logger.debug("CustomMappingExceptionResolver");
+    }
+    
+    
+    /**
+     * setMessageSource
+     */
     @Override
-    public void setMessageSource(MessageSource messageSource) {
+    public void setMessageSource(final MessageSource messageSource) {
         this.messageSource = messageSource;
     }
-
+    
+    
     public void setDefaultCode(final String defaultCode) {
         this.defaultCode = defaultCode;
     }
-
+    
+    
     public String getDefaultCode() {
         return this.defaultCode;
     }
-
-    private String getMessage(final String code, Locale locale) {
+    
+    
+    private String getMessage(final String code, final Locale locale) {
         return messageSource.getMessage(code, null, locale);
     }
-
-    private String getCode(final Exception ex) {
+    
+    
+    private String getCode(final Exception excp) {
         String result = this.getDefaultCode();
 
-        if (ex instanceof BizException) {
-            final String code = ((BizException) ex).getCode();
+        if (excp instanceof BizException) {
+            final String code = ((BizException) excp).getCode();
             if (StringUtils.isNotEmpty(code)) {
                 result = code;
             }
@@ -55,27 +95,36 @@ public class CustomMappingExceptionResolver extends SimpleMappingExceptionResolv
 
         return result;
     }
-
+    
+    
     /**
      * json type으로 반환해야 할 경우 ModelAndView를 생성하여 처리, json이 아닌경우는 Super에서 처리
      */
     @Override
-    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        logger.debug("=> 예외 발생: [{}]", ex);
-
+    protected ModelAndView doResolveException(final HttpServletRequest request, final HttpServletResponse response, final Object handler, final Exception excp) {
+    	ModelAndView rtnView;
+    	
+        logger.debug("=> 예외 발생: [{}]", excp);
+        
         if (!HttpUtil.isJsonRequest(request)) {
-            return super.doResolveException(request, response, handler, ex);
+            return super.doResolveException(request, response, handler, excp);
         }
 
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-        ModelAndView mnv = new ModelAndView(new MappingJackson2JsonView());
-        final String code = getCode(ex);
-        final String msg = getMessage(code, request.getLocale());
-
-        mnv.addObject(ERR_ATT_CODE, code);
-        mnv.addObject(ERR_ATT_MSG, msg);
-
-        return mnv;
+        if (HttpUtil.isJsonRequest(request)) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			
+			final ModelAndView mnv = new ModelAndView(new MappingJackson2JsonView());
+			final String code = getCode(excp);
+			final String msg = getMessage(code, request.getLocale());
+			
+			mnv.addObject(ERR_ATT_CODE, code);
+			mnv.addObject(ERR_ATT_MSG, msg);
+			
+			rtnView = mnv;
+        } else {
+        	rtnView = super.doResolveException(request, response, handler, excp);
+        }
+        
+        return rtnView;
     }
 }

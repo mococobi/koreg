@@ -3,11 +3,14 @@
 <%@ page import="com.mococo.web.util.CustomProperties" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
+	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
+	pageContext.setAttribute("portalAppName", portalAppName);
+	
 	String boardId = (String)request.getParameter("BRD_ID");
 	String postId = (String)request.getParameter("POST_ID");
 	
-	String portalAppName = (String)CustomProperties.getProperty("portal.application.file.name");
-	pageContext.setAttribute("portalAppName", portalAppName);
+	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
+	Boolean portalAdminAuth = PORAL_AUTH_LIST.contains("PORTAL_SYSTEM_ADMIN");
 %>
 <!DOCTYPE html>
 <html>
@@ -15,7 +18,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>${boardData['BRD_NM']}</title>
+	<title>팝업</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
@@ -100,39 +103,35 @@
 					</td>
 					
 				</tr>
-				<c:if test="${boardData['POST_POPUP_YN'] eq 'Y'}">
-					<tr id="post_popup_yn_div">
-						<td>
-							<span>팝업여부</span>
-						</td>
-						<td class="text-center">
-							<input type="checkbox" id="post_popup_yn" disabled>
-						</td>
-						<td>
-							<span>팝업일자</span>
-						</td>
-						<td colspan="5">
-							<span id="post_popup_dt"></span>
-						</td>
-					</tr>
-				</c:if>
-				<tr>
-					<c:if test="${boardData['POST_FIX_YN'] eq 'Y'}">
-						<td  id="post_fix_yn_div">
-							<span>상단 고정</span>
-						</td>
-						<td>
-							<input type="checkbox" id="post_fix_yn" disabled>
-						</td>
-					</c:if>
-					<c:if test="${boardData['POST_SECRET_YN'] eq 'Y'}">
-						<td id="post_secret_yn_div">
-							<span>비밀글</span>
-						</td>
-						<td>
-							<input type="checkbox" id="post_secret_yn" disabled>
-						</td>
-					</c:if>
+				<tr id="post_type_yn" style="display: none;">
+					<td>
+						<span>분류</span>
+					</td>
+					<td colspan="7">
+						<span id="post_type"></span>
+					</td>
+				</tr>
+				<tr id="post_popup_yn" style="display: none;">
+					<td>
+						<span>팝업여부</span>
+					</td>
+					<td class="text-center">
+						<input type="checkbox" id="popup_yn" disabled>
+					</td>
+					<td>
+						<span>팝업일자</span>
+					</td>
+					<td colspan="5">
+						<span id="popup_dt"></span>
+					</td>
+				</tr>
+				<tr id="post_fix_yn" style="display: none;">
+					<td>
+						<span>고정여부</span>
+					</td>
+					<td class="text-center">
+						<input type="checkbox" id="fix_yn" disabled>
+					</td>
 				</tr>
 				<tr>
 					<td>
@@ -142,17 +141,15 @@
 						<div id="post_content" style="min-height: 300px;"></div>
 					</td>
 				</tr>
-				<c:if test="${boardData['POST_FILE_YN'] eq 'Y'}">
-					<tr id="post_file_yn_div">
-						<td>
-							<span>첨부 파일</span>
-						</td>
-						<td colspan="7">
-							<div id="post_file" class="list-group">
-							</div>								
-						</td>
-					</tr>
-				</c:if>
+				<tr id="post_file_yn" style="display: none;">
+					<td>
+						<span>첨부 파일</span>
+					</td>
+					<td colspan="7">
+						<div id="post_file" class="list-group">
+						</div>								
+					</td>
+				</tr>
 			</tbody>
 		</table>
 		
@@ -184,70 +181,92 @@
 			let postData = data['data'];
 			let postFile = data['file'];
 			
-			document.title = '${boardData["BRD_NM"]} - ' + postData['POST_TITLE'];
-			
+			displayBoardPostTag(postData, postFile);
 			displayContents(postData, postFile);
 		});
 		
 	}
 	
 	
+	//태그 표시
+	function displayBoardPostTag(postData, postFile) {
+		document.title = postData['BRD_NM'] + ' - 상세';
+		
+		if(postData['POST_TYPE_YN'] == 'Y') {
+			$('#post_type_yn').show();
+		}
+		
+		if(postData['POST_POPUP_YN'] == 'Y') {
+			$('#post_popup_yn').show();
+		}
+		
+		if(postData['POST_FIX_YN'] == 'Y') {
+			$('#post_fix_yn').show();
+		}
+		
+		if(postData['POST_FILE_YN'] == 'Y') {
+			$('#post_file_yn').show();
+		}
+	}
+	
+	
 	//내용 표시
 	function displayContents(postData, postFile) {
-		
 		$('#post_title').text(postData['POST_TITLE']);
-		$('#post_create_user_id').text(postData['CRT_USR_ID']);
+		$('#post_create_user_id').text(postData['CRT_USR_NM']);
 		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);
 		$('#post_create_date').text(changeDisplayDate(postData['CRT_DT_TM'], 'YYYY-MM-DD'));
 		$('#post_count').text(postData['POST_VIEW_COUNT']);
+		
+		if(postData['POST_TYPE_YN'] == 'Y') {
+			$('#post_type').text(postData['POST_TYPE']);
+		}
+		
+		if(postData['POST_POPUP_YN'] == 'Y') {
+			if(postData['POPUP_YN'] == 'Y') {
+				$('#popup_yn').prop('checked', true);
+			} else {
+				$('#popup_yn').prop('checked', false);
+			}
+			
+			if(postData['POPUP_START_DT_TM'] || postData['POPUP_END_DT_TM']) {
+				$('#popup_dt').text(changeDisplayDate(postData['POPUP_START_DT_TM'], 'YYYY-MM-DD') + ' ~ ' + changeDisplayDate(postData['POPUP_END_DT_TM'], 'YYYY-MM-DD'));
+			}
+		}
+		
+		if(postData['POST_FIX_YN'] == 'Y') {
+			if(postData['FIX_YN'] == 'Y') {
+				$('#fix_yn').prop('checked', true);
+			} else {
+				$('#fix_yn').prop('checked', false);
+			}
+		}
+		
 		$('#post_content').html(postData['POST_CONTENT']);
 		
-		if(postData['POPUP_YN'] == 'Y') {
-			$('#post_popup_yn').prop('checked', true);
-			$('#post_popup_span').show();
-		} else {
-			$('#post_popup_yn').prop('checked', false);
-			$('#post_popup_span').hide();
-		}
-		
-		if(postData['POPUP_START_DT_TM'] || postData['POPUP_END_DT_TM']) {
-			$('#post_popup_dt').text(changeDisplayDate(postData['POPUP_START_DT_TM'], 'YYYY-MM-DD') + ' ~ ' + changeDisplayDate(postData['POPUP_END_DT_TM'], 'YYYY-MM-DD'));
-		}
-		
-		if(postData['SECRET_YN'] == 'Y') {
-			$('#post_secret_yn').prop('checked', true);
-		} else {
-			$('#post_secret_yn').prop('checked', false);
-		}
-		
-		if(postData['FIX_YN'] == 'Y') {
-			$('#post_fix_yn').prop('checked', true);
-		} else {
-			$('#post_fix_yn').prop('checked', false);
-		}
-		
-		//첨부파일
-		if(postFile) {
-			postFile.forEach((attachFile, idx) => {
-				let fileHtml = $('<a>', {
-					  class : 'list-group-item list-group-item-action list-group-item-secondary'
-					, style : 'cursor:pointer;'
-					, text : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT'] + '\t' + formatFileSize(attachFile['FILE_SIZE'])
-					, title : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT']
-					, click : function(e) {
-						let fileData = {
-							  BRD_ID : boardId
-							, POST_ID : attachFile['POST_ID']
-							, FILE_ID : attachFile['FILE_ID']
-						};
-						downloadAttachFile(fileData);
-					}
+		if(postData['POST_FILE_YN'] == 'Y') {
+			//첨부파일
+			if(postFile) {
+				postFile.forEach((attachFile, idx) => {
+					let fileHtml = $('<a>', {
+						  class : 'list-group-item list-group-item-action list-group-item-secondary'
+						, style : 'cursor:pointer;'
+						, text : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT'] + '\t' + formatFileSize(attachFile['FILE_SIZE'])
+						, title : attachFile['ORG_FILE_NM'] + '.' + attachFile['FILE_EXT']
+						, click : function(e) {
+							let fileData = {
+								  BRD_ID : boardId
+								, POST_ID : attachFile['POST_ID']
+								, FILE_ID : attachFile['FILE_ID']
+							};
+							downloadAttachFile(fileData);
+						}
+					});
+					
+					$('#post_file').append(fileHtml);
 				});
-				
-				$('#post_file').append(fileHtml);
-			});
+			}
 		}
-		
 	}
 	
 	//팝업 쿠키 세팅

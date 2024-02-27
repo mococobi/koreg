@@ -31,7 +31,7 @@
         <property name="dataSource" ref="dataSourceUserBatch"/>
     </bean>
     
-    <context:component-scan base-package="com.batch.JdbcTemplate">
+    <context:component-scan base-package="com.batch.jdbc">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>    
 	

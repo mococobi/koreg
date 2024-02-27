@@ -16,8 +16,8 @@
             </div>
         </div>
         <!-- contents -->
-		<div id="portal-loading" style="display: none;">
-			<img id="loading-image" src="${pageContext.request.contextPath}/_custom/image/main/loading.gif" alt="Loading..." />
+		<div id="portal-loading"  class="portal-loading" style="display: none;">
+			<img id="loading-image" class="loading-image" src="${pageContext.request.contextPath}/_custom/image/main/loading.gif" alt="Loading..." />
 		</div>
 		<iframe id="downloadTarget" name="downloadTarget" style="display:none;"></iframe>
 	</div>

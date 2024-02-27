@@ -1,16 +1,33 @@
 package com.mococo.microstrategy.sdk.prompt.cache;
 
 /**
- * 
- * @author hyoungilpark
+ * CacheProvider
+ * @author mococo
  *
  */
 public interface CacheProvider {
-
-    public void init();
-
-    public <T1> void setCache(String itemId, T1 item);
-
-    public <T2> T2 getCache(String itemId);
+	
+	/**
+	 * init
+	 */
+   void init();
+    
+    
+    /**
+     * setCache
+     * @param <T1>
+     * @param itemId
+     * @param item
+     */
+    <A> void setCache(String itemId, A item);
+    
+    
+    /**
+     * getCache
+     * @param <T2>
+     * @param itemId
+     * @return
+     */
+    <B> B getCache(String itemId);
 
 }

@@ -1,10 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
+<%@ page import="java.net.URLDecoder"%>
 <%@ page import="com.mococo.web.util.CustomProperties" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
 	String boardId = (String)request.getParameter("BRD_ID");
+	String postType = (String)request.getParameter("POST_TYPE");
+	if(postType != null) {
+		postType = URLDecoder.decode(postType, "UTF-8");
+	}
 	
 	List<String> PORAL_AUTH_LIST = (List<String>)session.getAttribute("PORTAL_AUTH");
 	
@@ -20,13 +25,10 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>${boardData['BRD_NM']}</title>
+	<title>${boardData['data']['BRD_NM']}</title>
 	
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageCss.jsp" />
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
-	
-	<!-- 게시판 JS -->
-	<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/portal/boardCommon.js?v=20240122001"></script>
 	
 	<style type="text/css">
 		  #boardPost_div
@@ -53,13 +55,24 @@
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivStart${portalAppName}.jsp" />
 	<div id="boardPost_div" class="container py-4" style="max-width: 100%;">
-		<p class="h3">${boardData['BRD_NM']}</p>
-		<p class="h6">${boardData['BRD_DESC']}</p>
+		<p class="h3">${boardData['data']['BRD_NM']}</p>
+		<p class="h6">${boardData['data']['BRD_DESC']}</p>
 		<div class="row mb-3">
+			<c:if test="${boardData['data']['POST_TYPE_YN'] eq 'Y'}">
+				<div class="col-md-2">
+					<select id="post_type_nm" class="form-select form-select-sm">
+						<option>전체</option>
+						<option>메뉴얼</option>
+						<option>용어사전</option>
+						<option>동영상교육</option>
+						<option>지점안내</option>
+					</select>
+				</div>
+			</c:if>
 			<div class="col-md-1">
 				<select id="searchKey" class="form-select form-select-sm">
 					<option value="POST_TITLE">제목</option>
-					<option value="CRT_USR_ID">작성자</option>
+					<option value="CRT_USR_NM">작성자</option>
 				</select>
 			</div>
 			<div class="col-md-4">
@@ -73,8 +86,8 @@
 					<button class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
 				</div>
 			<% } else { %>
-				<c:set var="create_auth_check1" value="${fn:indexOf(boardData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += mstrUserIdAttr += '\"')}" />
-				<c:set var="create_auth_check2" value="${fn:indexOf(boardData['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += 'ALL_USER' += '\"')}" />
+				<c:set var="create_auth_check1" value="${fn:indexOf(boardData['data']['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += mstrUserIdAttr += '\"')}" />
+				<c:set var="create_auth_check2" value="${fn:indexOf(boardData['data']['BRD_CRT_AUTH'], '\"AUTH_ID\":\"' += 'ALL_USER' += '\"')}" />
 				<c:if test="${create_auth_check1 gt -1 || create_auth_check2 gt -1}">
 					<div class="col text-end">
 						<button class="btn btn-secondary btn-sm" onclick="writeBoardPost()">글쓰기</button>
@@ -108,19 +121,26 @@
 </body>
 <script type="text/javascript">
 	let boardId = <%=boardId%>;
+	let postType = "<%=postType%>";
+	
+	let searchType = '';
 	let searchKey = '';
 	let searchVal = '';
 	
 	$(function() {
-		if('${boardData["BRD_NM"]}' == '') {
+		if('${boardData["data"]["BRD_NM"]}' == '') {
 			alert('선택한 게시판이 존재하지 않습니다.');
 			
 			let pagePrams = [];
 			pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
 		} else {
+			if(postType != '' && postType != 'undefined') {
+				searchType = postType;
+				$("#post_type_nm").val(postType).prop("selected", true);
+			}
+			
 			fnBoardInit();
 		}
-		
 		
 		$('#searchVal').keypress(function(e){
 			if(e.keyCode && e.keyCode == 13){
@@ -129,6 +149,25 @@
 		});
 		
 	});
+	
+	
+	//게시물 작성 - 페이지 이동
+	function writeBoardPost() {
+		let pagePrams = [
+			['BRD_ID', boardId]
+		];
+		pageGoPost('_self', __contextPath + '/app/board/boardPostWriteView.do', pagePrams);
+	}
+	
+	
+	//게시물 검색
+	function searchBoardPostList() {
+		searchType = $('#post_type_nm option:selected').val() == '전체' ? '' : $('#post_type_nm option:selected').val();
+		searchKey = $('#searchKey option:selected').val();
+		searchVal = $('#searchVal').val();
+		
+		$('#boardPostTable').DataTable().ajax.reload();
+	}
 	
 	
 	//게시물 목록
@@ -149,6 +188,10 @@
 				, data : function(data) {
 					data['BRD_ID'] = boardId;
 					data['listViewCount'] = listViewCount;
+					
+					if($('#post_type_nm').length == 1) {
+						data['searchType'] = searchType;
+					}
 					data['searchKey'] = searchKey;
 					data['searchVal'] = searchVal;
 					
@@ -179,9 +222,12 @@
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
+						
 						if (row['POPUP_YN'] == 'Y') {
 					        return '<i class="bi bi-megaphone-fill"></i>';
-					    } else {
+					    } else if(row['FIX_YN'] == 'Y') {
+					    	return '<i class="bi bi-pin-angle-fill"></i>';
+						} else {
 					        return rtnData;
 					    }
 					}
@@ -194,6 +240,7 @@
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
+						
 						if(row['POST_FILE_COUNT'] > 0) {
 							return '<a onclick="detailBoardPost('+ row['BRD_ID'] +', '+ row['POST_ID'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '<i class="bi bi-paperclip"></i>(' + row['POST_FILE_COUNT'] + ')' + '</a>';
 						} else {
@@ -213,7 +260,7 @@
 					}
 	            }
 				, {
-					  data : 'CRT_USR_ID'
+					  data : 'CRT_USR_NM'
 					, className : 'textCenter'
 					, render : function (data, type, row) {
 						let rtnData = '-';

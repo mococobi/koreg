@@ -9,7 +9,6 @@
 package com.mococo.web.filter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +16,6 @@ import java.util.Set;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -31,10 +29,31 @@ import org.apache.logging.log4j.Logger;
 import com.mococo.web.util.CustomProperties;
 import com.mococo.web.util.HttpUtil;
 
+/**
+ * SessionFilter
+ * @author mococo
+ *
+ */
 public class SessionFilter implements Filter {
-	private static final Logger LOGGER = LogManager.getLogger(SessionFilter.class);
 	
-	private final Set<String> ENTRYPOINTS = new HashSet<String>();
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LogManager.getLogger(SessionFilter.class);
+	
+	/**
+	 * ENTRYPOINTS
+	 */
+	private final Set<String> ENTRYPOINTS = new HashSet<>();
+	
+	
+    /**
+     * SessionFilter
+     */
+    public SessionFilter() {
+    	logger.debug("SessionFilter");
+    }
+    
 	
 	@Override
 	public void destroy() {
@@ -42,141 +61,95 @@ public class SessionFilter implements Filter {
 	}
 	
 	
-	private final boolean isEntryPoint(String uri) {
+	private boolean isEntryPoint(final String uri) {
+		Boolean rtnCheck = false;
+		
 		if (StringUtils.isNotEmpty(uri)) {
-			for (String entryPoint : ENTRYPOINTS) {
-//				LOGGER.debug("entryPoint : [{}]", entryPoint);
-//				LOGGER.debug("uri.matche(entryPoint) : [{}]", uri.matches(entryPoint));
+			for (final String entryPoint : ENTRYPOINTS) {
+//				logger.debug("entryPoint : [{}]", entryPoint);
+//				logger.debug("uri.matche(entryPoint) : [{}]", uri.matches(entryPoint));
 				if (uri.matches(entryPoint)) {
-					LOGGER.debug("=> is entry point: [{}]", uri);
-					return true;
+					rtnCheck = true;
+					logger.debug("=> is entry point: [{}]", uri);
 				}
 			}
 		}
 
-		return false;
+		return rtnCheck;
 	}
 	
 	
 	@Override
-	public void doFilter(ServletRequest arg0, ServletResponse arg1, FilterChain chain) throws IOException, ServletException {
+	public void doFilter(final ServletRequest arg0, final ServletResponse arg1, final FilterChain chain) throws IOException, ServletException {
 		final HttpServletRequest request = (HttpServletRequest) arg0;
 		final HttpServletResponse response = (HttpServletResponse) arg1;
 
-		String uri = request.getRequestURI();
-//		LOGGER.debug("=> request.getRequestURI(): [{}]", uri);
+		final String uri = request.getRequestURI();
+//		logger.debug("=> request.getRequestURI(): [{}]", uri);
 
 		if (!isEntryPoint(uri)) {
-			String currentSessionId = HttpUtil.getLoginUserId(request);
+			final String currentSessionId = HttpUtil.getLoginUserId(request);
 			if (StringUtils.isEmpty(currentSessionId)) {
-				
-				/*
-				if (HttpUtil.isJsonRequest(request)) {
-					LOGGER.debug("=> reponse json");
-
-//					Gson gson = new Gson();
-					response.setContentType("application/json");
-					response.setCharacterEncoding("utf-8");
-					
-					PrintWriter out = response.getWriter();
-//					out.print(gson.toJson(ControllerUtil.getFailMap("nosession")));
-					out.flush();
-				} else {
-					
-				}
-				*/
-				
-				String fowardUrl = "";
 				if(uri.indexOf("Eis") > -1) {
-					fowardUrl = CustomProperties.getProperty("eis.login.page");
+					final String fowardUrl = CustomProperties.getProperty("eis.login.page");
+					response.sendRedirect(request.getContextPath() + fowardUrl);
+					logger.debug("=> 세션 없는 요청 URI [{}] foward : [{}]", uri, fowardUrl);
 				} else {
-					fowardUrl = CustomProperties.getProperty("portal.login.page");
+					final String fowardUrl = CustomProperties.getProperty("portal.login.page");
+					response.sendRedirect(request.getContextPath() + fowardUrl);
+					logger.debug("=> 세션 없는 요청 URI [{}] foward : [{}]", uri, fowardUrl);
 				}
-				
-				LOGGER.debug("=> 세션 없는 요청 URI [{}] foward : [{}]", uri, fowardUrl);
-				RequestDispatcher dispatcher = request.getSession().getServletContext().getRequestDispatcher(fowardUrl);
-				dispatcher.forward(request, response);
 				
 				return;
 			}
 		}
-		
-		/*
-		if(uri.indexOf("servlet/mstrWebAdmin") > -1) {
-			if(request.getParameter("evt") == null) {
-				String sessionId = (String)CookieManager.getCookieValue(SECode.USER_ID, request);
-				if(sessionId == null) {
-					sessionId = (String) request.getSession().getAttribute("mstrUserIdAttr");
-				}
-				String sessionIp = HttpUtil.getClientIPReal(request);
-				String sessionTime = timeFormat.format(new Date());
-				
-				String logText = sessionId + "|" + sessionIp + "|" +sessionTime + "|IDS|BI|mstrWebAdmin";
-				LOGGER_B02.info("응용프로그램 관리자 접근기록 [{}]", logText);
-				LogUtil.writeSystemLog("B02", logText);
-			}
-		}
-		*/
 		
 		chain.doFilter(request, response);
 	}
 	
 	
 	/**
-	 * <pre>
-	 * 목적 : 패턴 검색
-	 * 매개변수 : 
-	 * 	FilterConfig filterConfig
-	 * 	String parameterName
-	 * 반환값 : java.lang.Boolean
-	 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-	 * </pre>
+	 * 패턴 검색
+	 * @param filterConfig
+	 * @param parameterName
+	 * @return
 	 */
-	private boolean contains(FilterConfig filterConfig, String parameterName) {
+	private boolean contains(final FilterConfig filterConfig, final String parameterName) {
+		Boolean rtnCheck = false;
+		
 		if (filterConfig == null) {
-			return false;
-		}
+			rtnCheck = false;
+		} else {
+			final Enumeration<String> paramNames = filterConfig.getInitParameterNames();
 
-		Enumeration<String> paramNames = filterConfig.getInitParameterNames();
-
-		while (paramNames.hasMoreElements()) {
-			if (StringUtils.equals(paramNames.nextElement(), parameterName)) {
-				return true;
+			while (paramNames.hasMoreElements()) {
+				if (StringUtils.equals(paramNames.nextElement(), parameterName)) {
+					rtnCheck = true;
+				}
 			}
 		}
 
-		return false;
+		return rtnCheck;
 	}
 	
 	
 	/**
-	 * <pre>
-	 * 목적 : 통과 URL 설정
-	 * 매개변수 : 
-	 * 	String entryPoints
-	 * 반환값 : 없음
-	 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-	 * </pre>
+	 * 통과 URL 설정
+	 * @param entryPoints
 	 */
-	public void setEntryPoints(String entryPoints) {
-		String values[] = entryPoints.split(";");
-		for (String value : values) {
+	public void setEntryPoints(final String entryPoints) {
+		final String values[] = entryPoints.split(";");
+		for (final String value : values) {
 			this.ENTRYPOINTS.add(value.trim());
 		}
 	}
 	
 	
 	/**
-	 * <pre>
-	 * 목적 : 시작 함수
-	 * 매개변수 : 
-	 * 	FilterConfig filterConfig
-	 * 반환값 : 없음
-	 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-	 * </pre>
+	 * 초기 함수
 	 */
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
+	public void init(final FilterConfig filterConfig) throws ServletException {
 		if (contains(filterConfig, "entryPoints")) {
 			setEntryPoints(filterConfig.getInitParameter("entryPoints"));
 		}

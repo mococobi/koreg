@@ -42,8 +42,7 @@ public class LoginController2 {
 
     final Logger LOGGER = LoggerFactory.getLogger(LoginController2.class);
     
-    @Autowired
-    LoginService loginService;
+    /* default */ @Autowired /* default */ LoginService loginService;
     
     private static String RSA_WEB_KEY = "_RSA_SF_KEY_"; // 개인키 session key
     private static String RSA_INSTANCE = "RSA"; // rsa transformation

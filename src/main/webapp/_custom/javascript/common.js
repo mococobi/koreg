@@ -42,15 +42,16 @@ function popupMstrPage(popupName) {
 
 
 //커뮤니티 - 리스트 화면 이동
-function moveCommunityPage(moveBoardId) {
+function moveCommunityPage(moveBoardId, moveSearchType) {
 	let pagePrams = [
-		['BRD_ID', moveBoardId]
+		  ['BRD_ID', moveBoardId]
+		, ['POST_TYPE', encodeURI(moveSearchType)]
 	];
 	
 	if(moveBoardId == '2') {
-		pageGoPost('_self', __contextPath + '/app/board/boardPostFaqListView.do', pagePrams);
+		pageGoPost('_self', __contextPath + '/app/board/boardPostFaqListView.do', pagePrams, 1);
 	} else {
-		pageGoPost('_self', __contextPath + '/app/board/boardPostListView.do', pagePrams);
+		pageGoPost('_self', __contextPath + '/app/board/boardPostListView.do', pagePrams, 1);
 	}
 }
 
@@ -101,9 +102,9 @@ function XSSCheck(str, level) {
 		return str;
 	}
 	
-    if (level == undefined || level == 0) {
+    if (level === undefined || level === 0) {
         str = str.replace(/\<|\>|\"|\'|\%|\;|\(|\)|\&|\+|\-/g,"");
-    } else if (level != undefined && level == 1) {
+    } else if (level !== undefined && level === 1) {
         str = str.replace(/\</g, "&lt;");
         str = str.replace(/\>/g, "&gt;");
     }
@@ -164,7 +165,7 @@ function callAjaxForm(url, params, callFunction) {
 //파라메터에 포함된 정보로 ajax 호출
 function _submit(action, target, inputs) {
     var $form = $('[name="__temp_form"]');
-    if ($form.length != 0) {
+    if ($form.length !== 0) {
 		$form.remove(); 
 	}
     
@@ -184,7 +185,7 @@ function _submit(action, target, inputs) {
 
 //공통 에러 처리
 function errorProcess(jqXHR, textStatus, errorThrown) {
-	if(jqXHR['status'] == 404) {
+	if(jqXHR['status'] === 404) {
 		alert('지정되지 않은 URL입니다.');
 	} else {
 		if(jqXHR['responseText'].indexOf('세션 만료') > -1) {
@@ -194,8 +195,12 @@ function errorProcess(jqXHR, textStatus, errorThrown) {
 				window.top.location = __contextPath + __portalLoginPage;
 			}
 		} else {
-			alert(errorThrown['message']);
-			console.log(errorThrown);
+			if(jqXHR['responseJSON']) {
+				alert(jqXHR['responseJSON']['message']);
+			} else {
+				alert(errorThrown['message']);
+				console.log(errorThrown);
+			}
 		}
 	}
 	
@@ -225,6 +230,7 @@ function changeDisplayDate(orgDate, changeType) {
 	let mins = changeDate.getMinutes().toString().padStart(2, '0');
     let sec = changeDate.getSeconds().toString().padStart(2, '0');
 	
+	let dateString = "";
 	switch(changeType) {
 		case "YYYY-MM-DD":
 			dateString = year + '-' + month + '-' + day;
@@ -269,7 +275,7 @@ function commonDatatableLanguage() {
 		'decimal' : ''
 		, 'emptyTable' : '데이터가 없습니다.'
 		, 'info' : '_START_ - _END_ (총 _TOTAL_개)'
-		, 'infoEmpty' : '0명'
+		, 'infoEmpty' : '0개'
 		, 'infoFiltered' : '(전체 _MAX_ 개 중 검색결과)'
 		, 'infoPostFix' : ''
 		, 'thousands' : ','
@@ -419,14 +425,14 @@ function getMstrFormDefinition(tmpObjectId, tmpType, tmpIsVi, mstrProjectNm) {
 			$.extend(rtnInput, formDefs[__portalAppName + '_report']);
 			break;
 		case 55:
-	        if (tmpIsVi == true) {
+	        if (tmpIsVi === true) {
 	        	$.extend(rtnInput, formDefs[__portalAppName + '_dossier']);
 	        } else {
 	        	$.extend(rtnInput, formDefs[__portalAppName + '_document']);
 	        }
 			break;
 		case 551:
-	        if (tmpIsVi == true) {
+	        if (tmpIsVi === true) {
 	        	$.extend(rtnInput, formDefs[__portalAppName + '_dossier_main']);
 	        } else {
 	        	$.extend(rtnInput, formDefs[__portalAppName + '_document']);
@@ -439,7 +445,7 @@ function getMstrFormDefinition(tmpObjectId, tmpType, tmpIsVi, mstrProjectNm) {
 	
 	if(typeof reportInfo == 'undefined') {
 		delete rtnInput['promptAnswerMode'];
-	} else if(typeof reportInfo['promptList'] != 'undefined' && reportInfo['promptList'].length == 0) {
+	} else if(typeof reportInfo['promptList'] !== 'undefined' && reportInfo['promptList'].length === 0) {
 		delete rtnInput['promptAnswerMode'];
 	}
 	
@@ -499,7 +505,7 @@ function getMstrTitleName(title) {
 	return rtnTitle;
 }
 
-
+/*
 //MSTR 도씨에 PDF 내보내기
 function exportPdfDossier(iframeId) {
 	let __mojo = $('#' + iframeId).get(0).contentWindow.mstrmojo;
@@ -515,3 +521,4 @@ function exportPdfDossier(iframeId) {
 		alert('실행된 리포트가 없습니다.');
 	}
 }
+*/

@@ -1,7 +1,8 @@
 package com.custom.log.service.impl;
 
-import java.util.HashMap;
+import java.sql.SQLException;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,19 +17,42 @@ import com.custom.log.service.LogService;
 import com.mococo.biz.common.dao.SimpleBizDao;
 import com.mococo.web.util.HttpUtil;
 
-@Service(value = "logService")
+/**
+ * LogServiceImpl
+ * @author mococo
+ *
+ */
+@Service("logService")
 public class LogServiceImpl implements LogService {
-
-    final Logger LOGGER = LoggerFactory.getLogger(LogServiceImpl.class);
+	
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LoggerFactory.getLogger(LogServiceImpl.class);
     
-    @Autowired
-    SimpleBizDao simpleBizDao;
+	/**
+	 * simpleBizDao
+	 */
+	/* default */ @Autowired /* default */ SimpleBizDao simpleBizDao;
+    
+	
+    /**
+     * LogServiceImpl
+     */
+    public LogServiceImpl() {
+    	logger.debug("LogServiceImpl");
+    }
+    
     
     @Override
-    public Map<String, Object> addPortalLog(HttpServletRequest request, String screenId, String screenDetailId, String userAction, Map<String, Object> datilInfo) throws Exception {
-    	Map<String, Object> params = new HashMap<String, Object>();
-    	
-    	Map<String, Object> rtnMap = new HashMap<String, Object>();
+    public Map<String, Object> addPortalLog(
+    		  final HttpServletRequest request
+    		, final String screenId
+    		, final String screenDetailId
+    		, final String userAction
+    		, final Map<String, Object> datilInfo) throws SQLException {
+    	final Map<String, Object> params = new ConcurrentHashMap<>();
+    	final Map<String, Object> rtnMap = new ConcurrentHashMap<>();
     	params.put("userId", HttpUtil.getLoginUserId(request));
     	
     	//TODO 인사정보 연동 필요
@@ -43,10 +67,10 @@ public class LogServiceImpl implements LogService {
     	params.put("screenDetailId", screenDetailId);
     	params.put("userAction", userAction);
     	
-    	JSONObject detailObj = new JSONObject(datilInfo);
+    	final JSONObject detailObj = new JSONObject(datilInfo);
     	params.put("datilInfo", detailObj.toString());
     	
-    	int logCnt = simpleBizDao.insert("Log.addPortalLog", params);
+    	final int logCnt = simpleBizDao.insert("Log.addPortalLog", params);
         
         rtnMap.put("data", logCnt);
         rtnMap.put("params", params);
@@ -55,11 +79,16 @@ public class LogServiceImpl implements LogService {
     }
     
     
-    public Map<String, Object> addPortalLog(MultipartHttpServletRequest request, String screenId, String screenDetailId, String userAction, Map<String, Object> datilInfo) throws Exception {
+    @Override
+    public Map<String, Object> addPortalLog(
+    		  final MultipartHttpServletRequest request
+    		, final String screenId
+    		, final String screenDetailId
+    		, final String userAction
+    		, final Map<String, Object> datilInfo) throws SQLException {
     	
-    		Map<String, Object> params = new HashMap<String, Object>();
-    	
-	    	Map<String, Object> rtnMap = new HashMap<String, Object>();
+    		final Map<String, Object> params = new ConcurrentHashMap<>();
+    		final Map<String, Object> rtnMap = new ConcurrentHashMap<>();
 	    	params.put("userId", HttpUtil.getLoginUserId(request));
 	    	
 	    	//TODO 인사정보 연동 필요
@@ -74,10 +103,10 @@ public class LogServiceImpl implements LogService {
 	    	params.put("screenDetailId", screenDetailId);
 	    	params.put("userAction", userAction);
 	    	
-	    	JSONObject detailObj = new JSONObject(datilInfo);
+	    	final JSONObject detailObj = new JSONObject(datilInfo);
 	    	params.put("datilInfo", detailObj.toString());
 	    	
-	    	int logCnt = simpleBizDao.insert("Log.addPortalLog", params);
+	    	final int logCnt = simpleBizDao.insert("Log.addPortalLog", params);
 	        
 	        rtnMap.put("data", logCnt);
 	        rtnMap.put("params", params);

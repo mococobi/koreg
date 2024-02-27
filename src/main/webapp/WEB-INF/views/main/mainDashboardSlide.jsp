@@ -1,18 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
+<%@ page import="com.mococo.web.util.CustomProperties" %>
 <%@ page import="java.util.*" %>
-<%@ page import="com.kb.kview.util.CustomProperties" %>
-<%@ page import="com.kb.kview.util.HttpUtil" %>
 <%
 	String userName = "";
 	userName = StringUtils.defaultString((String)session.getAttribute("mstrUserNameAttr"), "-");
-	userName = HttpUtil.XSSFilter(userName);
 	pageContext.setAttribute("userName", userName);
 	
 	/* 2020-12-01 소스코드취약점점검대응 - Cross-Site Scripting */
-	String server = HttpUtil.XSSFilter(request.getParameter("Server"));
-	String project = HttpUtil.XSSFilter(request.getParameter("Project"));
-	String port = HttpUtil.XSSFilter(request.getParameter("Port"));
+	String server = CustomProperties.getProperty("mstr.server.name");
+	String project = CustomProperties.getProperty("mstr.default.project.name");
+	String port = CustomProperties.getProperty("mstr.server.port");
 	
 	pageContext.setAttribute("server", server);
 	pageContext.setAttribute("project", project);
@@ -21,9 +19,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>본부 대시보드</title>
-    <jsp:include page="/_custom/jsp/include/include.base.jsp" />
+   	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EIS</title>
+    <jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
     <!--  
     <script src="${pageContext.request.contextPath}/_custom/js/full-screen-helper.js?v=20201116001" type="text/javascript"></script>
     -->
@@ -75,48 +75,28 @@
 	    var timeOutSec = 60;
 	    
 	    
-	    //대시보드 리스트 가져오기
-	    function getDashboardList(checkFolderId, customFunction) {
-	    	//16CBBFAF480AB08F8FCF08A99881982D
-	    	$.ajax({
-	    	      url : '${pageContext.request.contextPath}/app/main/menu.json'
-	    	    , data : JSON.stringify({folderId : checkFolderId})
-	    	    , processData : false
-	    	    , contentType : 'application/json;charset=utf-8'
-	    	    , type : 'POST'
-	    	    , success: function (data, text, request) {
-	    	    	customFunction(data, text, request);
-	    	    }
-	    	    , error: function (jqXHR, textStatus, errorThrown) {
-	    	    	if (jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.errorMessage) {
-                        alert(jqXHR.responseJSON.errorMessage);
-                    } else {
-                        alert("처리 중 오류가 발생하였습니다.");
-                    } 
-	    	    }
-	    	});
-	    }
-	    
-	    
 	    //초기 함수
-        function fnInit(data, text, request) {
-            var listData = data['data'];
-            var $tmpHtml = '';
-            
+        function fnInit(data) {
+            let listData = data['folder'];
+            let $tmpHtml = '';
             /*
-            for(var i=0; i<listData.length; i++) {
-                slideDashboard.push({'dossierId' : listData[i]['id'], 'subject' : listData[i]['name']});
+            for(let i=0; i<listData.length; i++) {
+                slideDashboard.push({
+                	  'dossierId' : listData[i]['id']
+                	, 'subject' : listData[i]['name']
+                });
                 $tmpHtml += '<a href="#" title="'+ listData[i]['name'] +'" style="margin-left: 5px;" id="move_'+i+'" name="move_Btn" onclick="moveUrlBtn(\'' + i +'\');">'+ (i+1) +'</a>';
             }
             */
             
-            var defaultListData = null;
-            var userListDataAll = null;
-            var userListData = null;
-            var listViewData = null;
-            var userName = '${userName}'.replace(')', '').split('(');
+//             let defaultListData = null;
+//             let userListDataAll = null;
+//             let userListData = null;
+//             let listViewData = null;
+            let userName = '${userName}'.replace(')', '').split('(');
             userName = userName[1] + '(' + userName[0] + ')';
             
+            /*
             for(var i=0; i<listData.length; i++) {
             	if(listData[i]['name'] == '01.Default') {
             		defaultListData = listData[i];
@@ -144,20 +124,20 @@
             		timeOutSec = parseInt(jsonData['slideTime']);
             	}
             }
+            */
             
-            for(var k=0; k<listViewData['child'].length; k++) {
-                slideDashboard.push({'dossierId' : listViewData['child'][k]['id'], 'subject' : listViewData['child'][k]['name']});
-                $tmpHtml += '<a href="#" title="'+ listViewData['child'][k]['name'] +'" style="margin-left: 5px;" id="move_'+k+'" name="move_Btn" onclick="moveUrlBtn(\'' + k +'\');">'+ (k+1) +'</a>';
+            for(let k=0; k<listData.length; k++) {
+                slideDashboard.push({
+                	  'dossierId' : listData[k]['id']
+                	, 'subject' : listData[k]['name']
+                });
+                $tmpHtml += '<a href="#" title="'+ listData[k]['name'] +'" style="margin-left: 5px;" id="move_'+k+'" name="move_Btn" onclick="moveUrlBtn(\'' + k +'\');">'+ (k+1) +'</a>';
             }
-            
             $tmpHtml += '<span id="changeTimerStop" class="stop"></span>';
-            
             $('#moveBtnDiv').html($tmpHtml);
             
             $('#changeTimerStop').on('click', function() {
-                //if($('#changeTimerStop').text() == '멈춤') {
                 if($('#changeTimerStop').attr('class') == 'stop') {
-                    //$('#changeTimerStop').text('시작');
                     $('#changeTimerStop').removeClass('stop');
                     $('#changeTimerStop').addClass('play');
                 
@@ -166,7 +146,6 @@
                     timerStopIdx2 = timerStopIdx;
                     timerStopText = $('#currentTime').text();
                 } else {
-                    //$('#changeTimerStop').text('멈춤');
                     $('#changeTimerStop').removeClass('play');
                     $('#changeTimerStop').addClass('stop');
                     
@@ -195,7 +174,7 @@
                         if($('iframe[name=slideReportFrame_'+slideDashboard[0]['dossierId']+']').contents().find('.mstrmojo-Editor.mstrWaitBox.modal').css('display') == 'none') {
                             checkIframeLoad(0);
                         }
-                    }, 500);
+                    }, 1000);
                 });
             }
           
@@ -212,7 +191,6 @@
 	    			zidx -= 1;
 	    			var url = replaceUrl + slideDashboard[i]['dossierId'];
 	                var $tempHtml = '';
-	                //$tempHtml += '<iframe src="'+ url +'" name="slideReportFrame_' + slideDashboard[i]['dossierId'] + '" frameborder="0" width="100%" height="'+iframeHeight+'" scrolling="yes" style="position: absolute; z-index: '+ zidx +';"></iframe>';
 	                $tempHtml += '<iframe name="slideReportFrame_' + slideDashboard[i]['dossierId'] + '" frameborder="0" width="100%" height="'+iframeHeight+'" scrolling="yes" style="position: absolute; z-index: '+ zidx +';"></iframe>';
 	                $displayArea.append($tempHtml);
 	                
@@ -273,10 +251,8 @@
             for(var i=0; i<slideDashboard.length; i++) {
             	tmpZidx--;
             	if(i != slideIdx) {
-            	    //$('iframe[name=slideReportFrame_'+slideDashboard[i]['dossierId']+']').hide();
             	    $('iframe[name=slideReportFrame_'+slideDashboard[i]['dossierId']+']').css('z-index', tmpZidx);
             	} else {
-            		//$('iframe[name=slideReportFrame_'+slideDashboard[slideIdx]['dossierId']+']').show();
             		$('iframe[name=slideReportFrame_'+slideDashboard[i]['dossierId']+']').css('z-index', 100);
             	}
             }
@@ -399,6 +375,7 @@
 	    			//화면 표시
 	    			var tempElemnet = (hours ? hours + ':' + twoDigits(mins) : mins) + ':' + twoDigits(time.getUTCSeconds());
 	    			$('#' + showTextId).text(tempElemnet);
+	    			console.log('tempElemnet : ' + tempElemnet);
 	    			
                 	setTimeout(updateTimer, time.getUTCSeconds() + 500);
 	    		}
@@ -493,13 +470,14 @@
 	    
 	    $(function() {
 	    	
-	    	//개발
-           	//getDashboardList('238249A141464B2605F359A57810A86F', fnInit);
-	    	
-	    	//운영
-            getDashboardList('9E6D84EA42ED0157BAECDAA67C259BF1', fnInit);
+            let callParams = {
+       			folderId : 'FA7EF09E40511428EEBC1C9E5D739D42'
+       		};
+       		callAjaxPost('/mstr/getFolderList.json', callParams, function(data) {
+       			fnInit(data);
+       		});
             
-            countDown('sessionCurrentTime', timeOutFunctionSession, 10, 0);
+//             countDown('sessionCurrentTime', timeOutFunctionSession, 10, 0);
             
             $('#closeBtn').click(function() {
             	window.close();
@@ -531,11 +509,11 @@
 	            <button id="changeTimerStop" style="margin-left: 10px;">멈춤</button>
 	            -->
 	        </div>
-	        <!-- 
+	        <!-- -->
 	        <div class="paging ds_nav" style="float: left; margin: 0px; padding: 6px;">
-                <span id="changeTimerStop" class="stop"></span>
+                <span id="changeTimerStop" class="stop">멈춤</span>
 	        </div>
-	        -->
+	        
 	        <div style="float: right; margin: 0px; padding: 6px; padding-right: 20px;">
                <button id="closeBtn">닫기</button>
             </div>
@@ -573,7 +551,7 @@
 	
 	<div id="mstrWeb_waitCurtain" class="divWaitCurtain" style="z-index:9998;">
 	   <div id="loadingImg" style="text-align: center; margin-top: 20%;">
-	       <img alt="" src="${pageContext.request.contextPath}/_custom/images/loading_p.gif">
+	       <img alt="" src="${pageContext.request.contextPath}/_custom/image/main/loading.gif">
 	   </div>
 	</div>
 </body>

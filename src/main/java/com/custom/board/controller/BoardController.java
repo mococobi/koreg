@@ -3,11 +3,12 @@ package com.custom.board.controller;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -15,13 +16,17 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -33,23 +38,51 @@ import com.custom.log.service.LogService;
 import com.mococo.web.util.ControllerUtil;
 import com.mococo.web.util.CustomProperties;
 import com.mococo.web.util.HttpUtil;
+import com.mococo.web.util.PortalCodeUtil;
 
+/**
+ * 게시판 Controller
+ * @author mococo
+ *
+ */
 @Controller
 @RequestMapping("/board/*")
 public class BoardController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BoardController.class);
+	
+	/**
+	 * 로그
+	 */
+    private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
     
-    private enum Status {OK, FILE_NOT_FOUND, EXCEPTION};
+    /**
+     * 상태
+     * @author mococo
+     *
+     */
+    private enum Status {FILE_OK, FILE_NOT_FOUND, EXCEPTION}
     
-    @Autowired
-    BoardService boardService;
+    /**
+     * 게시판
+     */
+    /* default */ @Autowired /* default */ BoardService boardService;
     
-    @Autowired
-    AdminService adminService;
+    /**
+     * 관리자
+     */
+    /* default */ @Autowired /* default */ AdminService adminService;
     
-    @Autowired
-    LogService logService;
+    /**
+     * 로그
+     */
+    /* default */ @Autowired /* default */ LogService logService;
+    
+    
+    /**
+     * BoardServiceImpl
+     */
+    public BoardController() {
+    	logger.debug("BoardController");
+    }
     
     
     /**
@@ -59,22 +92,69 @@ public class BoardController {
      * @param params
      * @return
      */
-    @RequestMapping(value = "/board/boardPostListView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView boardPostListView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("board/boardPostList");
+    @GetMapping("/board/boardPostListView.do")
+    public ModelAndView boardPostListViewGet(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	final ModelAndView view = new ModelAndView("board/boardPostList");
         
-        Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         try {
-    		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
-    		view.addObject("boardData", boardMap);
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			view.addObject("data", rtnMap);
-			LOGGER.error("boardPostListView Exception", e);
+        	final Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
+    		view.addObject(PortalCodeUtil.boardData, boardMap);
+		} catch (BadSqlGrammarException | SQLException e) {
+			logger.error("boardPostListView Exception", e);
 		}
         
         return view;
+    }
+    
+    
+    /**
+     * 게시판 - 게시물 조회 화면 이동
+     * @param request
+     * @param response
+     * @param params
+     * @return
+     */
+    @PostMapping("/board/boardPostListView.do")
+    public ModelAndView boardPostListViewPost(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	final ModelAndView view = new ModelAndView("board/boardPostList");
+        
+        try {
+    		final Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
+    		view.addObject(PortalCodeUtil.boardData, boardMap);
+		} catch (BadSqlGrammarException | SQLException e) {
+			logger.error("boardPostListView Exception", e);
+		}
+        
+        return view;
+    }
+    
+    
+    /**
+     * 게시판 - 조회
+     * @param request
+     * @param response
+     * @param params
+     * @return
+     */
+    @PostMapping("/board/boardInfo.json")
+    @ResponseBody
+    public Map<String, Object> boardInfo(final HttpServletRequest request, final HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+    	params.put(PortalCodeUtil.PORTAL_LOG, false);
+    	
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+    	
+    	try {
+    		final Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
+    		rtnMap.putAll(boardMap);
+		} catch (BadSqlGrammarException | SQLException e) {
+			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+			logger.error("boardPostList Exception", e);
+		}
+    	
+    	return rtnMap;
     }
     
     
@@ -85,21 +165,20 @@ public class BoardController {
      * @param params
      * @return
      */
-    @RequestMapping(value = "/board/boardPostList.json", method = { RequestMethod.POST })
+    @PostMapping("/board/boardPostList.json")
     @ResponseBody
-    public Map<String, Object> boardPostList(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
-    	params.put("PORTAL_LOG", false);
+    public Map<String, Object> boardPostList(final HttpServletRequest request, final HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+    	params.put(PortalCodeUtil.PORTAL_LOG, false);
     	
-    	LOGGER.debug("params : [{}]", params);
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	try {
-    		Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = boardService.boardPostList(request, response, params);
+    		final Map<String, Object> rtnList = boardService.boardPostList(request, response, params);
     		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
+		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostList Exception", e);
+			logger.error("boardPostList Exception", e);
 		}
     	
     	return rtnMap;
@@ -113,19 +192,18 @@ public class BoardController {
      * @param params
      * @return
      */
-    @RequestMapping(value = "/board/boardPostListGrid.json", method = { RequestMethod.POST })
-    public Map<String, Object> boardPostListGrid(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	params.put("PORTAL_LOG", true);
-    	LOGGER.debug("params : [{}]", params);
+    @PostMapping("/board/boardPostListGrid.json")
+    public Map<String, Object> boardPostListGrid(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	params.put(PortalCodeUtil.PORTAL_LOG, true);
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	try {
-    		Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = boardService.boardPostList(request, response, params);
+    		final Map<String, Object> rtnList = boardService.boardPostList(request, response, params);
     		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
+		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostListGrid Exception", e);
+			logger.error("boardPostListGrid Exception", e);
 		}
     	
     	return rtnMap;
@@ -139,19 +217,39 @@ public class BoardController {
      * @param params
      * @return
      */
-    @RequestMapping(value = "/board/boardPostFaqListView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView boardPostFaqListView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("board/boardPostFaqList");
+    @GetMapping("/board/boardPostFaqListView.do")
+    public ModelAndView boardPostFaqListViewGet(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	final ModelAndView view = new ModelAndView("board/boardPostFaqList");
         
-        Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
         try {
-    		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
-    		view.addObject("boardData", boardMap);
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			view.addObject("data", rtnMap);
-			LOGGER.error("boardPostFaqListView Exception", e);
+        	final Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
+    		view.addObject(PortalCodeUtil.boardData, boardMap);
+		} catch (BadSqlGrammarException | SQLException e) {
+			logger.error("boardPostFaqListView Exception", e);
+		}
+        
+        return view;
+    }
+    
+    
+    /**
+     * FAQ - 게시물 조회 화면 이동
+     * @param request
+     * @param response
+     * @param params
+     * @return
+     */
+    @PostMapping("/board/boardPostFaqListView.do")
+    public ModelAndView boardPostFaqListViewPost(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	final ModelAndView view = new ModelAndView("board/boardPostFaqList");
+        
+        try {
+        	final Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
+    		view.addObject(PortalCodeUtil.boardData, boardMap);
+		} catch (BadSqlGrammarException | SQLException e) {
+			logger.error("boardPostFaqListView Exception", e);
 		}
         
         return view;
@@ -165,22 +263,21 @@ public class BoardController {
      * @param params
      * @return
      */
-    @RequestMapping(value = "/board/boardPostFaqList.json", method = { RequestMethod.POST })
+    @PostMapping("/board/boardPostFaqList.json")
     @ResponseBody
-    public Map<String, Object> boardPostFaqList(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
-    	params.put("PORTAL_LOG", true);
-    	params.put("CHECK_POST_FILE", true);
+    public Map<String, Object> boardPostFaqList(final HttpServletRequest request, final HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+    	params.put(PortalCodeUtil.PORTAL_LOG, true);
+    	params.put(PortalCodeUtil.CHECK_POST_FILE, true);
     	
-    	LOGGER.debug("params : [{}]", params);
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	try {
-    		Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = boardService.boardPostList(request, response, params);
+    		final Map<String, Object> rtnList = boardService.boardPostList(request, response, params);
     		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
+		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostFaqList Exception", e);
+			logger.error("boardPostFaqList Exception", e);
 		}
     	
     	return rtnMap;
@@ -194,31 +291,22 @@ public class BoardController {
      * @param params
      * @return
      */
-    @RequestMapping(value = "/board/boardPostWriteView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView boardPostWriteView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("board/boardPostWrite");
-        Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
-        
-        try {
-        	if(params.get("POST_ID") == null) {
-        		//신규
-        		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
-        		view.addObject("boardData", boardMap);
-        	} else {
-        		//수정
-        		Map<String, Object> postMap = boardService.boardPostDetail(request, response, params);
-        		view.addObject("boardData", postMap.get("boardData"));
-        		view.addObject("postData", postMap.get("data"));
-        	}
-        	
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			view.addObject("data", rtnMap);
-			LOGGER.error("boardPostWriteView Exception", e);
-		}
-        
-        return view;
+    @GetMapping("/board/boardPostWriteView.do")
+    public ModelAndView boardPostWriteViewGet(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+        return new ModelAndView("board/boardPostWrite");
+    }
+    
+    
+    /**
+     * 게시판 - 게시물 작성 화면 이동
+     * @param request
+     * @param response
+     * @param params
+     * @return
+     */
+    @PostMapping("/board/boardPostWriteView.do")
+    public ModelAndView boardPostWriteViewPost(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+        return new ModelAndView("board/boardPostWrite");
     }
     
     
@@ -229,24 +317,22 @@ public class BoardController {
      * @param params
      * @return
      */
-    @RequestMapping(value = "/board/boardPostDetailView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView boardPostDetailView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	params.put("PORTAL_LOG", false);//값을 불러오는게 아닌 화면 이동에선 로그처리 필요X
-    	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("board/boardPostDetail");
-        Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
-        
-        try {
-        	Map<String, Object> postMap = boardService.boardPostDetail(request, response, params);
-        	view.addObject("boardData", postMap.get("boardData"));
-    		view.addObject("postData", postMap.get("data"));
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			view.addObject("data", rtnMap);
-			LOGGER.error("boardPostDetailView Exception", e);
-		}
-        
-        return view;
+    @GetMapping("/board/boardPostDetailView.do")
+    public ModelAndView boardPostDetailViewGet(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+        return new ModelAndView("board/boardPostDetail");
+    }
+    
+    
+    /**
+     * 게시판 - 게시물 상세 화면 이동
+     * @param request
+     * @param response
+     * @param params
+     * @return
+     */
+    @PostMapping("/board/boardPostDetailView.do")
+    public ModelAndView boardPostDetailViewPost(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+        return new ModelAndView("board/boardPostDetail");
     }
     
     
@@ -257,23 +343,22 @@ public class BoardController {
      * @param params
      * @return
      */
-    @RequestMapping(value = "/board/boardPostDetail.json", method = { RequestMethod.GET, RequestMethod.POST })
+    @PostMapping("/board/boardPostDetail.json")
     @ResponseBody
-    public Map<String, Object> boardPostDetail(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
-    	params.put("PORTAL_LOG", true);
+    public Map<String, Object> boardPostDetail(final HttpServletRequest request, final HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+    	params.put(PortalCodeUtil.PORTAL_LOG, true);
     	params.put("CHECK_POST_FILE", true);
-    	params.put("CHECK_POST_LOCATION", true);
+    	params.put(PortalCodeUtil.CHECK_POST_LOC, true);
     	
-    	LOGGER.debug("params : [{}]", params);
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	try {
-    		Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = boardService.boardPostDetail(request, response, params);
+    		final Map<String, Object> rtnList = boardService.boardPostDetail(request, response, params);
     		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
+		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostDetail Exception", e);
+			logger.error("boardPostDetail Exception", e);
 		}
     	
     	return rtnMap;
@@ -289,48 +374,44 @@ public class BoardController {
      * @return
      */
     @SuppressWarnings("unchecked")
-	@RequestMapping(value = "/board/boardPostInsert.json", method = {RequestMethod.GET, RequestMethod.POST})
-	public Map<String, Object> boardPostInsert(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) {
-//    	LOGGER.debug("params : [{}]", params);
+    @PostMapping("/board/boardPostInsert.json")
+	public Map<String, Object> boardPostInsert(final MultipartHttpServletRequest request, final HttpServletRequest hrequest, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
 		try {
-			{
-	    		//사용자 개인 권한 설정
-	    		Boolean boardPostInsertCheck = false;
-	    		Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
-	    		Map<String, Object> boardMapData = (Map<String, Object>) boardMap.get("data");
-	    		String boardCreateAuth = boardMapData.get("BRD_CRT_AUTH").toString();
-	    		String userId = "\"AUTH_ID\":\"" + HttpUtil.getLoginUserId(request) + "\"";
-	    		if(boardCreateAuth.indexOf(userId) > -1) {
-	    			boardPostInsertCheck = true;
-	    		}
-	    		
-	    		//전체 유저 체크
-	    		String allUserId = "\"AUTH_ID\":\"" + "ALL_USER" + "\"";
-	    		if(boardCreateAuth.indexOf(allUserId) > -1) {
-	    			boardPostInsertCheck = true;
-	    		}
-	    		
-		    	//관리자 권한 체크
-		    	List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
-		    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-		    		boardPostInsertCheck = true;
-		    	}
-		    	
-		    	//최종 권한 판단
-		    	if(!boardPostInsertCheck) {
-		    		rtnMap = ControllerUtil.getFailMap("portal.board.insert.auth.error");
-		    		return rtnMap;
-		    	}
+    		//사용자 개인 권한 설정
+    		Boolean boardPostInsert = false;
+    		final Map<String, Object> boardMap = boardService.boardDetail(request, response, params);
+    		final Map<String, Object> boardMapData = (Map<String, Object>) boardMap.get(PortalCodeUtil.data);
+    		final String boardCreateAuth = boardMapData.get("BRD_CRT_AUTH").toString();
+    		final String userId = "\"AUTH_ID\":\"" + HttpUtil.getLoginUserId(request) + "\"";
+    		if(boardCreateAuth.indexOf(userId) > -1) {
+    			boardPostInsert = true;
+    		}
+    		
+    		//전체 유저 체크
+    		final String allUserId = "\"AUTH_ID\":\"" + "ALL_USER" + "\"";
+    		if(boardCreateAuth.indexOf(allUserId) > -1) {
+    			boardPostInsert = true;
+    		}
+    		
+	    	//관리자 권한 체크
+    		final List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
+	    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
+	    		boardPostInsert = true;
 	    	}
-			
-			Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = boardService.boardPostInsert(request, response, params);
-    		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
+	    	
+	    	//최종 권한 판단
+	    	if(boardPostInsert) {
+	    		final Map<String, Object> rtnList = boardService.boardPostInsert(request, response, params);
+	    		rtnMap.putAll(rtnList);
+	    	} else {
+	    		rtnMap = ControllerUtil.getFailMap("portal.board.insert.auth.error");
+	    	}
+		} catch (BadSqlGrammarException | SQLException | IOException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostInsert Exception", e);
+			logger.error("boardPostInsert Exception", e);
 		}
 		
 		return rtnMap;
@@ -338,7 +419,7 @@ public class BoardController {
     
     
     /**
-     * 게시판 - 게시물 리스트 수정
+     * 게시판 - 게시물 수정
      * @param request
      * @param hrequest
      * @param response
@@ -346,41 +427,37 @@ public class BoardController {
      * @return
      */
     @SuppressWarnings("unchecked")
-	@RequestMapping(value = "/board/boardPostUpdate.json", method = {RequestMethod.GET, RequestMethod.POST})
-	public Map<String, Object> boardPostUpdate(MultipartHttpServletRequest request, HttpServletRequest hrequest, HttpServletResponse response, @RequestParam Map<String, Object> params) {
-//    	LOGGER.debug("params : [{}]", params);
+    @PostMapping("/board/boardPostUpdate.json")
+	public Map<String, Object> boardPostUpdate(final MultipartHttpServletRequest mRequest, final HttpServletRequest hRequest, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
 		try {
-			{
-	    		//기본 권한 설정
-	    		Boolean boardPostInsertCheck = false;
-	    		
-	    		//작성자 권한 체크
-	    		Map<String, Object> boardPostCheckData = (Map<String, Object>)boardService.boardPostDetail(hrequest, response, params).get("data");
-	    		if(boardPostCheckData.get("CRT_USR_ID").toString().equals(HttpUtil.getLoginUserId(request))) {
-	    			boardPostInsertCheck = true;
-	    		}
-	    		
-		    	//관리자 권한 체크
-		    	List<String> portalAuthList = adminService.getSessionPortalAuthList(hrequest);
-		    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-		    		boardPostInsertCheck = true;
-		    	}
-		    	
-		    	//최종 권한 판단
-		    	if(!boardPostInsertCheck) {
-		    		rtnMap = ControllerUtil.getFailMap("portal.board.update.auth.error");
-		    		return rtnMap;
-		    	}
+    		//기본 권한 설정
+    		Boolean boardPostInsert = false;
+    		
+    		//작성자 권한 체크
+    		final Map<String, Object> boardPostData = (Map<String, Object>)boardService.boardPostDetail(hRequest, response, params).get(PortalCodeUtil.data);
+    		if(boardPostData.get("CRT_USR_ID").toString().equals(HttpUtil.getLoginUserId(mRequest))) {
+    			boardPostInsert = true;
+    		}
+    		
+	    	//관리자 권한 체크
+    		final List<String> portalAuthList = adminService.getSessionPortalAuthList(hRequest);
+	    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
+	    		boardPostInsert = true;
 	    	}
-			
-			Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = boardService.boardPostUpdate(request, response, params);
-    		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
+	    	
+	    	//최종 권한 판단
+	    	if(boardPostInsert) {
+	    		final Map<String, Object> rtnList = boardService.boardPostUpdate(mRequest, response, params);
+	    		rtnMap.putAll(rtnList);
+	    	} else {
+	    		rtnMap = ControllerUtil.getFailMap("portal.board.update.auth.error");
+	    	}
+		} catch (BadSqlGrammarException | SQLException | IOException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostUpdate Exception", e);
+			logger.error("boardPostUpdate Exception", e);
 		}
 		
 		return rtnMap;
@@ -395,41 +472,37 @@ public class BoardController {
 	 * @return
 	 */
     @SuppressWarnings("unchecked")
-	@RequestMapping(value = "/board/boardPostDelete.json", method = {RequestMethod.GET, RequestMethod.POST})
-	public Map<String, Object> boardPostDelete(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
-    	LOGGER.debug("params : [{}]", params);
+    @PostMapping("/board/boardPostDelete.json")
+	public Map<String, Object> boardPostDelete(final HttpServletRequest request, final HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
 		try {
-	    	{
-	    		//기본 권한 설정
-	    		Boolean boardPostInsertCheck = false;
-		    	
-	    		//작성자 권한 체크
-	    		Map<String, Object> boardPostCheckData = (Map<String, Object>)boardService.boardPostDetail(request, response, params).get("data");
-	    		if(boardPostCheckData.get("CRT_USR_ID").toString().equals(HttpUtil.getLoginUserId(request))) {
-	    			boardPostInsertCheck = true;
-	    		}
-	    		
-		    	//관리자 권한 체크
-		    	List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
-		    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
-		    		boardPostInsertCheck = true;
-		    	}
-		    	
-		    	//최종 권한 판단
-		    	if(!boardPostInsertCheck) {
-		    		rtnMap = ControllerUtil.getFailMap("portal.board.delete.auth.error");
-		    		return rtnMap;
-		    	}
+    		//기본 권한 설정
+    		Boolean boardPostInsert = false;
+	    	
+    		//작성자 권한 체크
+    		final Map<String, Object> boardPostData = (Map<String, Object>)boardService.boardPostDetail(request, response, params).get(PortalCodeUtil.data);
+    		if(boardPostData.get("CRT_USR_ID").toString().equals(HttpUtil.getLoginUserId(request))) {
+    			boardPostInsert = true;
+    		}
+    		
+	    	//관리자 권한 체크
+    		final List<String> portalAuthList = adminService.getSessionPortalAuthList(request);
+	    	if(portalAuthList.contains("PORTAL_SYSTEM_ADMIN")) {
+	    		boardPostInsert = true;
 	    	}
-			
-			Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = boardService.boardPostDelete(request, response, params);
-    		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
+	    	
+	    	//최종 권한 판단
+	    	if(boardPostInsert) {
+	    		final Map<String, Object> rtnList = boardService.boardPostDelete(request, response, params);
+	    		rtnMap.putAll(rtnList);
+	    	} else {
+	    		rtnMap = ControllerUtil.getFailMap("portal.board.delete.auth.error");
+	    	}
+		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostDelete Exception", e);
+			logger.error("boardPostDelete Exception", e);
 		}
 		
 		return rtnMap;
@@ -443,165 +516,107 @@ public class BoardController {
 	 * @param params
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/board/downloadAttachFile.do", method = {RequestMethod.GET, RequestMethod.POST})
-	public void download(final HttpServletRequest request, final HttpServletResponse response, @RequestParam Map<String, Object> params) throws IOException {
-		Status state = Status.OK;
+    @PostMapping("/board/downloadAttachFile.do")
+	public void download(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+		Status state = Status.FILE_OK;
 		String errorMsg = "";
-
-		FileInputStream fileInputStream = null;
-		BufferedInputStream bufferedInputStream = null;
-		ServletOutputStream servletOutputStream = null;
-		BufferedOutputStream bufferedOutputStream = null;
-		File rtnEncDrmFile = null;
+		
+		final String boardId = params.get("BRD_ID").toString();
+		final String postId = params.get("POST_ID").toString();
+		
+		Map<String, Object> fileMap = null;
 		
 		try {
-			String boardId = HttpUtil.replaceFilePath(request.getParameter("BRD_ID"));
-			String postId = HttpUtil.replaceFilePath(request.getParameter("POST_ID"));
-//			String fileId = HttpUtil.replaceFilePath(request.getParameter("FILE_ID"));
-			
-			Map<String, Object> fileMap = boardService.boardPostFileDetail(request, response, params);
-			
-			String serverFileName = fileMap.get("SRV_FILE_NM").toString();
-			String orgFileName = fileMap.get("ORG_FILE_NM").toString();
-			String fileExtension = "." + fileMap.get("FILE_EXT").toString();
-			
-			String downFilePath = CustomProperties.getProperty("attach.base.location") + boardId + "/";
-			String downFileName = HttpUtil.getDownloadFileName(orgFileName, request) + fileExtension;
-			
-			//DRM 영역
-			/*
-			SLDsFile sFile = new SLDsFile();
-			SLBsUtil sUtil = new SLBsUtil();
-			
-			int isSupportFile = sFile.DSIsSupportFile(downFilePath + downFileName);
-			int isEncrypted = sUtil.isEncryptFile(downFilePath + downFileName);
-			
-			System.out.println("지원가능 여부 : " + isSupportFile);	//0 : 지원 X, 	1 : 지원되는
-			System.out.println("암호화 여부 : " + isEncrypted);		//0 : 일반 파일, 	1 : 암호화파일
-			
-			rtnEncDrmFile = DrmUtil.encDrm(downFilePath, downFileName);
-			*/
-			
-			rtnEncDrmFile = new File(downFilePath + serverFileName);
-			fileInputStream = new FileInputStream(rtnEncDrmFile);
-			bufferedInputStream = new BufferedInputStream(fileInputStream);
-			
-			response.reset();
-			
-			/* 전송방식이 'file'일 경우, browser 별 설정도 추가하여야 한다 */
-		    response.setHeader("Content-type", "application/octet-stream");
-		    response.setHeader("Content-Disposition", "attachment; filename=" + downFileName);
-		    response.setHeader("Content-Length", Long.toString(rtnEncDrmFile.length()) );
-
-		    response.setHeader("Content-Transfer-Encoding", "binary");
-		    response.setHeader("Pragma", "no-cache");
-		    response.setHeader("Cache-Control", "private");
-		    response.setHeader("Expires", "0");
-
-			int nReadSize = 0;
-			final int BUFFER_CAPACITY = 1024;
-			
-			byte[] buf = null;
-			buf = new byte[BUFFER_CAPACITY];
-			
-			servletOutputStream = response.getOutputStream();
-			bufferedOutputStream = new BufferedOutputStream(servletOutputStream);
-
-			nReadSize = bufferedInputStream.read(buf);
-			while (nReadSize != -1) {
-				bufferedOutputStream.write(buf, 0, nReadSize);
-				nReadSize = bufferedInputStream.read(buf);				
-			}
-			
-			bufferedOutputStream.flush();
-			servletOutputStream.flush();
-			
-			/*
-			//포탈 이력
-			if(bulletinId.equals("99999")) {
-				params.put("historyAction", "download_bdp");
-			} else {
-				params.put("historyAction", "download1");
-			}
-			bulletinService.insertProtalHistory(params);
-			*/
-			
-			//포탈 로그 기록(게시물 + 파일 등록)
-			logService.addPortalLog(request, boardId, postId, "DOWNLOAD", params);
-			
-		} catch (FileNotFoundException e) {
-			LOGGER.error("downloadAttachFile FileNotFoundException", e);
-			
-			errorMsg = e.getMessage();
-			state = Status.FILE_NOT_FOUND;
-		} catch (Exception e) {
-			LOGGER.error("downloadAttachFile Exception", e);
-			
+			fileMap = boardService.boardPostFileDetail(request, response, params);
+		}  catch (BadSqlGrammarException | SQLException e) {
+			logger.error("download Exception", e);
 			errorMsg = e.getMessage();
 			state = Status.EXCEPTION;
-		} finally {
-			if (fileInputStream != null) {
-				try {
-					fileInputStream.close();
-				} catch (IOException e) {
-					LOGGER.error("!!! error", e);
-				}
-			}
-			if (bufferedInputStream != null) {
-				try {
-					bufferedInputStream.close();
-				} catch (IOException e) {
-					LOGGER.error("!!! error", e);
-				}
-			}
-			if (bufferedOutputStream != null) {
-				try {
-					bufferedOutputStream.close();
-				} catch (IOException e) {
-					LOGGER.error("!!! error", e);
-				}
-			}
-			if (bufferedOutputStream != null) {
-				try {
-					bufferedOutputStream.close();
-				} catch (IOException e) {
-					LOGGER.error("!!! error", e);
-				}
-			}
-			if (servletOutputStream != null) {
-				try {
-					servletOutputStream.close();
-				} catch (IOException e) {
-					LOGGER.error("!!! error", e);
-				}
-			}
-			
-			/*
-			if(rtnEncDrmFile != null) {
-				boolean isDeleteFile = rtnEncDrmFile.delete();
-				LOGGER.debug("DRM Finish. temp isDeleteFile [{}]", isDeleteFile);
-			}
-			*/
 		}
 		
-		if (state != Status.OK) {
-			LOGGER.debug("!!! 오류가 발생하였습니다.");
+		if (state == Status.FILE_OK) {
+			final String serverFileName = fileMap.get("SRV_FILE_NM").toString();
+			final String orgFileName = fileMap.get("ORG_FILE_NM").toString();
+			final String fileExtension = "." + fileMap.get("FILE_EXT").toString();
+			
+			final String downFilePath = CustomProperties.getProperty("attach.base.location") + fileMap.get("BRD_ID").toString() + "/";
+			final String downFileName = HttpUtil.getDownloadFileName(orgFileName, request) + fileExtension;
+			
+			final File rtnEncFile = new File(downFilePath, FilenameUtils.getName(serverFileName));
+			
+			try (InputStream fileInputStream = Files.newInputStream(Paths.get(downFilePath + FilenameUtils.getName(serverFileName)));
+				BufferedInputStream buffInStream = new BufferedInputStream(fileInputStream);){
+				/* 전송방식이 'file'일 경우, browser 별 설정도 추가하여야 한다 */
+				response.reset();
+				response.setHeader("Content-type", "application/octet-stream");
+				response.setHeader("Content-Disposition", "attachment; filename=" + downFileName);
+				response.setHeader("Content-Length", Long.toString(rtnEncFile.length()));
+				
+				response.setHeader("Content-Transfer-Encoding", "binary");
+				response.setHeader("Pragma", "no-cache");
+				response.setHeader("Cache-Control", "private");
+				response.setHeader("Expires", "0");
+				
+				try (ServletOutputStream svlOutStream = response.getOutputStream();
+					BufferedOutputStream buffOutStream = new BufferedOutputStream(svlOutStream);){
+					final byte[] buf = new byte[1024];
+					int nReadSize = buffInStream.read(buf);
+					while (nReadSize != -1) {
+						buffOutStream.write(buf, 0, nReadSize);
+						nReadSize = buffInStream.read(buf);				
+					}
+					
+					buffOutStream.flush();
+					svlOutStream.flush();
+					
+					//포탈 로그 기록(게시물 + 파일 등록)
+					logService.addPortalLog(request, boardId, postId, "DOWNLOAD", params);
+				}  catch (IOException | BadSqlGrammarException | SQLException e) {
+					logger.error("downloadAttachFile Exception", e);
+					errorMsg = e.getMessage();
+					state = Status.EXCEPTION;
+				}
+				
+			} catch (IOException e) {
+				logger.error("download Exception", e);
+				errorMsg = e.getMessage();
+				state = Status.EXCEPTION;
+			}
+		}
+		
+		checkErrorMsg(response, state, errorMsg);
+	}
+    
+    
+    /**
+     * 에러 메시지 출력
+     * @param response
+     * @param state
+     * @param errorMsg
+     */
+    private void checkErrorMsg(final HttpServletResponse response, final Status state, final String errorMsg) {
+    	if (state != Status.FILE_OK) {
+			final String logTmp1 = state.toString().replaceAll("[\r\n]","");
+			logger.debug("!!! download [{}]", logTmp1);
 			
 			if(response != null) {
 				response.reset();
 				response.setHeader("Content-type", "text/html;charset=UTF-8");
 				response.setHeader("Content-Transfer-Encoding", "chunked");
 				
-				final StringBuffer BUF = new StringBuffer(100);
-				BUF.append("<script type='text/javascript'>alert('" + errorMsg + "')</script>");
+				final StringBuffer BUF = new StringBuffer(300);
+				BUF.append(errorMsg);
 				
-				final PrintWriter WRITER = response.getWriter();
-				if(WRITER != null) {
-					WRITER.print(BUF.toString());
-				}
+				try (PrintWriter WRITER = response.getWriter();) {
+					if(WRITER != null) {
+						WRITER.print("<script type='text/javascript'>alert('" + Encode.forHtml(BUF.toString()) + "')</script>");
+					}
+				} catch (IOException e) {
+					logger.error("WRITER Exception", e);
+				} 
 			}
 		}
-	}
+    }
 	
 	
 	/**
@@ -611,22 +626,20 @@ public class BoardController {
 	 * @param params
 	 * @return
 	 */
-    @RequestMapping(value = "/board/boardPostPopupList.json", method = {RequestMethod.GET, RequestMethod.POST })
+    @PostMapping("/board/boardPostPopupList.json")
     @ResponseBody
-    public Map<String, Object> boardPostListPopup(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	params.put("PORTAL_LOG", true);
-    	params.put("CHECK_POST_FILE", true);
+    public Map<String, Object> boardPostListPopup(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	params.put(PortalCodeUtil.PORTAL_LOG, true);
     	
-    	LOGGER.debug("params : [{}]", params);
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	try {
-    		Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = boardService.boardPostPopupList(request, response, params);
+    		final Map<String, Object> rtnList = boardService.boardPostPopupList(request, response, params);
     		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
+		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostPopupList Exception", e);
+			logger.error("boardPostPopupList Exception", e);
 		}
     	
     	return rtnMap;
@@ -640,25 +653,22 @@ public class BoardController {
      * @param params
      * @return
      */
-    @RequestMapping(value = "/board/boardPostPopupView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView boardPostPopupView(HttpServletRequest request, HttpServletResponse response, @RequestParam final Map<String, Object> params) {
-    	params.put("PORTAL_LOG", false);//값을 불러오는게 아닌 화면 이동에선 로그처리 필요X
-    	params.put("CHECK_POST_LOCATION", false);//값을 불러오는게 아닌 화면 이동에선 로그처리 필요X
-    	LOGGER.debug("params : [{}]", params);
-        ModelAndView view = new ModelAndView("board/boardPostPopup");
-        Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
-        
-        try {
-        	Map<String, Object> postMap = boardService.boardPostDetail(request, response, params);
-    		view.addObject("boardData", postMap.get("boardData"));
-    		view.addObject("postData", postMap.get("data"));
-		} catch (Exception e) {
-			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			view.addObject("data", rtnMap);
-			LOGGER.error("boardPostPopupView Exception", e);
-		}
-        
-        return view;
+    @GetMapping("/board/boardPostPopupView.do")
+    public ModelAndView boardPostPopupViewGet(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+        return new ModelAndView("board/boardPostPopup");
+    }
+    
+    
+    /**
+     * 팝업 - 게시물 상세 화면 이동
+     * @param request
+     * @param response
+     * @param params
+     * @return
+     */
+    @PostMapping("/board/boardPostPopupView.do")
+    public ModelAndView boardPostPopupViewPost(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+        return new ModelAndView("board/boardPostPopup");
     }
     
     
@@ -669,23 +679,22 @@ public class BoardController {
      * @param params
      * @return
      */
-    @RequestMapping(value = "/board/boardPostPopupDetail.json", method = { RequestMethod.GET, RequestMethod.POST })
+    @PostMapping("/board/boardPostPopupDetail.json")
     @ResponseBody
-    public Map<String, Object> boardPostPopupDetail(HttpServletRequest request, HttpServletResponse response, @RequestBody final Map<String, Object> params) {
-    	params.put("PORTAL_LOG", true);
+    public Map<String, Object> boardPostPopupDetail(final HttpServletRequest request, final HttpServletResponse response, @RequestBody final Map<String, Object> params) {
+    	params.put(PortalCodeUtil.PORTAL_LOG, true);
     	params.put("CHECK_POST_FILE", true);
-    	params.put("CHECK_POST_LOCATION", false);
+    	params.put(PortalCodeUtil.CHECK_POST_LOC, false);
     	
-    	LOGGER.debug("params : [{}]", params);
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	try {
-    		Map<String, Object> rtnList = new HashMap<String, Object>();
-    		rtnList = boardService.boardPostDetail(request, response, params);
+    		final Map<String, Object> rtnList = boardService.boardPostDetail(request, response, params);
     		rtnMap.putAll(rtnList);
-		} catch (Exception e) {
+		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			LOGGER.error("boardPostPopupDetail Exception", e);
+			logger.error("boardPostPopupDetail Exception", e);
 		}
     	
     	return rtnMap;

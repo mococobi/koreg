@@ -45,6 +45,23 @@
 			font-size: 2rem;
 			font-family: 맑은 고딕;
 		}
+		
+		
+		.main-dashboard-loading {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			display: block;
+			background-color: #fff;
+			z-index: 9000;
+			text-align: center;
+		}
+		
+		.main-loading-image {
+		    width: 100px;
+		    height: auto;
+		    margin-top: 6%;
+		}
 	</style>
 </head>
 <body>
@@ -53,14 +70,19 @@
 <div>
 	<div id="main_div" class="container py-1" style="max-width: 100%;">
 		<!-- 이미지 영역 -->
-		<div class="mb-4 bg-body-tertiary rounded-3" style="height: calc(33vh);">
+		<div class="mb-4 bg-body-tertiary rounded-3" style="height: calc(33vh); position: relative;">
 			<%--
 			<img alt="메인 이미지" src="${pageContext.request.contextPath}/_custom/image/main/mainImage.png?v=20231123001" style="width: 100%; height: calc(33vh);">
 			--%>
+			
 			<iframe name="mainReport" id="mainReport" src=""
-				style="width: 100%; height: 100%; overflow: hidden; margin: 0px; background: #fff; border-radius: 8px; border: 1px solid #c8d8ec;"
+				style="position: absolute; z-index:100; width: 100%; height: 100%; overflow: hidden; margin: 0px; background: #fff; border-radius: 8px; border: 1px solid #c8d8ec;"
 				marginWidth=0 marginHeight=0 frameBorder=0 scrolling="no">
 			</iframe>
+			
+			<div id="main-dashboard-loading" class="main-dashboard-loading" style="">
+				<img class="main-loading-image" src="${pageContext.request.contextPath}/_custom/image/main/loading.gif" alt="Loading..." />
+			</div>
 		</div>
 
 		<!-- 그리드 영역 -->
@@ -105,7 +127,7 @@
 								<col width="20%">
 							</colgroup>
 							<thead>
-							<tr>
+								<tr>
 									<th scope="col">제목</th>
 									<th scope="col">등록일자</th>
 								</tr>
@@ -128,17 +150,17 @@
 					<div>
 						<h3 class="text-body-emphasis" style="font-size: 3rem;">메뉴얼</h3>
 						<p style="font-size: 2rem;">포탈 메뉴얼을 확인합니다.</p>
-						<a href="#" onclick="detailBoardPost(1,1)" class="btn btn-primary" style="font-size: 2rem;"> 확인 </a>
+						<a href="#" onclick="moveCommunityPage(3, '메뉴얼')" class="btn btn-primary" style="font-size: 2rem;"> 확인 </a>
 					</div>
 				</div>
 				<div class="col d-flex align-items-start">
 					<div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-						<i class="bi bi-box-seam-fill" style="font-size: 3rem;"></i>
+						<i class="bi bi-journal-text" style="font-size: 3rem;"></i>
 					</div>
 					<div>
-						<h3 class="text-body-emphasis" style="font-size: 3rem;">통계 용어 사전</h3>
-						<p style="font-size: 2rem;">통계 용어 사전을 확인합니다.</p>
-						<a href="#" onclick="detailBoardPost(1,1)" class="btn btn-primary" style="font-size: 2rem;"> 확인 </a>
+						<h3 class="text-body-emphasis" style="font-size: 3rem;">용어사전</h3>
+						<p style="font-size: 2rem;">용어사전을 확인합니다.</p>
+						<a href="#" onclick="moveCommunityPage(3, '용어사전')" class="btn btn-primary" style="font-size: 2rem;"> 확인 </a>
 					</div>
 				</div>
 				<div class="col d-flex align-items-start">
@@ -146,19 +168,19 @@
 						<i class="bi bi-camera-reels-fill" style="font-size: 3rem;"></i>
 					</div>
 					<div>
-						<h3 class="text-body-emphasis" style="font-size: 3rem;">동영상 가이드</h3>
-						<p style="font-size: 2rem;">동영상 가이드를 확인합니다.</p>
-						<a href="#" onclick="detailBoardPost(1,1)" class="btn btn-primary" style="font-size: 2rem;"> 확인 </a>
+						<h3 class="text-body-emphasis" style="font-size: 3rem;">동영상교육</h3>
+						<p style="font-size: 2rem;">동영상교육을 확인합니다.</p>
+						<a href="#" onclick="moveCommunityPage(3, '동영상교육')" class="btn btn-primary" style="font-size: 2rem;"> 확인 </a>
 					</div>
 				</div>
 				<div class="col d-flex align-items-start">
 					<div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-						<i class="bi bi-chat-square-text-fill" style="font-size: 3rem;"></i>
+						<i class="bi bi-person-plus" style="font-size: 3rem;"></i>
 					</div>
 					<div>
-						<h3 class="text-body-emphasis" style="font-size: 3rem;">포탈 가이드</h3>
-						<p style="font-size: 2rem;">포탈 가이드를 확인합니다.</p>
-						<a href="#" onclick="detailBoardPost(1,1)" class="btn btn-primary" style="font-size: 2rem;"> 확인 </a>
+						<h3 class="text-body-emphasis" style="font-size: 3rem;">지점안내</h3>
+						<p style="font-size: 2rem;">지점안내를 확인합니다.</p>
+						<a href="#" onclick="moveCommunityPage(3, '지점안내')" class="btn btn-primary" style="font-size: 2rem;"> 확인 </a>
 					</div>
 				</div>
 			</div>
@@ -170,6 +192,10 @@
 	
 <script type="text/javascript">
 	$(function() {
+		$('#mainReport').on("load", function() {
+			$('#main-dashboard-loading').hide();
+		});
+		
 		fnMainInit();
 	});
 	
@@ -185,15 +211,18 @@
 	
 	//게시물 목록
 	function getBoardList(boardId, divId) {
+		let displayCnt = 5;
 		let callParams = {
 			  BRD_ID : boardId
-			, listViewCount : 5
+			, listViewCount : displayCnt
 			, start : 0
-			, length : 5
+			, length : displayCnt
 		};
 		callAjaxPost('/board/boardPostList.json', callParams, function(data) {
 			let postData = data['data'];
-			postData.forEach((post, idx) => {
+// 			postData.forEach((post, idx) => {
+			for(let i=0; i<displayCnt; i++) {
+				let post = postData[i];
 				
 				let trHtml = $('<tr>');
 				
@@ -220,9 +249,9 @@
 				$(trHtml).append(tdTitleHtml);
 				$(trHtml).append(tdCreateDateHtml);
 				
-				
 				$('#' + divId).append(trHtml);
-			});
+			}
+// 			});
 		});
 	}
 	

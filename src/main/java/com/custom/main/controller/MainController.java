@@ -1,8 +1,5 @@
 package com.custom.main.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -10,36 +7,51 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.custom.board.service.BoardService;
-import com.custom.main.service.MainService;
-import com.mococo.web.util.ControllerUtil;
 import com.mococo.web.util.CustomProperties;
 
+/**
+ * MainController
+ * @author mococo
+ *
+ */
 @Controller
 @RequestMapping("/main/*")
 public class MainController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
+	
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LoggerFactory.getLogger(MainController.class);
     
-    @Autowired
-    MainService mainService;
+    /**
+     * boardService
+     */
+	/* default */ @Autowired /* default */ BoardService boardService;
     
-    @Autowired
-    BoardService boardService;
+    
+    /**
+     * MainController
+     */
+    public MainController() {
+    	logger.debug("MainController");
+    }
+    
     
     /**
      * 메인 화면 이동
+     * @param request
+     * @param response
      * @return
      */
-    @RequestMapping(value = "/main/mainView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView mainView(HttpServletRequest request, HttpServletResponse response) {
-    	ModelAndView view = new ModelAndView("error/auth");
+    @GetMapping("/main/mainView.do")
+    public ModelAndView mainViewGet(HttpServletRequest request, HttpServletResponse response) {
+    	final ModelAndView view = new ModelAndView("error/auth");
     	
     	switch (CustomProperties.getProperty("portal.main.display")) {
 			case "MSTR_DASHBOARD":
@@ -50,18 +62,34 @@ public class MainController {
 				break;
 			case "MAIN":
 				view.setViewName("main/main");
-				Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
-		        try {
-		        	Map<String, Object> params = new HashMap<String, Object>();
-		        	params.put("customOrder1", "BRD_ID");
-		        	
-//		    		Map<String, Object> boardMap = boardService.boardList(request, response, params);
-//		    		view.addObject("communityData", boardMap);
-				} catch (Exception e) {
-					rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-					view.addObject("data", rtnMap);
-					LOGGER.error("mainView Exception", e);
-				}
+				break;
+			default:
+				break;
+		}
+        
+        return view;
+    }
+    
+    
+    /**
+     * 메인 화면 이동
+     * @param request
+     * @param response
+     * @return
+     */
+    @PostMapping("/main/mainView.do")
+    public ModelAndView mainViewPost(HttpServletRequest request, HttpServletResponse response) {
+    	final ModelAndView view = new ModelAndView("error/auth");
+    	
+    	switch (CustomProperties.getProperty("portal.main.display")) {
+			case "MSTR_DASHBOARD":
+				view.setViewName("main/mainDashboard");
+				view.addObject("portalMainDashboardId", CustomProperties.getProperty("portal.main.dashboard.id"));
+				view.addObject("type", CustomProperties.getProperty("portal.main.dashboard.type"));
+				view.addObject("isvi", true);
+				break;
+			case "MAIN":
+				view.setViewName("main/main");
 				break;
 			default:
 				break;
@@ -75,9 +103,43 @@ public class MainController {
      * 리포트 메인 화면 이동
      * @return
      */
-    @RequestMapping(value = "/main/reportMainView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView reportMainView() {
-        ModelAndView view = new ModelAndView("main/reportMain" + CustomProperties.getProperty("portal.application.file.name"));
+    @GetMapping("/main/reportMainView.do")
+    public ModelAndView reportMainViewGet() {
+    	final ModelAndView view = new ModelAndView("main/reportMain");
+    	
+    	switch (CustomProperties.getProperty("portal.application.file.name")) {
+			case "Gcgf":
+				view.setViewName("main/reportMainGcgf");
+				break;
+			case "Koreg":
+				view.setViewName("main/reportMainKoreg");
+				break;
+			default:
+				break;
+		}
+        
+        return view;
+    }
+    
+    
+    /**
+     * 리포트 메인 화면 이동
+     * @return
+     */
+    @PostMapping("/main/reportMainView.do")
+    public ModelAndView reportMainViewPost() {
+    	final ModelAndView view = new ModelAndView("main/reportMain");
+    	
+    	switch (CustomProperties.getProperty("portal.application.file.name")) {
+			case "Gcgf":
+				view.setViewName("main/reportMainGcgf");
+				break;
+			case "Koreg":
+				view.setViewName("main/reportMainKoreg");
+				break;
+			default:
+				break;
+		}
         
         return view;
     }
@@ -87,11 +149,19 @@ public class MainController {
      * EIS 메인 화면 이동
      * @return
      */
-    @RequestMapping(value = "/main/mainEisView.do", method = { RequestMethod.GET, RequestMethod.POST })
-    public ModelAndView mainEisView() {
-        ModelAndView view = new ModelAndView("main/mainEis");
-        
-        return view;
+    @GetMapping("/main/mainEisView.do")
+    public ModelAndView mainEisViewGet() {
+        return new ModelAndView("main/mainEis");
+    }
+    
+    
+    /**
+     * EIS 메인 화면 이동
+     * @return
+     */
+    @PostMapping("/main/mainEisView.do")
+    public ModelAndView mainEisViewPost() {
+        return new ModelAndView("main/mainEis");
     }
     
     
@@ -99,11 +169,9 @@ public class MainController {
      * 프롬프트 선택 화면
      * @return
      */
-    @RequestMapping(value = "/main/selectPrompt.do", method = { RequestMethod.GET, RequestMethod.POST })
+    @PostMapping("/main/selectPrompt.do")
     public ModelAndView selectPrompt() {
-        ModelAndView view = new ModelAndView("main/selectPrompt");
-        
-        return view;
+        return new ModelAndView("main/selectPrompt");
     }
     
     

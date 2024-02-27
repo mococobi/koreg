@@ -16,41 +16,68 @@ import com.mococo.microstrategy.sdk.prompt.vo.ObjectConfig;
 
 /**
  * MSTR 객체의 긴주석을 이용한 확장 속성 처리
- * 
- * @author hyoungilpark
+ * @author mococo
  *
  */
 public class DescConfigHandler extends ConfigHandler {
-    private static final Logger logger = LoggerFactory.getLogger(DescConfigHandler.class);
-
+	
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LoggerFactory.getLogger(DescConfigHandler.class);
+	
+	
+    /**
+     * DescConfigHandler
+     */
+    public DescConfigHandler() {
+    	super();
+    	logger.debug("DescConfigHandler");
+    }
+    
+    
+	@SuppressWarnings("unused")
+	private void sample() {
+    	logger.debug("DescConfigHandler");
+    }
+	
+	
+	/**
+	 * initConfigObjectList
+	 */
     @Override
     public void initConfigObjectList() {
+    	logger.debug("initConfigObjectList");
     }
-
+    
+    
+    /**
+     * getObjectConfig
+     */
     @Override
     public ObjectConfig getObjectConfig(String project, String objectId) {
         return null;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.mocomsys.microstrategy.sdk.config.ConfigHandler#getObjectConfig(com.
-     * microstrategy.web.objects.WebObjectInfo)
+    
+    
+    /**
+     * getObjectConfig
+     * @see com.mocomsys.microstrategy.sdk.config.ConfigHandler#getObjectConfig
+     * (com.microstrategy.web.objects.WebObjectInfo)
      */
     @Override
-    public ObjectConfig getObjectConfig(WebObjectInfo object, WebIServerSession session) {
+    public ObjectConfig getObjectConfig(final WebObjectInfo object, final WebIServerSession session) {
         // 파라미터 prompt의 주석 속성에서 확장 속성을 조회한다. 주석내용은 Map으로 변환 가능한 json 형식의 문자열이다.
         Map<String, Object> configInfo = null;
         if (object != null) {
-            String json = object.getDescription();
+        	final String json = object.getDescription().replaceAll("[\r\n]","");
             logger.debug("=> json:[{}]", json);
             if (StringUtils.isNotEmpty(json)) {
                 try {
-                    configInfo = new ObjectMapper().readValue(json, new TypeReference<Map<String, Object>>() {
+                    configInfo = new ObjectMapper().readValue(json, new TypeReference<>() {
                     });
                 } catch (IOException e) {
-                    logger.error("!!! json [{}] parsing error", json, e);
+                	logger.error("!!! getObjectConfig IOException", e);
                 }
             }
         }

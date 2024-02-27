@@ -1,29 +1,64 @@
 package com.mococo.microstrategy.sdk.prompt.vo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Report
+ * @author mococo
+ *
+ */
 public class Report {
-    private final String id;
+	
+	/**
+	 * id
+	 */
+    private final String reportId;
+    
+    /**
+     * type
+     */
     private final int type;
+    
+    /**
+     * title
+     */
     private final String title;
-    private List<Prompt> promptList = new ArrayList<Prompt>();
-    private List<Map<String, Object>> customPromptList = new ArrayList<Map<String, Object>>();
-
-    public Report(String id, int type, String title) {
-        this.id = id;
+    
+    /**
+     * promptList
+     */
+    private final List<Prompt> promptList = new ArrayList<>();
+    
+    
+    /**
+     * Report
+     * @param id
+     * @param type
+     * @param title
+     */
+    public Report(final String promptId, final int type, final String title) {
+        this.reportId = promptId;
         this.type = type;
         this.title = title;
     }
-
-    public void addPrompt(Prompt prompt) {
+    
+    
+    /**
+     * addPrompt
+     * @param prompt
+     */
+    public void addPrompt(final Prompt prompt) {
         this.promptList.add(prompt);
     }
-
+    
+    
+    /**
+     * getId
+     * @return
+     */
     public String getId() {
-        return id;
+        return reportId;
     }
 
     public int getType() {
@@ -40,8 +75,14 @@ public class Report {
 
     @Override
     public String toString() {
-        return new StringBuilder().append("{id: ").append(id).append(", type: ").append(type).append(", title: ")
-                .append(title).append(", promptList: ").append(promptList).append("}").toString();
+        return new StringBuilder()
+        		.append('{')
+        		.append(" id: ").append(reportId)
+        		.append(", type: ").append(type)
+        		.append(", title: ").append(title)
+        		.append(", promptList: ").append(promptList)
+        		.append('}')
+        		.toString();
     }
 
 }

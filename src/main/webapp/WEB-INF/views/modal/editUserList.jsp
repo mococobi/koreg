@@ -130,13 +130,16 @@
 	//유저 리스트 이름 추출
 	function getUserListSpanName(userList) {
 		let rtnUserNm = '';
-		JSON.parse(userList).forEach((authMap, idx) => {
-			if(rtnUserNm == '') {
-				rtnUserNm += authMap['AUTH_NAME'];
-			} else {
-				rtnUserNm += ', ' +authMap['AUTH_NAME'];
-			}
-		});
+		
+		if(userList.length > 0) {
+			JSON.parse(userList).forEach((authMap, idx) => {
+				if(rtnUserNm == '') {
+					rtnUserNm += authMap['AUTH_NAME'];
+				} else {
+					rtnUserNm += ', ' +authMap['AUTH_NAME'];
+				}
+			});
+		}
 		
 		return rtnUserNm;
 	}

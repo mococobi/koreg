@@ -5,6 +5,26 @@
 <mapper namespace="Admin">
 	<!-- <cache /> -->
 	
+	<!-- Oralce 변환 맵 -->
+	<resultMap id="oracleBoardMap" type="HashMap">
+		<result property="POST_CONTENT" column="POST_CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
+		<result property="CRT_DT_TM" column="CRT_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+		<result property="MOD_DT_TM" column="MOD_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+	</resultMap>
+	
+	
+	<!-- 사용자 테이블 Join -->
+	<sql id="portalUserJoin">
+		INNER JOIN META195.DSSMDOBJINFO userInfo
+			ON (
+					userInfo.OBJECT_TYPE = 34
+				AND userInfo.SUBTYPE = 8704
+				AND plog.USR_ID = userInfo.ABBREVIATION
+			)
+	</sql>
+	
+	
+	<!-- 관리자 - 권한 목록 조회 -->
 	<select id="Admin.adminAuthList" resultType="HashMap" parameterType="Map">
 		SELECT /* Admin.adminAuthList */ 
 			  ADM_CD
@@ -22,13 +42,7 @@
 	</select>
 	
 	
-	<resultMap id="oracleBoardMap" type="HashMap">
-		<result property="POST_CONTENT" column="POST_CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
-		<result property="CRT_DT_TM" column="CRT_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
-		<result property="MOD_DT_TM" column="MOD_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
-	</resultMap>
-	
-	
+	<!-- 게시판 - 목록 조회 -->
 	<select id="Admin.boardList" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
 		WITH /* Admin.boardList */
 		BOARD_LIST AS (
@@ -112,6 +126,7 @@
 	</select>
 	
 	
+	<!-- 게시판 - 상세 -->
 	<select id="Admin.boardDetail" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
 		SELECT /* Admin.boardDetail */
 			  BRD_ID
@@ -121,6 +136,8 @@
 			, BRD_ADM_USR
 			, BRD_CRT_AUTH
 			, BRD_VIEW_AUTH
+			, POST_TYPE_YN
+			, POST_TAG_YN
 			, POST_FILE_YN
 			, POST_CMNT_YN
 			, POST_CMNT_FILE_YN
@@ -136,10 +153,11 @@
 		FROM 
 			PORTAL.PT_BOARD
 		WHERE 1=1
-			AND BRD_ID = #{boardId}
+			AND BRD_ID = #{BRD_ID}
 	</select>
 	
 	
+	<!-- 게시판 - 추가 -->
 	<insert id="Admin.boardInsert" parameterType="Map">
 		<selectKey resultType="int" keyProperty="insertKey" order="BEFORE">
         	SELECT
@@ -153,6 +171,8 @@
 				, BRD_NM
 				, BRD_DESC
 				, BRD_TYPE
+				, POST_TYPE_YN
+				, POST_TAG_YN
 				, POST_FILE_YN
 				, POST_CMNT_YN
 				, POST_CMNT_FILE_YN
@@ -168,12 +188,14 @@
 				, #{BRD_NM}
 				, #{BRD_DESC}
 				, #{BRD_TYPE}
+				, #{POST_TYPE_YN}
+				, #{POST_TAG_YN}
 				, #{POST_FILE_YN}
 				, #{POST_CMNT_YN}
-				, 'N'
+				, #{POST_CMNT_FILE_YN}
 				, #{POST_POPUP_YN}
-				, 'N'
-				, 'N'
+				, #{POST_SECRET_YN}
+				, #{POST_FIX_YN}
 				, #{DEL_YN}
 				, SYSDATE
 				, #{userId}
@@ -181,6 +203,7 @@
 	</insert>
 	
 	
+	<!-- 게시판 - 수정 -->
 	<update id="Admin.boardUpdate" parameterType="Map">
 		UPDATE /* Admin.boardUpdate */ 
 			PORTAL.PT_BOARD
@@ -189,9 +212,14 @@
 			, BRD_DESC = #{BRD_DESC}
 			, BRD_TYPE = #{BRD_TYPE}
 			, BRD_CRT_AUTH = #{BRD_CRT_AUTH}
+			, POST_TYPE_YN = #{POST_TYPE_YN}
+			, POST_TAG_YN = #{POST_TAG_YN}
 			, POST_FILE_YN = #{POST_FILE_YN}
 			, POST_CMNT_YN = #{POST_CMNT_YN}
+			, POST_CMNT_FILE_YN = #{POST_CMNT_FILE_YN}
 			, POST_POPUP_YN = #{POST_POPUP_YN}
+			, POST_SECRET_YN = #{POST_SECRET_YN}
+			, POST_FIX_YN = #{POST_FIX_YN}
 			, DEL_YN = #{DEL_YN}
 			, MOD_DT_TM = SYSDATE
 			, MOD_USR_ID = #{userId}
@@ -200,13 +228,14 @@
 	</update>
 	
 	
+	<!-- 로그 - 목록 조회 -->
 	<select id="Admin.logList" resultType="HashMap" parameterType="Map" resultMap="oracleBoardMap">
 		WITH /* Admin.logList */
 		LOG_LIST AS (
 			SELECT
 				  plog.LOG_ID
 				, plog.USR_ID
-				, plog.USR_NM
+				, userInfo.OBJECT_NAME AS USR_NM
 				, plog.USR_DEPT_ID
 				, plog.USR_DEPT_NM
 				, plog.USR_POS_ID
@@ -223,6 +252,7 @@
 				</if>
 			FROM 
 				PORTAL.PT_PORTAL_LOG plog
+				<include refid="portalUserJoin"/>
 				<if test="LOG_TYPE != null and LOG_TYPE.equals('BOARD')">
 					INNER JOIN PORTAL.PT_BOARD board
 						ON plog.SCRN_ID = TO_CHAR(board.BRD_ID)
@@ -264,18 +294,21 @@
 							USR_ID
 						</when>
 						<when test="customOrder1 != null and customOrder1 == 2">
-							USR_IP
+							USR_NM
 						</when>
 						<when test="customOrder1 != null and customOrder1 == 3">
-							SCRN_ID
+							USR_IP
 						</when>
 						<when test="customOrder1 != null and customOrder1 == 4">
-							SCRN_DET_ID
+							SCRN_ID
 						</when>
 						<when test="customOrder1 != null and customOrder1 == 5">
-							USR_ACTN
+							SCRN_DET_ID
 						</when>
 						<when test="customOrder1 != null and customOrder1 == 6">
+							USR_ACTN
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 7">
 							CRT_DT_TM
 						</when>
 						<otherwise>

@@ -7,27 +7,28 @@ import org.slf4j.LoggerFactory;
 import com.microstrategy.web.objects.WebObjectsException;
 
 public class EncryptUtilTest {
-	private static final Logger LOGGER = LoggerFactory.getLogger(EncryptUtilTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(EncryptUtilTest.class);
 
 	
 	@Test
 	public void testEncrypt() throws WebObjectsException {
-		String testVal = "1";
+		final String testVal = "1";
 		
-		String testEnc = EncryptUtil.encrypt(testVal);
-		LOGGER.debug("String encrypt : [{}]", testEnc);
+		final String testEnc = EncryptUtil.encrypt(testVal).replaceAll("[\r\n]","");
+		logger.debug("String encrypt : [{}]", testEnc);
 		
-		String testDec = EncryptUtil.decrypt(testEnc);
-		LOGGER.debug("String decrypt : [{}]", testDec);
+		final String testDec = EncryptUtil.decrypt(testEnc).replaceAll("[\r\n]","");
+		logger.debug("String decrypt : [{}]", testDec);
 	}
 	
 	
 	@Test
 	public void testDecrypt() throws WebObjectsException {
-		String testVal = "";
+		final String testVal = "bW9jb2NvcG9ydGFsMjAyM+Wk9cbgd2r7RT2vlwpWbaCK";
 		
-		String testDec = EncryptUtil.decrypt(testVal);
-		LOGGER.debug("String decrypt : [{}]", testDec);
+		final String testDec = EncryptUtil.decrypt(testVal).replaceAll("[\r\n]","");
+		logger.debug("String decrypt : [{}]", testDec);
+		
 	}
 	
 }

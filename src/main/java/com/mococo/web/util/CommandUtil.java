@@ -11,41 +11,66 @@ package com.mococo.web.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.mococo.biz.exception.BizException;
 
+/**
+ * CommandUtil
+ * @author mococo
+ *
+ */
 public class CommandUtil {
-	private static final Logger LOGGER = LogManager.getLogger(CommandUtil.class);
+	
+	/**
+	 * 로그
+	 */
+	private static final Logger logger = LogManager.getLogger(CommandUtil.class);
 	
 	
+    /**
+     * CommandUtil
+     */
+    public CommandUtil() {
+    	logger.debug("CommandUtil");
+    }
+    
+    
+	@SuppressWarnings("unused")
+	private void sample() {
+    	logger.debug("CommandUtil");
+    }
+	
+	
+	/**
+	 * RunResult
+	 * @author mococo
+	 *
+	 */
 	public static class RunResult {
-		private Map<String, Object> result = new HashMap<String, Object>();
+		
+		/**
+		 * result
+		 */
+		private final Map<String, Object> result = new ConcurrentHashMap<>();
 		
 		
 		/**
-		 * <pre>
-		 * 목적 : EXIT 코드 설정
-		 * 매개변수 : 
-		 * 	int exitCode
-		 * 반환값 : 없음
-		 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-		 * </pre>
+		 * EXIT 코드 설정
+		 * @param exitCode
 		 */
-		public void setExitCode(int exitCode) { 
+		public void setExitCode(final int exitCode) { 
 			result.put("exitCode", exitCode); 
 		}
 		
+		
 		/**
-		 * <pre>
-		 * 목적 : EXIT 코드 반환
-		 * 매개변수 : 없음
-		 * 반환값 : java.lang.Integer
-		 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-		 * </pre>
+		 * EXIT 코드 반환
+		 * @return
 		 */
 		public int getExitCode() { 
 			return (Integer)result.get("exitCode"); 
@@ -53,26 +78,17 @@ public class CommandUtil {
 		
 		
 		/**
-		 * <pre>
-		 * 목적 : 출력 결과 설정
-		 * 매개변수 : 
-		 * 	String output
-		 * 반환값 : 없음
-		 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-		 * </pre>
+		 * 출력 결과 설정
+		 * @param output
 		 */
-		public void setOutput(String output) { 
+		public void setOutput(final String output) { 
 			result.put("output", output); 
 		}
 		
 		
 		/**
-		 * <pre>
-		 * 목적 : 출력 결과 반환
-		 * 매개변수 : 없음
-		 * 반환값 : java.lang.String
-		 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-		 * </pre>
+		 * 출력 결과 반환
+		 * @return
 		 */
 		public String getOutput() { 
 			return (String)result.get("output"); 
@@ -80,16 +96,11 @@ public class CommandUtil {
 		
 		
 		/**
-		 * <pre>
-		 * 목적 : EXIT 코드, 출력 결과 설정
-		 * 매개변수 : 
-		 * 	int exitCode
-		 * 	String output
-		 * 반환값 : 없음
-		 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-		 * </pre>
+		 * EXIT 코드, 출력 결과 설정
+		 * @param exitCode
+		 * @param output
 		 */
-		public void setResult(int exitCode, String output) {
+		public void setResult(final int exitCode, final String output) {
 			setExitCode(exitCode);
 			setOutput(output);
 		}
@@ -97,43 +108,43 @@ public class CommandUtil {
 	
 	
 	/**
-	 * <pre>
-	 * 목적 : 명령어 및 파라미터를 문자열 배열로 구성하여 전달 커맨드 실행
-	 * 매개변수 : 
-	 * 	String[] command
-	 * 반환값 : com.mococo.web.util.RunCommand.RunResult
-	 * 개정이력 : 송민권, 2022.05.16, 최신화 및 주석 작성
-	 * </pre>
+	 * 명령어 및 파라미터를 문자열 배열로 구성하여 전달 커맨드 실행
+	 * @param command
+	 * @return
 	 */
-	public static final RunResult runCommand(String[] command) throws IOException, InterruptedException {
+	public static final RunResult runCommand(final String... command) throws IOException, InterruptedException {
 		
-		LOGGER.info("=> runCommand - size : [{}]", command.length);
-		
+		/*
+		logger.debug("=> runCommand - size : [{}]", command.length);
 		for(int i=0; i<command.length; i++) {
-			LOGGER.info("=> runCommand 파라미터 정보 {} data : [{}]", i, command[i]);
+			logger.debug("=> runCommand 파라미터 정보 [{}] data : [{}]", i, command[i]);
 		}
+		*/
 		
-		RunResult result = new RunResult();
+		final RunResult result = new RunResult();
 		
-		ProcessBuilder builder = new ProcessBuilder(command);
+		final ProcessBuilder builder = new ProcessBuilder(command);
 		builder.redirectErrorStream(true);
-		Process process = builder.start();
+		final Process process = builder.start();
 		
 		//상황에 맞추어 변경
-		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
-//		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), "EUC-KR"));
-		StringBuffer buffer = new StringBuffer();
-		
-		String line = null;
-		while((line = reader.readLine()) != null) {
-			LOGGER.info("=> line : {}", line);
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"))) {
+			final StringBuffer buffer = new StringBuffer();
+			
+			String line;
+			while((line = reader.readLine()) != null) {
+				logger.debug("=> line : {}", line);
+			}
+			
+			//process.getOutputStream().close();
+			final int code = process.waitFor();
+			
+			result.setResult(code, buffer.toString());
+			logger.info("=> runCommand End : [{}]", code);
+		} catch (IOException | InterruptedException e) {
+			throw new BizException(e);
 		}
 		
-		process.getOutputStream().close();
-		int code = process.waitFor();
-		
-		result.setResult(code, buffer.toString());
-		LOGGER.info("=> runCommand End : [{}]", code);
 		
 		return result;
 	}
