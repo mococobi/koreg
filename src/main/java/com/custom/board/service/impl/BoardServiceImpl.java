@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.custom.board.service.BoardService;
+import com.custom.code.service.CodeService;
 import com.custom.log.service.LogService;
 import com.mococo.biz.common.dao.SimpleBizDao;
 import com.mococo.web.util.CustomProperties;
@@ -58,6 +59,11 @@ public class BoardServiceImpl implements BoardService {
 	 * logService
 	 */
 	/* default */ @Autowired /* default */ LogService logService;
+	
+	/**
+     * 코드
+     */
+    /* default */ @Autowired /* default */ CodeService codeService;
     
 	
     /**
@@ -69,7 +75,7 @@ public class BoardServiceImpl implements BoardService {
     
     
     /**
-     * boardDetail
+     * 게시판 - 상세
      */
     @Override
     public Map<String, Object> boardDetail(final HttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException{
@@ -81,6 +87,18 @@ public class BoardServiceImpl implements BoardService {
     	if(boardMap != null) {
     		rtnMap.put(PortalCodeUtil.data, boardMap);
     		rtnMap.put(PortalCodeUtil.params, params);
+    		
+    		if(PortalCodeUtil.CHECK_Y.equals(boardMap.get("POST_TYPE_YN").toString()) 
+    			&& params.get("CHECK_POST_TYPE") != null && (Boolean)params.get("CHECK_POST_TYPE")) 
+    		{
+    			params.put("customOrder1", 3);
+    			params.put("customOrder2", "asc");
+    			params.put("CD_TYPE_ENG_NM", "PORTAL_BRD_TYPE");
+    			params.put("CHECK_DEL_YN", true);
+    			
+    			final Map<String, Object> postTypeCodeMap = codeService.codeList(request, response, params);
+    			rtnMap.put("postTypeCode", postTypeCodeMap.get(PortalCodeUtil.data));
+    		}
     	}
         
         return rtnMap;
@@ -187,33 +205,40 @@ public class BoardServiceImpl implements BoardService {
 	    	logService.addPortalLog(request, params.get(PortalCodeUtil.BRD_ID).toString(), params.get(PortalCodeUtil.POST_ID).toString(), "DETAIL", params);
     	}
     	
-    	//게시판 - 정보
-    	//final Map<String, Object> rtnBoardMap = 
-    	//simpleBizDao.select("Board.boardDetail", params);
+    	//게시물 - 정보
+    	final Map<String, Object> rtnPostMap = simpleBizDao.select("Board.boardPostDetail", params);
     	
-//    	if(rtnBoardMap != null) {
-        	//게시물 - 정보
-        	final Map<String, Object> rtnPostMap = simpleBizDao.select("Board.boardPostDetail", params);
-        	
-        	//첨부파일
-        	if(!rtnPostMap.isEmpty()
-        		&& PortalCodeUtil.CHECK_Y.equals(rtnPostMap.get("POST_FILE_YN").toString()) 
-        		&& params.get(PortalCodeUtil.CHECK_POST_FILE) != null && (Boolean)params.get(PortalCodeUtil.CHECK_POST_FILE)
-        	) {
-    			final List<Map<String, Object>> rtnPostFileList = simpleBizDao.list("Board.boardPostFileList", params);
-        		rtnMap.put("file", rtnPostFileList);
-        	}
-        	
-        	//이전글, 다음글
-        	if(params.get("CHECK_POST_LOCATION") != null && (Boolean)params.get("CHECK_POST_LOCATION")) {
-        		final List<Map<String, Object>> rtnLocList = simpleBizDao.list("Board.boardPostBeforeNext", params);
-        		rtnMap.put("location", rtnLocList);
-        	}
-        	
-            rtnMap.put(PortalCodeUtil.data, rtnPostMap);
-            rtnMap.put("boardData", rtnPostMap);
-            rtnMap.put(PortalCodeUtil.params, params);
-//    	}
+    	//게시판 타입
+    	if(PortalCodeUtil.CHECK_Y.equals(rtnPostMap.get("POST_TYPE_YN").toString()) 
+			&& params.get("CHECK_POST_TYPE") != null && (Boolean)params.get("CHECK_POST_TYPE")) 
+		{
+			params.put("customOrder1", 3);
+			params.put("customOrder2", "asc");
+			params.put("CD_TYPE_ENG_NM", "PORTAL_BRD_TYPE");
+			params.put("CHECK_DEL_YN", true);
+			
+			final Map<String, Object> postTypeCodeMap = codeService.codeList(request, response, params);
+			rtnMap.put("postTypeCode", postTypeCodeMap.get(PortalCodeUtil.data));
+		}
+    	
+    	//첨부 파일
+    	if(!rtnPostMap.isEmpty()
+    		&& PortalCodeUtil.CHECK_Y.equals(rtnPostMap.get("POST_FILE_YN").toString()) 
+    		&& params.get(PortalCodeUtil.CHECK_POST_FILE) != null && (Boolean)params.get(PortalCodeUtil.CHECK_POST_FILE)
+    	) {
+			final List<Map<String, Object>> rtnPostFileList = simpleBizDao.list("Board.boardPostFileList", params);
+    		rtnMap.put("file", rtnPostFileList);
+    	}
+    	
+    	//이전글, 다음글
+    	if(params.get("CHECK_POST_LOCATION") != null && (Boolean)params.get("CHECK_POST_LOCATION")) {
+    		final List<Map<String, Object>> rtnLocList = simpleBizDao.list("Board.boardPostBeforeNext", params);
+    		rtnMap.put("location", rtnLocList);
+    	}
+    	
+        rtnMap.put(PortalCodeUtil.data, rtnPostMap);
+        rtnMap.put("boardData", rtnPostMap);
+        rtnMap.put(PortalCodeUtil.params, params);
         
         return rtnMap;
     }
@@ -229,7 +254,7 @@ public class BoardServiceImpl implements BoardService {
     	
     	params.put(PortalCodeUtil.userId, HttpUtil.getLoginUserId(request));
     	
-    	if (PortalCodeUtil.CHECK_Y.equals(params.get("POPUP_YN").toString())) {
+    	if (PortalCodeUtil.CHECK_Y.equals(params.get("POPUP_YN"))) {
     		params.put(PortalCodeUtil.POPUP_START_DT_TM, (String) params.get(PortalCodeUtil.POPUP_START_DT_TM) + " 00:00:00.000" );
     		params.put(PortalCodeUtil.POPUP_END_DT_TM, (String) params.get(PortalCodeUtil.POPUP_END_DT_TM) + " 23:59:59.999" );
     	} else {
@@ -278,7 +303,13 @@ public class BoardServiceImpl implements BoardService {
     }
     
     
-    //첨부파일 처리
+    /**
+     * 첨부파일 처리
+     * @param mRquest
+     * @param params
+     * @return
+     * @throws IOException
+     */
     private List<Map<String, Object>> uploadFile(final MultipartHttpServletRequest mRquest, final Map<String, Object> params) throws IOException {
     	final List<Map<String,Object>> lmRstUploadedFile = new ArrayList<>();
 		
@@ -328,7 +359,9 @@ public class BoardServiceImpl implements BoardService {
     }
     
     
-    //게시판 - 게시물 수정
+    /**
+     * 게시판 - 게시물 수정
+     */
     @Override
     @Transactional("transactionManager")
     public Map<String, Object> boardPostUpdate(final MultipartHttpServletRequest mRequest, final HttpServletResponse response, final Map<String, Object> params) throws SQLException, IOException{
@@ -336,7 +369,7 @@ public class BoardServiceImpl implements BoardService {
     	
     	params.put(PortalCodeUtil.userId, HttpUtil.getLoginUserId(mRequest));
     	
-    	if (PortalCodeUtil.CHECK_Y.equals(params.get("POPUP_YN").toString())) {
+    	if (PortalCodeUtil.CHECK_Y.equals(params.get("POPUP_YN"))) {
     		params.put(PortalCodeUtil.POPUP_START_DT_TM, (String) params.get(PortalCodeUtil.POPUP_START_DT_TM) + " 00:00:00.000" );
     		params.put(PortalCodeUtil.POPUP_END_DT_TM, (String) params.get(PortalCodeUtil.POPUP_END_DT_TM) + " 23:59:59.999" );
     	} else {
@@ -397,7 +430,9 @@ public class BoardServiceImpl implements BoardService {
     }
     
     
-    //게시판 - 게시물 삭제
+    /**
+     * 게시판 - 게시물 삭제
+     */
     @Override
     public Map<String, Object> boardPostDelete(final HttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException {
     	final Map<String, Object> rtnMap = new ConcurrentHashMap<>();
@@ -419,7 +454,9 @@ public class BoardServiceImpl implements BoardService {
     }
     
     
-    //게시판 - 게시물 - 파일 상세
+    /**
+     * 게시판 - 게시물 - 파일 상세
+     */
     @Override
     public Map<String, Object> boardPostFileDetail(final HttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException{
     	params.put(PortalCodeUtil.userId, HttpUtil.getLoginUserId(request));
@@ -427,7 +464,9 @@ public class BoardServiceImpl implements BoardService {
     }
 
 
-    //팝업 - 게시물 목록 조회
+    /**
+     * 팝업 - 게시물 목록 조회
+     */
     @Override
     public Map<String, Object> boardPostPopupList(final HttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException {
     	final Map<String, Object> rtnMap = new ConcurrentHashMap<>();

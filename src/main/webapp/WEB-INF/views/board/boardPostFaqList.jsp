@@ -79,10 +79,9 @@
 				<div class="col-md-2">
 					<select id="post_type_nm" class="form-select form-select-sm">
 						<option>전체</option>
-						<option>메뉴얼</option>
-						<option>용어사전</option>
-						<option>동영상교육</option>
-						<option>지점안내</option>
+						<c:forEach var="item" items="${boardData['postTypeCode']}">
+							<option>${item['CD_KOR_NM']}</option>
+						</c:forEach>
 					</select>
 				</div>
 			</c:if>
@@ -128,12 +127,19 @@
 	let searchVal = '';
 	
 	$(function() {
-		if(postType != '' && postType != 'undefined') {
-			searchType = postType;
-			$("#post_type_nm").val(postType).prop("selected", true);
+		if('${boardData["data"]["BRD_NM"]}' == '') {
+			alert('선택한 게시판이 존재하지 않습니다.');
+			
+			let pagePrams = [];
+			pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
+		} else {
+			if(postType != '' && postType != 'undefined') {
+				searchType = postType;
+				$("#post_type_nm").val(postType).prop("selected", true);
+			}
+			
+			fnBoardInit(boardId);
 		}
-		
-		fnBoardInit(boardId);
 		
 		$('#searchVal').keypress(function(e){
 			if(e.keyCode && e.keyCode == 13){

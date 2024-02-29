@@ -44,6 +44,17 @@
 		<p class="h3">게시판 관리</p>
 		<p class="h6">게시판을 관리할 수 있습니다.</p>
 		<div class="row mb-3">
+			<div class="col-md-1">
+				<select id="searchKey" class="form-select form-select-sm">
+					<option value="BRD_NM">게시판 이름</option>
+				</select>
+			</div>
+			<div class="col-md-4">
+				<input id="searchVal" class="form-control form-control-sm" type="search" placeholder="Search" aria-label="Search">
+			</div>
+			<div class="col-md-1">
+				<button class="btn btn-primary btn-sm" onclick="searchBoardList()">조회</button>
+			</div>
 			<div class="col text-end">
 				<button class="btn btn-secondary btn-sm" onclick="writeBoard()">글쓰기</button>
 			</div>
@@ -75,7 +86,22 @@
 	
 	$(function() {
 		fnBoardInit();
+		
+		$('#searchVal').keypress(function(e){
+			if(e.keyCode && e.keyCode == 13){
+				searchBoardList();
+			}
+		});
 	});
+	
+	
+	//게시판 검색
+	function searchBoardList() {
+		searchKey = $('#searchKey option:selected').val();
+		searchVal = $('#searchVal').val();
+		
+		$('#boardTable').DataTable().ajax.reload();
+	}
 	
 	
 	//게시판 목록

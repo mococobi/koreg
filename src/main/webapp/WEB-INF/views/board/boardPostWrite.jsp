@@ -129,10 +129,6 @@
 						</td>
 						<td colspan="7">
 							<select id="post_type" class="form-select form-select-sm" style="width: 29%;">
-								<option>메뉴얼</option>
-								<option>용어사전</option>
-								<option>동영상교육</option>
-								<option>지점안내</option>
 				            </select>
 						</td>
 					</tr>
@@ -206,11 +202,10 @@
 			let callParams = {
 				  BRD_ID : boardId
 				, POST_ID : postId
+				, CHECK_POST_TYPE : true
 			};
 			callAjaxPost('/board/boardPostDetail.json', callParams, function(data) {
 				let postData = data['data'];
-				let postFile = data['file'];
-				let postLocation = data['location'];
 				
 				if(postData['CRT_USR_ID'] == '${mstrUserIdAttr}' || <%=portalAdminAuth%>) {
 					$('#btn_post_modify').show();
@@ -222,8 +217,8 @@
 					let pagePrams = [];
 					pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
 				} else {
-					displayBoardPostTag(postData, postFile, postLocation);
-					displayBoardPostContents(postData, postFile, postLocation);
+					displayBoardPostTag(data);
+					displayBoardPostContents(data);
 				}
 			});
 			
@@ -233,11 +228,10 @@
 			
 			let callParams = {
 				  BRD_ID : boardId
+				, CHECK_POST_TYPE : true
 			};
 			callAjaxPost('/board/boardInfo.json', callParams, function(data) {
 				let postData = data['data'];
-				let postFile = data['file'];
-				let postLocation = data['location'];
 				
 				if(postData['CRT_USR_ID'] == '${mstrUserIdAttr}' 
 					|| <%=portalAdminAuth%>
@@ -253,8 +247,8 @@
 					let pagePrams = [];
 					pageGoPost('_self', '${pageContext.request.contextPath}/app/main/mainView.do', pagePrams);
 				} else {
-					displayBoardPostTag(postData, postFile, postLocation);
-					displayBoardPostContents(postData, postFile, postLocation);
+					displayBoardPostTag(data);
+					displayBoardPostContents(data);
 				}
 			});
 		}
@@ -309,13 +303,28 @@
 	
 	
 	//태그 표시
-	function displayBoardPostTag(postData, postFile, postLocation) {
+	function displayBoardPostTag(data) {
+		let postData = data['data'];
+		let postFile = data['file'];
+		let postLocation = data['location'];
+		
 		document.title = postData['BRD_NM'] + ' - 상세';
 		
 		$('#brd_nm').text(postData['BRD_NM']);
 		$('#brd_desc').text(postData['BRD_DESC']);
 		
 		if(postData['POST_TYPE_YN'] == 'Y') {
+			//게시판 분류 체크
+			let postTypeCode = data['postTypeCode'];
+			postTypeCode.forEach((codeInfo, idx) => {
+				var option = $('<option>' + codeInfo['CD_KOR_NM'] + '</option>');                
+				$('#post_type').append(option);
+			});
+			
+			if(postData['POST_TYPE'] != null && postData['POST_TYPE'] != '' && postData['POST_TYPE'] != 'undefined') {
+				$("#post_type").val(postData['POST_TYPE']).prop('selected', true);
+			}
+			
 			$('#post_type_yn').show();
 		}
 		
@@ -389,7 +398,10 @@
 	
 	
 	//내용 표시
-	function displayBoardPostContents(postData, postFile) {
+	function displayBoardPostContents(data) {
+		let postData = data['data'];
+		let postFile = data['file'];
+		
 		$('#post_title').val(postData['POST_TITLE']);
 		$('#post_create_user_id').text(postData['CRT_USR_ID']);
 		$('#post_create_user_dept_name').text(postData['CRT_USR_DEPT_NM']);
@@ -540,24 +552,35 @@
 				
 				formData.append('POST_ID', postId);
 				formData.append('BRD_ID', boardId);
-				formData.append('POST_TYPE', $('#post_type').val());
+				
+				if($('#post_type_yn').css('display') != 'none') {
+					formData.append('POST_TYPE', $('#post_type').val());
+				}
 				formData.append('POST_TITLE', $('#post_title').val());
 				formData.append('POST_CONTENT', editor.getHTML());
-				formData.append('POPUP_YN', $('#popup_yn').is(':checked') ? 'Y' : 'N');
-				formData.append('FIX_YN', $('#fix_yn').is(':checked') ? 'Y' : 'N');
-				formData.append('POPUP_START_DT_TM', $('#startDateInput').val());
-				formData.append('POPUP_END_DT_TM', $('#endDateInput').val());
 				
-				//multiple 파일 갯수에 만큼 저장
-				Object.values(filesObj).forEach((file, idx) => {
-					formData.append('ATTACH_FILE_' + idx, file);
-				});
+				if($('#post_popup_yn').css('display') != 'none') {
+					formData.append('POPUP_YN', $('#popup_yn').is(':checked') ? 'Y' : 'N');
+					formData.append('POPUP_START_DT_TM', $('#startDateInput').val());
+					formData.append('POPUP_END_DT_TM', $('#endDateInput').val());
+				}
 				
-				if(changeType == 'UPDATE') {
-					//삭제 첨부파일 추가
-					deleteFileIds.forEach(id => {
-						formData.append('deleteFileIds', id);
+				if($('#post_fix_yn').css('display') != 'none') {
+					formData.append('FIX_YN', $('#fix_yn').is(':checked') ? 'Y' : 'N');
+				}
+				
+				if($('#post_file_yn').css('display') != 'none') {
+					//multiple 파일 갯수에 만큼 저장
+					Object.values(filesObj).forEach((file, idx) => {
+						formData.append('ATTACH_FILE_' + idx, file);
 					});
+					
+					if(changeType == 'UPDATE') {
+						//삭제 첨부파일 추가
+						deleteFileIds.forEach(id => {
+							formData.append('deleteFileIds', id);
+						});
+					}
 				}
 				
 				callAjaxForm('/board/'+changeQuery+'.json', formData, function(data) {

@@ -32,7 +32,7 @@
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/daterangepicker/moment.min.js?v=20240115001"></script>
 
 <%-- 공통 CSS --%>
-<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/common.js?v=20240220001"></script>
+<script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/_custom/javascript/common.js?v=2024022901"></script>
 
 <script type="text/javascript">
 	var __contextPath = '${pageContext.request.contextPath}';

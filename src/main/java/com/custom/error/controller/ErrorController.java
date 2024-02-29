@@ -46,7 +46,46 @@ public class ErrorController {
      * @return
      */
     @GetMapping("/error/error{error_code}")
-    public ModelAndView errorProcess(final HttpServletRequest request, @PathVariable final String error_code) {
+    public ModelAndView errorProcessGet(final HttpServletRequest request, @PathVariable final String error_code) {
+		final ModelAndView view = new ModelAndView("error/500");
+    	
+    	switch (error_code) {
+			case "404":
+				view.setViewName("error/404");
+				break;
+			case "405":
+				view.setViewName("error/405");
+				break;
+			case "500":
+				view.setViewName("error/500");
+				break;
+			default:
+				break;
+		}
+    	
+    	final Map<String, Object> map = getErrorMsg(request);
+        final Iterator<Entry<String, Object>> iterator = map.entrySet().iterator();
+        Entry<String, Object> entry;
+        
+        while(iterator.hasNext()) {
+            entry = iterator.next();
+            view.addObject(entry.getKey(), entry.getValue());
+            
+            if (logger.isDebugEnabled()) {
+            	logger.debug("key : [{}], value : [{}]", entry.getKey(), entry.getValue());
+            }
+        }
+    	
+        return view;
+    }
+
+    
+    /**
+     * 에러 코드 처리(404, 405, 500 ...)
+     * @return
+     */
+    @PostMapping("/error/error{error_code}")
+    public ModelAndView errorProcessPost(final HttpServletRequest request, @PathVariable final String error_code) {
 		final ModelAndView view = new ModelAndView("error/500");
     	
     	switch (error_code) {

@@ -94,6 +94,7 @@ public class BoardController {
      */
     @GetMapping("/board/boardPostListView.do")
     public ModelAndView boardPostListViewGet(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	params.put("CHECK_POST_TYPE", true);
 //    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	final ModelAndView view = new ModelAndView("board/boardPostList");
         
@@ -117,6 +118,7 @@ public class BoardController {
      */
     @PostMapping("/board/boardPostListView.do")
     public ModelAndView boardPostListViewPost(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	params.put("CHECK_POST_TYPE", true);
 //    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	final ModelAndView view = new ModelAndView("board/boardPostList");
         
@@ -219,6 +221,7 @@ public class BoardController {
      */
     @GetMapping("/board/boardPostFaqListView.do")
     public ModelAndView boardPostFaqListViewGet(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	params.put("CHECK_POST_TYPE", true);
 //    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	final ModelAndView view = new ModelAndView("board/boardPostFaqList");
         
@@ -242,6 +245,7 @@ public class BoardController {
      */
     @PostMapping("/board/boardPostFaqListView.do")
     public ModelAndView boardPostFaqListViewPost(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+    	params.put("CHECK_POST_TYPE", true);
 //    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
     	final ModelAndView view = new ModelAndView("board/boardPostFaqList");
         

@@ -16,22 +16,22 @@
 	<jsp:include flush="true" page="/WEB-INF/views/include/pageJs.jsp" />
 	
 	<style type="text/css">
-		  .board_custom_div
-		, .board_custom_div a
-		, .board_custom_div input
-		, .board_custom_div span
-		, .board_custom_div select
-		, .board_custom_div button {
+		  #board_div
+		, #board_div a
+		, #board_div input
+		, #board_div span
+		, #board_div select
+		, #board_div button {
 			font-size: 1.5rem;
 			font-family: 맑은 고딕;
 		}
 		
-		.board_custom_div .h3 {
+		#board_div .h3 {
 			font-size: 3rem;
 			font-family: 맑은 고딕;
 		}
 		
-		.board_custom_div .h6 {
+		#board_div .h6 {
 			font-size: 2rem;
 			font-family: 맑은 고딕;
 		}
@@ -40,93 +40,70 @@
 <body>
 	<jsp:include flush="true" page="/WEB-INF/views/include/adminDivStart.jsp" />
 	
-	<div class="container py-4 board_custom_div" style="max-width: 100%;">
-		<p class="h3">포탈 로그 확인(${LOG_TYPE_NM})</p>
-		<p class="h6">포탈을 사용한 로그를 확인한다.</p>
+	<div id="board_div" class="container py-4" style="max-width: 100%;">
+		<p class="h3">코드 분류 관리</p>
+		<p class="h6">코드 분류를 관리할 수 있습니다.</p>
 		<div class="row mb-3">
-			<div class="col-md-1">
+			<div class="col-md-2">
 				<select id="searchKey" class="form-select form-select-sm">
-					<option value="USR_ID">사용자 ID</option>
-					<option value="USR_NM">사용자명</option>
-					<option value="SCRN_ID">화면 ID</option>
-					<option value="SCRN_DET_ID">화면 상세 ID</option>
-					<option value="USR_ACTN">사용자 행동</option>
+					<option value="CD_TYPE_ENG_NM">코드 분류 영문명</option>
+					<option value="CD_TYPE_KOR_NM">코드 분류 한글명</option>
+      				<option value="CD_TYPE_ORD">코드 분류 순서</option>
+      				<option value="DEL_YN">삭제 여부</option>
 				</select>
 			</div>
 			<div class="col-md-4">
 				<input id="searchVal" class="form-control form-control-sm" type="search" placeholder="Search" aria-label="Search">
 			</div>
 			<div class="col-md-1">
-				<button class="btn btn-primary btn-sm" onclick="searchLogList()">조회</button>
+				<button class="btn btn-primary btn-sm" onclick="searchBoardList()">조회</button>
 			</div>
 			<div class="col text-end">
+<!-- 				<button class="btn btn-secondary btn-sm" onclick="writeBoard()">글쓰기</button> -->
 			</div>
 		</div>
 		<div id="boardTable_div">
 			<table id="boardTable" class="table hover table-striped table-bordered dataTablesCommonStyle" style="width: 100%">
 				<colgroup>
+					<col width="20%">
+					<col >
 					<col width="10%">
 					<col width="10%">
 					<col width="10%">
 					<col width="10%">
-					<col width="">
-					<col width="">
-					<col width="10%">
-					<col width="15%">
 				</colgroup>
 				<thead>
     				<tr>
-	     				<th>로그 ID</th>
-	      				<th>사용자 ID</th>
-	      				<th>사용자명</th>
-	      				<th>사용자 IP</th>
-	      				<th>화면 ID</th>
-	      				<th>화면 상세 ID</th>
-	      				<th>사용자 행동</th>
-	      				<th>생성일시</th>
+	     				<th>코드 분류 영문명</th>
+	      				<th>코드 분류 한글명</th>
+	      				<th>코드 분류 순서</th>
+	      				<th>삭제 여부</th>
+	      				<th>작성일자</th>
+	      				<th>작성자</th>
 	    			</tr>
 	  			</thead>
 			</table>
 		</div>
 	</div>
-	
-	<div class="modal fade board_custom_div" id="logListModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h3 class="modal-title fs-5" id="exampleModalLabel">로그 정보</h3>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<div class="ui segment" id ="smon_log" style="white-space: pre;"></div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	
 	<jsp:include flush="true" page="/WEB-INF/views/include/portalDivEnd.jsp" />
 </body>
 <script type="text/javascript">
 	let searchKey = '';
 	let searchVal = '';
-	let logDetail;
 	
 	$(function() {
 		fnBoardInit();
 		
 		$('#searchVal').keypress(function(e){
 			if(e.keyCode && e.keyCode == 13){
-				searchLogList();
+				searchBoardList();
 			}
 		});
 	});
 	
 	
-	//로그 검색
-	function searchLogList() {
+	//게시판 검색
+	function searchBoardList() {
 		searchKey = $('#searchKey option:selected').val();
 		searchVal = $('#searchVal').val();
 		
@@ -134,7 +111,7 @@
 	}
 	
 	
-	//로그 목록
+	//게시판 목록
 	function fnBoardInit() {
 		let listViewCount = 10;
 		$('#boardTable').DataTable({
@@ -147,10 +124,9 @@
 			, pagingType : 'full_numbers'
 			, order : [[ 0, 'desc' ]]
 			, ajax : {
-				  url : '${pageContext.request.contextPath}/app/admin/logListGrid.json'
+				  url : '${pageContext.request.contextPath}/app/code/codeTypeListGrid.json'
 				, type : 'POST'
 				, data : function(data) {
-					data['LOG_TYPE'] = '${LOG_TYPE}';
 					data['listViewCount'] = listViewCount;
 					data['searchKey'] = searchKey;
 					data['searchVal'] = searchVal;
@@ -164,7 +140,6 @@
 					} else {
 				        data['recordsTotal'] = data['dataSize'];
 				        data['recordsFiltered'] = data['dataSize'];
-				        logDetail = data['data'];
 				        
 						return data['data'];
 					}
@@ -176,18 +151,18 @@
 			, language : commonDatatableLanguage()
 			, columns : [
 				{
-					  data : 'LOG_ID'
+					  data : 'CD_TYPE_ENG_NM'
 					, className : 'textCenter'
-					, render : function (data, type, row, idx) {
+					, render : function (data, type, row) {
 						let rtnData = '-';
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
-						return '<a onclick="popupLogDetail('+ idx['row'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
+						return '<a onclick="detailBoard('+ row['CD_TYPE_KOR_NM'] +')" class="not-a-text" title="'+ rtnData +'">' + rtnData + '</a>';
 					}
 	            }
 				, {
-					  data : 'USR_ID'
+					  data : 'CD_TYPE_KOR_NM'
 					, className : ''
 					, render : function (data, type, row) {
 						let rtnData = '-';
@@ -198,63 +173,7 @@
 					}
 	            }
 				, {
-					  data : 'USR_NM'
-					, className : ''
-					, render : function (data, type, row) {
-						let rtnData = '-';
-						if(data) {
-							rtnData = XSSCheck(data, 0);
-						}
-						return rtnData;
-					}
-	            }
-				, {
-					  data : 'USR_IP'
-					, className : ''
-					, render : function (data, type, row) {
-						let rtnData = '-';
-						if(data) {
-							rtnData = XSSCheck(data, 0);
-						}
-						return rtnData;
-					}
-	            }
-				, {
-					<c:choose>
-						<c:when test="${LOG_TYPE eq 'BOARD'}">
-							data : 'BRD_NM'
-						</c:when>
-						<c:otherwise>
-							data : 'SCRN_ID'
-						</c:otherwise>
-					</c:choose>
-					, render : function (data, type, row) {
-						let rtnData = '-';
-						if(data) {
-							rtnData = XSSCheck(data, 0);
-						}
-						return rtnData;
-					}
-		        }
-				, {
-					<c:choose>
-						<c:when test="${LOG_TYPE eq 'BOARD'}">
-							data : 'POST_TITLE'
-						</c:when>
-						<c:otherwise>
-							data : 'SCRN_DET_ID'
-						</c:otherwise>
-					</c:choose>
-					, render : function (data, type, row) {
-						let rtnData = '-';
-						if(data) {
-							rtnData = XSSCheck(data, 0);
-						}
-						return rtnData;
-					}
-		        }
-				, {
-					  data : 'USR_ACTN'
+			  		  data : 'CD_TYPE_ORD'
 					, className : 'textCenter'
 					, render : function (data, type, row) {
 						let rtnData = '-';
@@ -263,7 +182,18 @@
 						}
 						return rtnData;
 					}
-		        }
+	            }
+				, {
+			  		  data : 'DEL_YN'
+					, className : 'textCenter'
+					, render : function (data, type, row) {
+						let rtnData = '-';
+						if(data) {
+							rtnData = XSSCheck(data, 0);
+						}
+						return rtnData;
+					}
+	            }
 				, {
 					  data : 'CRT_DT_TM'
 					, className : 'textCenter'
@@ -272,7 +202,18 @@
 						if(data) {
 							rtnData = XSSCheck(data, 0);
 						}
-						return changeDisplayDate(rtnData, 'YYYY-MM-DD HH:mm:ss');
+						return changeDisplayDate(rtnData, 'YYYY-MM-DD');
+					}
+	            }
+				, {
+					  data : 'CRT_USR_ID'
+					, className : 'textCenter'
+					, render : function (data, type, row) {
+						let rtnData = '-';
+						if(data) {
+							rtnData = XSSCheck(data, 0);
+						}
+						return rtnData;
 					}
 	            }
 	        ]
@@ -280,15 +221,19 @@
 	}
 	
 	
-	//관리자 - 로그 상세
-	function popupLogDetail(infoIdx) {
-		let logDetailInfo = logDetail[infoIdx];
-		
-		$('#smon_log').empty();
-		$('#smon_log').append(document.createTextNode(JSON.stringify(JSON.parse(logDetailInfo['DET_INFO_MAP']), null, 4)));
-
-		$('#logListModal').modal('show');
-// 		debugger;
+	//게시판 작성
+	function writeBoard() {
+		let pagePrams = [];
+		pageGoPost('_self', '${pageContext.request.contextPath}/app/admin/boardWriteView.do', pagePrams);
+	}
+	
+	
+	//관리자 - 게시판 상세 화면 이동
+	function detailBoard(moveBoardId) {
+		let pagePrams = [
+			["boardId", moveBoardId]
+		];
+		pageGoPost('_self', '${pageContext.request.contextPath}/app/admin/boardDetailView.do', pagePrams);
 	}
 	
 	

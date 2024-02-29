@@ -88,6 +88,12 @@ public class AdminController {
 				case "BOARD_ADMIN":
 					view.setViewName("admin/boardList");
 					break;
+				case "CODE_TYPE_ADMIN":
+					view.setViewName("admin/codeTypeList");
+					break;
+				case "CODE_ADMIN":
+					view.setViewName("admin/codeList");
+					break;
 				case "LOGIN_LOG_ADMIN":
 					view.setViewName("admin/logList");
 					view.addObject("LOG_TYPE", "LOGIN");
@@ -321,4 +327,63 @@ public class AdminController {
     	
     	return rtnMap;
     }
+    
+    
+    
+    /**
+     * 코드 - 등록
+     * @param params
+     * @param request
+     * @return
+     */
+    @PostMapping("/admin/codeInsert.json")
+	@ResponseBody
+	public Map<String, Object> codeInsert(final MultipartHttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+		
+    	//관리자 권한 체크
+		if(checkPortalAdmin(request)) {
+			try {
+				final Map<String, Object> rtnList = adminService.codeInsert(request, response, params);
+	    		rtnMap.putAll(rtnList);
+			} catch (BadSqlGrammarException | SQLException e) {
+				rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+				logger.error("boardInsert Exception", e);
+			}
+		} else {
+			rtnMap = ControllerUtil.getFailMap(PortalCodeUtil.portalError01);
+		}
+		
+		return rtnMap;
+	}
+    
+    
+    /**
+     * 코드 - 수정
+     * @param params
+     * @param request
+     * @return
+     */
+    @PostMapping("/admin/codeUpdate.json")
+	@ResponseBody
+	public Map<String, Object> codeUpdate(final MultipartHttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
+//    	logger.debug("params : [{}]", params.toString().replaceAll("[\r\n]",""));
+    	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
+		
+    	//관리자 권한 체크
+		if(checkPortalAdmin(request)) {
+			try {
+				final Map<String, Object> rtnList = adminService.codeUpdate(request, response, params);
+	    		rtnMap.putAll(rtnList);
+			} catch (BadSqlGrammarException | SQLException e) {
+				rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
+				logger.error("boardUpdate Exception", e);
+			}
+		} else {
+			rtnMap = ControllerUtil.getFailMap(PortalCodeUtil.portalError01);
+		}
+		
+		return rtnMap;
+	}
 }

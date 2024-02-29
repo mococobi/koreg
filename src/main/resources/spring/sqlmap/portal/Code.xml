@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Code">
+	<!-- <cache /> -->
+	
+	<!-- 유저 Oralce 변환 맵 -->
+	<resultMap id="oracleBoardMap" type="HashMap">
+		<result property="CRT_DT_TM" column="CRT_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+		<result property="MOD_DT_TM" column="MOD_DT_TM" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+		
+		<result property="CREATE_TIME" column="CREATE_TIME" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+		<result property="MOD_TIME" column="MOD_TIME" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+	</resultMap>
+	
+	
+	<!-- 코드 분류 - 리스트 조회 -->
+	<select id="Code.codeTypeList" parameterType="Map" resultMap="oracleBoardMap">
+		WITH /* Code.codeTypeList */
+		CODE_TYPE_LIST AS (
+			SELECT
+				  CD_TYPE_ENG_NM
+				, CD_TYPE_ENG_ABRV_NM
+				, CD_TYPE_KOR_NM
+				, CD_TYPE_DESC
+				, CD_TYPE_ORD
+				, DEL_YN
+				, CRT_DT_TM
+				, CRT_USR_ID
+				, MOD_DT_TM
+				, MOD_USR_ID
+			FROM
+				PORTAL.PT_PORTAL_CODE_TYPE
+			WHERE 1=1
+				<if test="CHECK_DEL_YN != null and !CHECK_DEL_YN.equals('')">
+					AND DEL_YN = 'N'
+				</if>
+				<if test="searchKey != null and !searchKey.equals('') and searchVal != null and !searchVal.equals('')">
+					<choose>
+						<when test="searchKey.equals('CD_TYPE_ENG_NM')">
+							AND UPPER(CD_TYPE_ENG_NM) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    	<when test="searchKey.equals('CD_TYPE_KOR_NM')">
+				    		AND UPPER(CD_TYPE_KOR_NM) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    	<when test="searchKey.equals('CD_TYPE_ORD')">
+				    		AND UPPER(CD_TYPE_ORD) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    	<when test="searchKey.equals('DEL_YN')">
+				    		AND UPPER(DEL_YN) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    </choose>
+				</if>
+		)
+		SELECT 
+			*
+		FROM (
+			SELECT 
+				<choose>
+					<when test="countCheck != null and countCheck == true">
+						COUNT(ORDER_T.CD_TYPE_ENG_NM) AS COUNT
+					</when>
+					<otherwise>
+						  ROWNUM rn
+						, ORDER_T.* 
+					</otherwise>
+				</choose>
+			FROM (
+				SELECT 
+					* 
+				FROM 
+					CODE_TYPE_LIST 
+				ORDER BY 
+					<choose>
+						<when test="customOrder1 != null and customOrder1 == 0">
+							CD_TYPE_ENG_NM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 1">
+							CD_TYPE_KOR_NM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 2">
+							CD_TYPE_ORD
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 3">
+							DEL_YN
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 4">
+							CRT_DT_TM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 5">
+							CRT_USR_ID
+						</when>
+					</choose>
+					<choose>
+						<when test="customOrder2 != null and customOrder2.equals('asc')">
+							ASC
+						</when>
+						<when test="customOrder2 != null and customOrder2.equals('desc')">
+							DESC
+						</when>
+						<otherwise>
+							DESC
+						</otherwise>
+					</choose>
+			) ORDER_T
+		) T
+		WHERE 1=1
+			<if test="countCheck != null and countCheck == false and listViewCount != null">
+				AND rn BETWEEN #{listViewCount} * (((#{start} + #{length}) / #{listViewCount}) - 1) + 1 AND #{listViewCount} * ((#{start} + #{length}) / #{listViewCount})
+			</if>
+	</select>
+	
+	
+	<!-- 코드 - 리스트 조회 -->
+	<select id="Code.codeList" parameterType="Map" resultMap="oracleBoardMap">
+		WITH /* Code.codeList */
+		CODE_LIST AS (
+			SELECT
+				  CD_TYPE_ENG_NM
+				, CD_ENG_NM
+				, CD_ENG_ABRV_NM
+				, CD_KOR_NM
+				, CD_DESC
+				, CD_ORD
+				, DEL_YN
+				, CRT_DT_TM
+				, CRT_USR_ID
+				, MOD_DT_TM
+				, MOD_USR_ID
+			FROM
+				PORTAL.PT_PORTAL_CODE
+			WHERE 1=1
+				<if test="CHECK_DEL_YN != null and !CHECK_DEL_YN.equals('')">
+					AND DEL_YN = 'N'
+				</if>
+				<if test="CD_TYPE_ENG_NM != null and !CD_TYPE_ENG_NM.equals('')">
+					AND CD_TYPE_ENG_NM = #{CD_TYPE_ENG_NM}
+				</if>
+				<if test="searchKey != null and !searchKey.equals('') and searchVal != null and !searchVal.equals('')">
+					<choose>
+						<when test="searchKey.equals('CD_TYPE_ENG_NM')">
+							AND UPPER(CD_TYPE_ENG_NM) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    	<when test="searchKey.equals('CD_ENG_NM')">
+				    		AND UPPER(CD_ENG_NM) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    	<when test="searchKey.equals('CD_KOR_NM')">
+				    		AND UPPER(CD_KOR_NM) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    	<when test="searchKey.equals('CD_ORD')">
+				    		AND UPPER(CD_ORD) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+						<when test="searchKey.equals('DEL_YN')">
+				    		AND UPPER(DEL_YN) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    </choose>
+				</if>
+		)
+		SELECT 
+			*
+		FROM (
+			SELECT 
+				<choose>
+					<when test="countCheck != null and countCheck == true">
+						COUNT(ORDER_T.CD_ENG_NM) AS COUNT
+					</when>
+					<otherwise>
+						  ROWNUM rn
+						, ORDER_T.* 
+					</otherwise>
+				</choose>
+			FROM (
+				SELECT 
+					* 
+				FROM 
+					CODE_LIST 
+				ORDER BY 
+					<choose>
+						<when test="customOrder1 != null and customOrder1 == 0">
+							CD_TYPE_ENG_NM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 1">
+							CD_ENG_NM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 2">
+							CD_KOR_NM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 3">
+							CD_ORD
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 4">
+							DEL_YN
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 5">
+							CRT_DT_TM
+						</when>
+						<when test="customOrder1 != null and customOrder1 == 6">
+							CRT_USR_ID
+						</when>
+					</choose>
+					<choose>
+						<when test="customOrder2 != null and customOrder2.equals('asc')">
+							ASC
+						</when>
+						<when test="customOrder2 != null and customOrder2.equals('desc')">
+							DESC
+						</when>
+						<otherwise>
+							DESC
+						</otherwise>
+					</choose>
+			) ORDER_T
+		) T
+		WHERE 1=1
+			<if test="countCheck != null and countCheck == false and listViewCount != null">
+				AND rn BETWEEN #{listViewCount} * (((#{start} + #{length}) / #{listViewCount}) - 1) + 1 AND #{listViewCount} * ((#{start} + #{length}) / #{listViewCount})
+			</if>
+	</select>	
+</mapper>

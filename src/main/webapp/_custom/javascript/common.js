@@ -72,6 +72,7 @@ function moveAdminPage(moveAdminPage) {
 	let pagePrams = [
 		['page', moveAdminPage]
 	];
+	
 	pageGoPost('_self', __contextPath + '/app/admin/adminPage.do', pagePrams);
 }
 
@@ -505,7 +506,7 @@ function getMstrTitleName(title) {
 	return rtnTitle;
 }
 
-/*
+
 //MSTR 도씨에 PDF 내보내기
 function exportPdfDossier(iframeId) {
 	let __mojo = $('#' + iframeId).get(0).contentWindow.mstrmojo;
@@ -521,4 +522,3 @@ function exportPdfDossier(iframeId) {
 		alert('실행된 리포트가 없습니다.');
 	}
 }
-*/

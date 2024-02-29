@@ -62,10 +62,9 @@
 				<div class="col-md-2">
 					<select id="post_type_nm" class="form-select form-select-sm">
 						<option>전체</option>
-						<option>메뉴얼</option>
-						<option>용어사전</option>
-						<option>동영상교육</option>
-						<option>지점안내</option>
+						<c:forEach var="item" items="${boardData['postTypeCode']}">
+							<option>${item['CD_KOR_NM']}</option>
+						</c:forEach>
 					</select>
 				</div>
 			</c:if>
@@ -136,7 +135,7 @@
 		} else {
 			if(postType != '' && postType != 'undefined') {
 				searchType = postType;
-				$("#post_type_nm").val(postType).prop("selected", true);
+				$("#post_type_nm").val(postType).prop('selected', true);
 			}
 			
 			fnBoardInit();

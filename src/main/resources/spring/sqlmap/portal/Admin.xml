@@ -69,6 +69,13 @@
 			FROM 
 				PORTAL.PT_BOARD
 			WHERE 1=1
+				<if test="searchKey != null and !searchKey.equals('') and searchVal != null and !searchVal.equals('')">
+					<choose>
+						<when test="searchKey.equals('BRD_NM')">
+							AND UPPER(BRD_NM) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    </choose>
+				</if>
 		)
 		SELECT 
 			*
@@ -266,6 +273,39 @@
 				<if test="LOG_TYPE != null and LOG_TYPE.equals('LOGIN')">
 					AND plog.SCRN_ID IN('PORTAL', 'EIS')
 				</if>
+				<if test="searchKey != null and !searchKey.equals('') and searchVal != null and !searchVal.equals('')">
+					<choose>
+						<when test="searchKey.equals('USR_ID')">
+							AND UPPER(plog.USR_ID) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    	<when test="searchKey.equals('USR_NM')">
+							AND UPPER(plog.USR_NM) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    	<when test="searchKey.equals('SCRN_ID')">
+				    		<choose>
+								<when test="LOG_TYPE != null and LOG_TYPE.equals('BOARD')">
+									AND UPPER(board.BRD_NM) LIKE UPPER('%'||#{searchVal}||'%')
+								</when>
+								<otherwise>
+									AND UPPER(plog.SCRN_ID) LIKE UPPER('%'||#{searchVal}||'%')
+								</otherwise>
+							</choose>
+				    	</when>
+				    	<when test="searchKey.equals('SCRN_DET_ID')">
+							<choose>
+								<when test="LOG_TYPE != null and LOG_TYPE.equals('BOARD')">
+									AND UPPER(post.POST_TITLE) LIKE UPPER('%'||#{searchVal}||'%')
+								</when>
+								<otherwise>
+									AND UPPER(plog.SCRN_DET_ID) LIKE UPPER('%'||#{searchVal}||'%')
+								</otherwise>
+							</choose>
+				    	</when>
+				    	<when test="searchKey.equals('USR_ACTN')">
+							AND UPPER(plog.USR_ACTN) LIKE UPPER('%'||#{searchVal}||'%')
+				    	</when>
+				    </choose>
+				</if>
 		)
 		SELECT 
 			*
@@ -333,4 +373,52 @@
 				AND rn BETWEEN #{listViewCount} * (((#{start} + #{length}) / #{listViewCount}) - 1) + 1 AND #{listViewCount} * ((#{start} + #{length}) / #{listViewCount})
 			</if>
 	</select>
+	
+	
+	<!-- 코드 - 추가 -->
+	<insert id="Admin.codeInsert" parameterType="Map">
+		INSERT INTO /* Admin.codeInsert */ 
+			PORTAL.PT_PORTAL_CODE(
+				  CD_TYPE_ENG_NM
+				, CD_ENG_NM
+				, CD_ENG_ABRV_NM
+				, CD_KOR_NM
+				, CD_DESC
+				, CD_ORD
+				, DEL_YN
+				, CRT_DT_TM
+				, CRT_USR_ID
+			)
+			VALUES(
+				  #{CD_TYPE_ENG_NM}
+				, #{CD_ENG_NM}
+				, #{CD_ENG_ABRV_NM}
+				, #{CD_KOR_NM}
+				, #{CD_DESC}
+				, #{CD_ORD}
+				, #{DEL_YN}
+				, SYSDATE
+				, #{userId}
+			)
+	</insert>
+	
+	
+	<!-- 코드 - 수정 -->
+	<update id="Admin.codeUpdate" parameterType="Map">
+		UPDATE /* Admin.codeUpdate */ 
+			PORTAL.PT_PORTAL_CODE
+		SET
+			  CD_TYPE_ENG_NM = #{CD_TYPE_ENG_NM}
+			, CD_ENG_NM = #{CD_ENG_NM}
+			, CD_ENG_ABRV_NM = #{CD_ENG_ABRV_NM}
+			, CD_KOR_NM = #{CD_KOR_NM}
+			, CD_DESC = #{CD_DESC}
+			, CD_ORD = #{CD_ORD}
+			, DEL_YN = #{DEL_YN}
+			, MOD_DT_TM = SYSDATE
+			, MOD_USR_ID = #{userId}
+		WHERE 1=1
+			AND	CD_TYPE_ENG_NM = #{CD_TYPE_ENG_NM}
+			AND CD_ENG_NM = #{CD_ENG_NM}
+	</update>
 </mapper>

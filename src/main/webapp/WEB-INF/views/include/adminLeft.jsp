@@ -97,6 +97,18 @@
 							<i class="bi bi-tools" style="margin-right: 15px;"></i>게시판 관리
 						</a>
 					</li>
+					<!-- 
+					<li>
+						<a title="코드 분류 관리" onclick="moveAdminPage('CODE_TYPE_ADMIN')" href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">
+							<i class="bi bi-tools" style="margin-right: 15px;"></i>코드 분류 관리
+						</a>
+					</li>
+					-->
+					<li>
+						<a title="코드 관리" onclick="moveAdminPage('CODE_ADMIN')" href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">
+							<i class="bi bi-tools" style="margin-right: 15px;"></i>코드 관리
+						</a>
+					</li>
 				</ul>
 			</div>
 		</li>

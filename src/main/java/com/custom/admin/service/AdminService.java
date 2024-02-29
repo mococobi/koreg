@@ -82,4 +82,24 @@ public interface AdminService {
 	 * @throws SQLException
 	 */
 	Map<String, Object> logList(HttpServletRequest request, HttpServletResponse response, Map<String, Object> params) throws SQLException;
+	
+	/**
+	 * codeInsert
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	Map<String, Object> codeInsert(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws SQLException;
+	
+	/**
+	 * codeUpdate
+	 * @param request
+	 * @param response
+	 * @param params
+	 * @return
+	 * @throws SQLException
+	 */
+	Map<String, Object> codeUpdate(MultipartHttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> params) throws SQLException;
 }

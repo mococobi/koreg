@@ -55,6 +55,9 @@ public class AdminServiceImpl implements AdminService {
     }
 	
 	
+    /**
+     * 포탈 권한 정보
+     */
     @SuppressWarnings("unchecked")
 	@Override
     public List<String> getSessionPortalAuthList(final HttpServletRequest request) {
@@ -62,6 +65,9 @@ public class AdminServiceImpl implements AdminService {
     }
     
     
+    /**
+     * 관리자 권한 정보 조회
+     */
     @Override
     public List<Map<String, Object>> adminAuthList(final HttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) {
     	params.put(PortalCodeUtil.userId, HttpUtil.getLoginUserId(request));
@@ -69,6 +75,9 @@ public class AdminServiceImpl implements AdminService {
     }
     
     
+    /**
+     * 게시판 - 리스트 조회
+     */
     @Override
     public Map<String, Object> boardList(final HttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException {
     	final Map<String, Object> rtnMap = new ConcurrentHashMap<>();
@@ -94,6 +103,9 @@ public class AdminServiceImpl implements AdminService {
     }
     
     
+    /**
+     * 게시판 - 상세
+     */
     @Override
     public Map<String, Object> boardDetail(final HttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException {
     	final Map<String, Object> rtnMap = new ConcurrentHashMap<>();
@@ -112,6 +124,9 @@ public class AdminServiceImpl implements AdminService {
     }
     
     
+    /**
+     * 게시판 - 입력
+     */
     @Override
     @Transactional("transactionManager")
     public Map<String, Object> boardInsert(final MultipartHttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException {
@@ -134,6 +149,9 @@ public class AdminServiceImpl implements AdminService {
     }
     
     
+    /**
+     * 게시판 - 수정
+     */
     @Override
     @Transactional("transactionManager")
     public Map<String, Object> boardUpdate(final MultipartHttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException {
@@ -155,6 +173,9 @@ public class AdminServiceImpl implements AdminService {
     }
     
     
+    /**
+     * 로그 리스트 조회
+     */
     @Override
     public Map<String, Object> logList(final HttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException {
     	final Map<String, Object> rtnMap = new ConcurrentHashMap<>();
@@ -177,5 +198,51 @@ public class AdminServiceImpl implements AdminService {
         rtnMap.put(PortalCodeUtil.params, params);
         
         return rtnMap;
+    }
+    
+    
+    /**
+     * 코드 - 입력
+     */
+    @Override
+    @Transactional("transactionManager")
+    public Map<String, Object> codeInsert(final MultipartHttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException {
+    	final Map<String, Object> rtnMap = new ConcurrentHashMap<>();
+    	
+    	params.put(PortalCodeUtil.userId, HttpUtil.getLoginUserId(request));
+    	
+		//코드 정보 입력
+    	final int codeInsertCount = simpleBizDao.insert("Admin.codeInsert", params);
+    	
+		//포탈 로그 기록(생성)
+    	logService.addPortalLog(request, "CODE_ADMIN", params.get("CD_ENG_NM").toString(), "CREATE", params);
+		
+		rtnMap.put("INSERT_CODE_CNT", codeInsertCount);
+		rtnMap.put(PortalCodeUtil.params, params);
+		
+		return rtnMap;
+    }
+    
+    
+    /**
+     * 코드 - 수정
+     */
+    @Override
+    @Transactional("transactionManager")
+    public Map<String, Object> codeUpdate(final MultipartHttpServletRequest request, final HttpServletResponse response, final Map<String, Object> params) throws SQLException {
+    	final Map<String, Object> rtnMap = new ConcurrentHashMap<>();
+    	
+    	params.put(PortalCodeUtil.userId, HttpUtil.getLoginUserId(request));
+    	
+		//코드 정보 입력
+    	final int codeUpdateCount = simpleBizDao.update("Admin.codeUpdate", params);
+		
+		//포탈 로그 기록(수정)
+    	logService.addPortalLog(request, "CODE_ADMIN", params.get("CD_ENG_NM").toString(), "MODIFY", params);
+		
+		rtnMap.put("UPDATE_CODE_CNT", codeUpdateCount);
+		rtnMap.put(PortalCodeUtil.params, params);
+		
+		return rtnMap;
     }
 }
