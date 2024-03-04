@@ -56,7 +56,7 @@
 				<button class="btn btn-primary btn-sm" onclick="searchBoardList()">조회</button>
 			</div>
 			<div class="col text-end">
-				<button class="btn btn-secondary btn-sm" onclick="writeBoard()">글쓰기</button>
+				<button class="btn btn-secondary btn-sm" onclick="writeBoard()">신규</button>
 			</div>
 		</div>
 		<div id="boardTable_div">

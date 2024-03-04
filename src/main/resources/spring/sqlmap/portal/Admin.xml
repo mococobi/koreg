@@ -408,9 +408,7 @@
 		UPDATE /* Admin.codeUpdate */ 
 			PORTAL.PT_PORTAL_CODE
 		SET
-			  CD_TYPE_ENG_NM = #{CD_TYPE_ENG_NM}
-			, CD_ENG_NM = #{CD_ENG_NM}
-			, CD_ENG_ABRV_NM = #{CD_ENG_ABRV_NM}
+			  CD_ENG_ABRV_NM = #{CD_ENG_ABRV_NM}
 			, CD_KOR_NM = #{CD_KOR_NM}
 			, CD_DESC = #{CD_DESC}
 			, CD_ORD = #{CD_ORD}

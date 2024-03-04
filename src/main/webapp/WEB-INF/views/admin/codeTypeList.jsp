@@ -35,6 +35,16 @@
 			font-size: 2rem;
 			font-family: 맑은 고딕;
 		}
+		
+		#board_table th, #board_table td {
+		    border: 1px solid;
+		}
+		
+		.themed-grid-col {
+		  padding-top: .75rem;
+		  padding-bottom: .75rem;
+		  border: 1px solid rgba(112.520718, 44.062154, 249.437846, .3);
+		}
 	</style>
 </head>
 <body>

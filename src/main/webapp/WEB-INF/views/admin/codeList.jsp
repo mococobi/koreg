@@ -56,6 +56,15 @@
 			font-size: 2rem;
 			font-family: 맑은 고딕;
 		}
+		
+		#board_table th, #board_table td {
+		    border: 1px solid;
+		}
+		.themed-grid-col {
+		  padding-top: .75rem;
+		  padding-bottom: .75rem;
+		  border: 1px solid rgba(112.520718, 44.062154, 249.437846, .3);
+		}
 	</style>
 </head>
 <body>
@@ -81,7 +90,7 @@
 				<button class="btn btn-primary btn-sm" onclick="searchBoardList()">조회</button>
 			</div>
 			<div class="col text-end">
-				<button class="btn btn-secondary btn-sm" onclick="writeCode()">글쓰기</button>
+				<button class="btn btn-secondary btn-sm" onclick="writeCode()">신규</button>
 			</div>
 		</div>
 		<div id="boardTable_div">
@@ -382,6 +391,11 @@
 	function detailCode(moveBoardId) {
 		let selectedData = listData[moveBoardId];
 		
+		$('#cd_type_eng_nm').attr('readonly', true);
+		$('#cd_type_eng_nm').attr('disabled', true);
+		$('#cd_eng_nm').attr('readonly', true);
+		$('#cd_eng_nm').attr('disabled', true);
+		
 		$('#cd_type_eng_nm').val(selectedData['CD_TYPE_ENG_NM']);
 		$('#cd_eng_nm').val(selectedData['CD_ENG_NM']);
 		$('#cd_kor_nm').val(selectedData['CD_KOR_NM']);
@@ -405,6 +419,11 @@
 	
 	//글쓰기
 	function writeCode() {
+		$('#cd_type_eng_nm').attr('readonly', false);
+		$('#cd_type_eng_nm').attr('disabled', false);
+		$('#cd_eng_nm').attr('readonly', false);
+		$('#cd_eng_nm').attr('disabled', false);
+		
 		$('#cd_type_eng_nm').val('');
 		$('#cd_eng_nm').val('');
 		$('#cd_kor_nm').val('');
