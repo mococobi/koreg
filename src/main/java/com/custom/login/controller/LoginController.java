@@ -292,7 +292,13 @@ public class LoginController {
 				| NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException 
 				| IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
 			logger.error("!!! loginUser Exception", e);
-			view.addObject(PortalCodeUtil.errorMessage, e.getMessage());
+			
+			String errMsg = e.getMessage();
+			if(errMsg.indexOf("로그인 실패") > -1) {
+				errMsg = userId + errMsg;
+			}
+			
+			view.addObject(PortalCodeUtil.errorMessage, errMsg);
 		} finally {
 			MstrUtil.closeISession(session);
 		}
@@ -328,7 +334,7 @@ public class LoginController {
 			connData.put("localeNum", Integer.parseInt(CustomProperties.getProperty("mstr.session.locale")));
 			connData.put("uid", userId);
 			connData.put("trustToken", CustomProperties.getProperty("mstr.trust.token"));
-			session = MstrUtil.connectStandardSession(connData);
+			session = MstrUtil.connectTrustSession(connData);
 			
 			//로그인 프로세스 처리(데이터 및 로그 기록시)
 			loginSessionProcess(request, response, session, userId, screenId);
@@ -342,8 +348,14 @@ public class LoginController {
 			
 		} catch (BizException | WebObjectsException | BadSqlGrammarException | SQLException e) {
 //			logger.debug("=> 요청 사용자 : [{}]", userId.replaceAll("[\r\n]",""));
-			logger.error("!!! loginUser Exception", e);
-			view.addObject(PortalCodeUtil.errorMessage, e.getMessage());
+			logger.error("!!! loginUserTrust Exception", e);
+			
+			String errMsg = e.getMessage();
+			if(errMsg.indexOf("로그인 실패") > -1) {
+				errMsg = userId + errMsg;
+			}
+			
+			view.addObject(PortalCodeUtil.errorMessage, errMsg);
 		} finally {
 			MstrUtil.closeISession(session);
 		}

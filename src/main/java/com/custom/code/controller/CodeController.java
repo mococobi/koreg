@@ -63,7 +63,7 @@ public class CodeController {
     		rtnMap.putAll(rtnList);
 		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			logger.error("userListGrid Exception", e);
+			logger.error("codeTypeList Exception", e);
 		}
     	
     	return rtnMap;
@@ -84,7 +84,7 @@ public class CodeController {
     		rtnMap.putAll(rtnList);
 		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			logger.error("userListGrid Exception", e);
+			logger.error("codeTypeListGrid Exception", e);
 		}
     	
     	return rtnMap;
@@ -100,7 +100,7 @@ public class CodeController {
     public Map<String, Object> boardPostList(final HttpServletRequest request, final HttpServletResponse response, @RequestBody final Map<String, Object> params) {
     	params.put("PORTAL_LOG", false);
     	params.put("CHECK_LIST_COUNT", true);
-    	logger.debug("params : [{}]", params);
+//    	logger.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	try {
@@ -108,7 +108,7 @@ public class CodeController {
     		rtnMap.putAll(rtnList);
 		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			logger.error("userListGrid Exception", e);
+			logger.error("boardPostList Exception", e);
 		}
     	
     	return rtnMap;
@@ -123,7 +123,7 @@ public class CodeController {
     public Map<String, Object> codeListGrid(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final Map<String, Object> params) {
     	params.put("PORTAL_LOG", false);
     	params.put("CHECK_LIST_COUNT", true);
-    	logger.debug("params : [{}]", params);
+//    	logger.debug("params : [{}]", params);
     	Map<String, Object> rtnMap = ControllerUtil.getSuccessMap();
     	
     	try {
@@ -131,7 +131,7 @@ public class CodeController {
     		rtnMap.putAll(rtnList);
 		} catch (BadSqlGrammarException | SQLException e) {
 			rtnMap = ControllerUtil.getFailMapMessage(e.getMessage());
-			logger.error("userListGrid Exception", e);
+			logger.error("codeListGrid Exception", e);
 		}
     	
     	return rtnMap;

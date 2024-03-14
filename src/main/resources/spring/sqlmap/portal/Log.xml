@@ -8,12 +8,12 @@
 	<insert id="Log.addPortalLog" parameterType="Map">
 		<selectKey resultType="int" keyProperty="insertKey" order="BEFORE">
         	SELECT
-        		PORTAL.PT_PORTAL_LOG_SEQ.NEXTVAL AS INSERTKEY
+        		${PORTAL_SCHEMA}.PT_PORTAL_LOG_SEQ.NEXTVAL AS INSERTKEY
         	FROM 
         		DUAL
     	</selectKey>
 		INSERT INTO /* Log.addPortalLog */
-			PORTAL.PT_PORTAL_LOG (
+			${PORTAL_SCHEMA}.PT_PORTAL_LOG (
 				  LOG_ID
 				, USR_ID
 				, USR_NM

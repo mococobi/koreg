@@ -31,7 +31,7 @@
 				, MOD_DT_TM
 				, MOD_USR_ID
 			FROM
-				PORTAL.PT_PORTAL_CODE_TYPE
+				${PORTAL_SCHEMA}.PT_PORTAL_CODE_TYPE
 			WHERE 1=1
 				<if test="CHECK_DEL_YN != null and !CHECK_DEL_YN.equals('')">
 					AND DEL_YN = 'N'
@@ -129,7 +129,7 @@
 				, MOD_DT_TM
 				, MOD_USR_ID
 			FROM
-				PORTAL.PT_PORTAL_CODE
+				${PORTAL_SCHEMA}.PT_PORTAL_CODE
 			WHERE 1=1
 				<if test="CHECK_DEL_YN != null and !CHECK_DEL_YN.equals('')">
 					AND DEL_YN = 'N'

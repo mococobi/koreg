@@ -15,7 +15,7 @@
 	
 	<!-- 사용자 테이블 Join -->
 	<sql id="portalUserJoin">
-		INNER JOIN META195.DSSMDOBJINFO userInfo
+		INNER JOIN ${MSTR_META_SCHEMA}.DSSMDOBJINFO userInfo
 			ON (
 					userInfo.OBJECT_TYPE = 34
 				AND userInfo.SUBTYPE = 8704
@@ -35,7 +35,7 @@
 			, MOD_DT_TM
 			, MOD_USR_ID
 		FROM
-			PORTAL.PT_PORTAL_ADMIN
+			${PORTAL_SCHEMA}.PT_PORTAL_ADMIN
 		WHERE 1=1
 			AND DEL_YN = 'N'
 			AND USR_ID = #{userId}
@@ -67,7 +67,7 @@
 				, MOD_DT_TM
 				, MOD_USR_ID
 			FROM 
-				PORTAL.PT_BOARD
+				${PORTAL_SCHEMA}.PT_BOARD
 			WHERE 1=1
 				<if test="searchKey != null and !searchKey.equals('') and searchVal != null and !searchVal.equals('')">
 					<choose>
@@ -158,7 +158,7 @@
 			, MOD_DT_TM
 			, MOD_USR_ID
 		FROM 
-			PORTAL.PT_BOARD
+			${PORTAL_SCHEMA}.PT_BOARD
 		WHERE 1=1
 			AND BRD_ID = #{BRD_ID}
 	</select>
@@ -170,10 +170,10 @@
         	SELECT
         		NVL(MAX(BRD_ID)+1, 1) AS INSERTKEY
         	FROM 
-        		PORTAL.PT_BOARD
+        		${PORTAL_SCHEMA}.PT_BOARD
     	</selectKey>
 		INSERT INTO /* Admin.boardInsert */ 
-			PORTAL.PT_BOARD(
+			${PORTAL_SCHEMA}.PT_BOARD(
 				  BRD_ID
 				, BRD_NM
 				, BRD_DESC
@@ -213,7 +213,7 @@
 	<!-- 게시판 - 수정 -->
 	<update id="Admin.boardUpdate" parameterType="Map">
 		UPDATE /* Admin.boardUpdate */ 
-			PORTAL.PT_BOARD
+			${PORTAL_SCHEMA}.PT_BOARD
 		SET
 			  BRD_NM = #{BRD_NM}
 			, BRD_DESC = #{BRD_DESC}
@@ -258,12 +258,12 @@
 					, post.POST_TITLE
 				</if>
 			FROM 
-				PORTAL.PT_PORTAL_LOG plog
+				${PORTAL_SCHEMA}.PT_PORTAL_LOG plog
 				<include refid="portalUserJoin"/>
 				<if test="LOG_TYPE != null and LOG_TYPE.equals('BOARD')">
-					INNER JOIN PORTAL.PT_BOARD board
+					INNER JOIN ${PORTAL_SCHEMA}.PT_BOARD board
 						ON plog.SCRN_ID = TO_CHAR(board.BRD_ID)
-					LEFT OUTER JOIN PORTAL.PT_BOARD_POST post
+					LEFT OUTER JOIN ${PORTAL_SCHEMA}.PT_BOARD_POST post
 						ON (
 							    plog.SCRN_ID = TO_CHAR(post.BRD_ID)
 							AND plog.SCRN_DET_ID = TO_CHAR(post.POST_ID)
@@ -378,7 +378,7 @@
 	<!-- 코드 - 추가 -->
 	<insert id="Admin.codeInsert" parameterType="Map">
 		INSERT INTO /* Admin.codeInsert */ 
-			PORTAL.PT_PORTAL_CODE(
+			${PORTAL_SCHEMA}.PT_PORTAL_CODE(
 				  CD_TYPE_ENG_NM
 				, CD_ENG_NM
 				, CD_ENG_ABRV_NM
@@ -406,7 +406,7 @@
 	<!-- 코드 - 수정 -->
 	<update id="Admin.codeUpdate" parameterType="Map">
 		UPDATE /* Admin.codeUpdate */ 
-			PORTAL.PT_PORTAL_CODE
+			${PORTAL_SCHEMA}.PT_PORTAL_CODE
 		SET
 			  CD_ENG_ABRV_NM = #{CD_ENG_ABRV_NM}
 			, CD_KOR_NM = #{CD_KOR_NM}

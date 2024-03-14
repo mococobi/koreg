@@ -9,7 +9,7 @@ SET BATCH_CLASS_PATH=%BATCH_CLASS_PATH1%%BATCH_CLASS_PATH2%%BATCH_PROPERTIES_PAT
 SET BATCH_CLASS_NAME=com.batch.util
 SET BATCH_NAME=SyncUser
 
-SET JAVA_PATH=C:\eclipse-jee-2023-03-R-win32-x86_64\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_17.0.6.v20230204-1729\jre\bin\java.exe
+SET JAVA_PATH=C:\eclipse-jee-2023-03-R-win32-x86_64\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_17.0.10.v20240120-1143\jre\bin\java.exe
 
 @echo cd C:\eclipse-workspace-gcgf\portal\src\main\java
 @echo userBatch.bat

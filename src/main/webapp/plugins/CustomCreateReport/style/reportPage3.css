@@ -1,0 +1,56 @@
+@charset "utf-8";
+
+/* 메뉴바 - 기본 */
+.mstrListBlockToolbarListContainer {
+	background: #fffffb;
+}
+
+/* 메뉴바 - 기본 */
+.mstrListBlockToolbarItem, .mstrListBlockToolbarItemHover {
+	background: #fffffb;
+}
+
+/* 메뉴바 - 드랍다운 */
+.mstrFloatingMenu {
+	background: #fffffb;
+}
+
+/* 메뉴바 - 선택 메뉴 */
+.mstrListBlockToolbarItemSelected, .mstrListBlockToolbarItemSelectedHover {
+	background: #0e396c;
+}
+
+/* 아이콘바 - 바탕 */
+.mstrTabbedMenuVBox .mstrViewStack, .mstrDockTop {
+	background: #0e396c;
+}
+
+/* 아이콘바 - 아이콘 */
+.mstrToolbar2End {
+	background: #0e396c;
+}
+
+/* 툴바 - 글자 선택 색상 */
+.mstrWeb.Gray .mstrListBlockToolbarItemSelected .mstrListBlockToolbarItemName {
+    color: #ffffff;
+}
+
+/* 툴바 - 글자 색상 */
+.mstrListBlockToolbarItem .mstrListBlockToolbarItemName, .mstrListBlockToolbarItemHover .mstrListBlockToolbarItemName {
+    color: #000000;
+}
+
+/* 툴바 - 글자 마우스 오버 색상 */
+.mstrWeb.Gray .mstrFloatingMenuItem .hover, .mstrWeb.Gray .mstrListBlockToolbarItemSelectedHover, .mstrWeb.Gray .mstrListBlockToolbarItemSelectedHover .mstrListBlockToolbarItemName, .mstrWeb.Gray .mstrListBlockToolbarItemHover .mstrListBlockToolbarItemName {
+    color: #000000;
+}
+
+/* 툴바 - 메뉴 클릭 */
+.mstrWeb.Gray .mstrFloatingMenuItem .hover, .mstrWeb.Gray .mstrListBlockToolbarItemSelectedHover, .mstrWeb.Gray .mstrListBlockToolbarItemSelectedHover .mstrListBlockToolbarItemName, .mstrWeb.Gray .mstrListBlockToolbarItemHover .mstrListBlockToolbarItemName {
+    color: #000000;
+}
+
+/* 툴바 - 메뉴 글자 색상 */
+.mstrFloatingMenu {
+    color: #000000;
+}

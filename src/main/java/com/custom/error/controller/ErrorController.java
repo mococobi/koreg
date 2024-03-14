@@ -72,7 +72,9 @@ public class ErrorController {
             view.addObject(entry.getKey(), entry.getValue());
             
             if (logger.isDebugEnabled()) {
-            	logger.debug("key : [{}], value : [{}]", entry.getKey(), entry.getValue());
+            	final String logTmp1 = entry.getKey();
+            	final String logTmp2 = (String) entry.getValue();
+            	logger.debug("key : [{}], value : [{}]", logTmp1, logTmp2);
             }
         }
     	
@@ -111,7 +113,9 @@ public class ErrorController {
             view.addObject(entry.getKey(), entry.getValue());
             
             if (logger.isDebugEnabled()) {
-            	logger.debug("key : [{}], value : [{}]", entry.getKey(), entry.getValue());
+            	final String logTmp1 = entry.getKey();
+            	final String logTmp2 = (String) entry.getValue();
+            	logger.debug("key : [{}], value : [{}]", logTmp1, logTmp2);
             }
         }
     	

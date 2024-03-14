@@ -66,6 +66,11 @@ public class PortalCodeUtil {
 	public static final String CHECK_Y = "Y";
 	
 	/**
+	 * CHECK_N
+	 */
+	public static final String CHECK_N = "N";
+	
+	/**
 	 * CHECK_EMPTY
 	 */
 	public static final String CHECK_EMPTY = "";

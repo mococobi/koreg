@@ -17,7 +17,7 @@
 	
 	<!-- 사용자 테이블 Join -->
 	<sql id="portalUserJoin">
-		INNER JOIN META195.DSSMDOBJINFO userInfo
+		INNER JOIN ${MSTR_META_SCHEMA}.DSSMDOBJINFO userInfo
 			ON (
 					userInfo.OBJECT_TYPE = 34
 				AND userInfo.SUBTYPE = 8704
@@ -49,7 +49,7 @@
 			, board.MOD_DT_TM
 			, board.MOD_USR_ID
 		FROM 
-			PORTAL.PT_BOARD board
+			${PORTAL_SCHEMA}.PT_BOARD board
 		WHERE 1=1
 			AND board.BRD_ID = #{BRD_ID}
 			AND board.DEL_YN = 'N'
@@ -69,7 +69,7 @@
 				SELECT
 					POST_ID
 				FROM 
-					PORTAL.PT_BOARD_POST
+					${PORTAL_SCHEMA}.PT_BOARD_POST
 				WHERE 1=1
 					AND BRD_ID = #{BRD_ID}
 				ORDER BY 
@@ -105,8 +105,8 @@
 				, board.POST_FIX_YN
 				, POST_NUMBER.POST_ID_ROWNUM
 			FROM 
-				PORTAL.PT_BOARD_POST post
-				INNER JOIN PORTAL.PT_BOARD board
+				${PORTAL_SCHEMA}.PT_BOARD_POST post
+				INNER JOIN ${PORTAL_SCHEMA}.PT_BOARD board
 					ON (post.BRD_ID = board.BRD_ID)
 				INNER JOIN POST_NUMBER
 					ON (post.POST_ID = POST_NUMBER.POST_ID)
@@ -130,9 +130,9 @@
 		, ROW_POST_LIST AS (
 			SELECT
 				  post.*
-				, (SELECT COUNT(USR_ACTN) FROM PORTAL.PT_PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
+				, (SELECT COUNT(USR_ACTN) FROM ${PORTAL_SCHEMA}.PT_PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
 				, CASE 
-					WHEN post.POST_FILE_YN = 'Y' THEN (SELECT COUNT(post_file.FILE_ID) FROM PORTAL.PT_BOARD_POST_FILE post_file WHERE post_file.DEL_YN = 'N' AND post.POST_ID = post_file.POST_ID) 
+					WHEN post.POST_FILE_YN = 'Y' THEN (SELECT COUNT(post_file.FILE_ID) FROM ${PORTAL_SCHEMA}.PT_BOARD_POST_FILE post_file WHERE post_file.DEL_YN = 'N' AND post.POST_ID = post_file.POST_ID) 
 					ELSE 0
 				END AS POST_FILE_COUNT
 			FROM 
@@ -217,8 +217,8 @@
 			  post.POST_ID
 			, post.BRD_ID
 		FROM 
-			PORTAL.PT_BOARD_POST post 
-			INNER JOIN PORTAL.PT_BOARD board
+			${PORTAL_SCHEMA}.PT_BOARD_POST post 
+			INNER JOIN ${PORTAL_SCHEMA}.PT_BOARD board
 				ON (post.BRD_ID = board.BRD_ID) 
 		WHERE 1=1 
 			AND SYSDATE BETWEEN post.POPUP_START_DT_TM AND post.POPUP_END_DT_TM
@@ -246,7 +246,7 @@
 			, userInfo.OBJECT_NAME AS CRT_USR_NM
 			, post.MOD_DT_TM
 			, post.MOD_USR_ID
-			, (SELECT COUNT(USR_ACTN) FROM PORTAL.PT_PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
+			, (SELECT COUNT(USR_ACTN) FROM ${PORTAL_SCHEMA}.PT_PORTAL_LOG WHERE USR_ACTN ='DETAIL' AND SCRN_DET_ID = post.POST_ID) AS POST_VIEW_COUNT
 			, board.BRD_NM
 			, board.BRD_DESC
 			, board.BRD_TYPE
@@ -262,8 +262,8 @@
 			, board.POST_SECRET_YN
 			, board.POST_FIX_YN
 		FROM 
-			PORTAL.PT_BOARD_POST post
-			INNER JOIN PORTAL.PT_BOARD board
+			${PORTAL_SCHEMA}.PT_BOARD_POST post
+			INNER JOIN ${PORTAL_SCHEMA}.PT_BOARD board
 				ON (post.BRD_ID = board.BRD_ID)
 			<include refid="portalUserJoin"/>
 		WHERE 1=1
@@ -286,7 +286,7 @@
 						, post.POST_ID
 						, post.POST_TITLE 
 					FROM 
-						PORTAL.PT_BOARD_POST post
+						${PORTAL_SCHEMA}.PT_BOARD_POST post
 					WHERE 1=1
 						AND post.DEL_YN = 'N'
 						AND post.POST_ID <![CDATA[<]]> #{POST_ID}
@@ -307,7 +307,7 @@
 						, post.POST_ID
 						, post.POST_TITLE 
 					FROM 
-						PORTAL.PT_BOARD_POST post
+						${PORTAL_SCHEMA}.PT_BOARD_POST post
 					WHERE 1=1
 						AND post.DEL_YN = 'N'
 						AND post.POST_ID <![CDATA[>]]> #{POST_ID}
@@ -334,10 +334,10 @@
         	SELECT
         		NVL(MAX(post.POST_ID)+1, 1) AS INSERTKEY
         	FROM 
-        		PORTAL.PT_BOARD_POST post
+        		${PORTAL_SCHEMA}.PT_BOARD_POST post
     	</selectKey>
     	INSERT INTO /* Board.boardPostInsert */ 
-    		PORTAL.PT_BOARD_POST(
+    		${PORTAL_SCHEMA}.PT_BOARD_POST(
     			POST_ID
     		  , BRD_ID
     		  , POST_TYPE
@@ -375,7 +375,7 @@
 	<!-- 게시판 - 게시물 수정 -->
 	<update id="Board.boardPostUpdate" parameterType="Map"> <!-- keyProperty="keyNum" -->
     	UPDATE /* Board.boardPostUpdate */
-    		PORTAL.PT_BOARD_POST
+    		${PORTAL_SCHEMA}.PT_BOARD_POST
     	SET
  		    POST_TYPE = #{POST_TYPE}
    		  , POST_TITLE = #{POST_TITLE}
@@ -398,7 +398,7 @@
 	<!-- 게시판 - 게시물 삭제 -->
 	<update id="Board.boardPostDelete" parameterType="Map">
     	UPDATE /* Board.boardPostDelete */
-    		PORTAL.PT_BOARD_POST
+    		${PORTAL_SCHEMA}.PT_BOARD_POST
     	SET
    		    DEL_YN = 'Y'
    		  , MOD_DT_TM = SYSDATE
@@ -427,7 +427,7 @@
 			, post_file.MOD_DT_TM
 			, post_file.MOD_USR_ID
 		FROM
-			PORTAL.PT_BOARD_POST_FILE post_file
+			${PORTAL_SCHEMA}.PT_BOARD_POST_FILE post_file
 		WHERE 1=1
 			AND post_file.DEL_YN = 'N'
 			AND post_file.POST_ID = #{POST_ID}
@@ -454,7 +454,7 @@
 			, post_file.MOD_DT_TM
 			, post_file.MOD_USR_ID
 		FROM
-			PORTAL.PT_BOARD_POST_FILE post_file
+			${PORTAL_SCHEMA}.PT_BOARD_POST_FILE post_file
 		WHERE 1=1
 			AND post_file.DEL_YN = 'N'
 			AND post_file.POST_ID IN (
@@ -487,8 +487,8 @@
 			, post_file.MOD_DT_TM
 			, post_file.MOD_USR_ID
 		FROM
-			PORTAL.PT_BOARD_POST_FILE post_file
-			INNER JOIN PORTAL.PT_BOARD_POST post 
+			${PORTAL_SCHEMA}.PT_BOARD_POST_FILE post_file
+			INNER JOIN ${PORTAL_SCHEMA}.PT_BOARD_POST post 
 				ON post_file.POST_ID = post.POST_ID 
 		WHERE 1=1
 			AND post_file.FILE_ID = #{FILE_ID}
@@ -503,10 +503,10 @@
 			SELECT
 				NVL(MAX(post_file.FILE_ID)+1, 1) AS INSERTKEY
 			FROM
-				PORTAL.PT_BOARD_POST_FILE post_file
+				${PORTAL_SCHEMA}.PT_BOARD_POST_FILE post_file
 		</selectKey>
 		INSERT INTO /* Board.boardPostFileInsert */ 
-			PORTAL.PT_BOARD_POST_FILE(
+			${PORTAL_SCHEMA}.PT_BOARD_POST_FILE(
     			FILE_ID
     		  , POST_ID
     		  , FILE_TYPE
@@ -540,7 +540,7 @@
 	<!-- 게시판 - 게시물 - 파일 삭제 -->
 	<update id="Board.boardPostFileDelete" parameterType="Map">
     	UPDATE /* Board.boardPostFileDelete */
-    		PORTAL.PT_BOARD_POST_FILE
+    		${PORTAL_SCHEMA}.PT_BOARD_POST_FILE
     	SET
    		    DEL_YN = 'Y'
    		  , MOD_DT_TM = SYSDATE

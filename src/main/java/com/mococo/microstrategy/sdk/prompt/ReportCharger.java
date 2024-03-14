@@ -92,7 +92,7 @@ public class ReportCharger {
         for(int i=0; i<prompts.size(); i++) {
         	final WebPrompt prompt = prompts.get(i);
         	final String logTmp1 = prompt.getID().replaceAll("[\r\n]","");
-            logger.debug("=> id: [{}]", logTmp1);
+            logger.debug("=> prompt.getID() : [{}]", logTmp1);
             
             promptList.add(PromptCharger.getChargedPrompt(session, prompt));
         }

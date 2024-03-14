@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+	<properties>
+		<property name="PORTAL_SCHEMA" value="portal"/>
+		<property name="MSTR_META_SCHEMA" value="META195"/>
+		<property name="MSTR_STAT_SCHEMA" value="STAT195"/>
+	</properties>
   	<settings>
 	    <setting name="jdbcTypeForNull" value="VARCHAR"/>
 	    <setting name="callSettersOnNulls" value="true"/>

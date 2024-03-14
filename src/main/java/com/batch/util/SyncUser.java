@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 import com.batch.jdbc.UserJdbcTemplate;
@@ -33,12 +34,14 @@ import com.mococo.microstrategy.sdk.util.MstrUserUtil;
 import com.mococo.microstrategy.sdk.util.MstrUtil;
 import com.mococo.web.util.CustomProperties;
 import com.mococo.web.util.EncryptUtil;
+import com.mococo.web.util.PortalCodeUtil;
 
 /**
  * 사용자 배치
  * @author mococo
  *
  */
+@EnableScheduling
 @Component
 public class SyncUser {
 	
@@ -68,6 +71,11 @@ public class SyncUser {
 	 * orgMstrUser
 	 */
 	private static Map<String, String> orgMstrUser = new ConcurrentHashMap<>();
+	
+	/**
+	 * orgAllAuth
+	 */
+	private static Map<String, String> orgAllAuth = new ConcurrentHashMap<>();
 	
 	/**
 	 * orgUserAuth
@@ -148,11 +156,12 @@ public class SyncUser {
 		}
 	}
 	
+	
 	/**
 	 * batchDo
 	 * @param args
 	 */
-//	@Scheduled(cron = "0 0/1 * * * *")
+//	@Scheduled(cron = "0 0 1 * * *")
 //	public static void batchDo() {
 	public static void main(String[] args) {
 		logger.info("배치 실행");
@@ -170,7 +179,7 @@ public class SyncUser {
 	
 	
 	/**
-	 * doSync
+	 * 사용자 배치 시작
 	 */
 	public void doSync() {
 		final SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd", Locale.KOREA);
@@ -207,7 +216,6 @@ public class SyncUser {
 			
 			
 			//02.기존 MSTR 유저 확인
-//			final Map<String, String> orgMstrUser = SyncUserUtil.getAllMstrUser(objSource);
 			orgMstrUser = SyncUserUtil.getAllMstrUser(objSource);
 			final Iterator<String> orgMstrUserKeys = orgMstrUser.keySet().iterator();
 			while(orgMstrUserKeys.hasNext()) {
@@ -225,8 +233,8 @@ public class SyncUser {
 				final String strKey = orgUserAuthKeys.next();
 				String strValue = orgUserAuth.get(strKey);
 			}
-			final int logTmp2 = orgUserAuth.size();
-			logger.debug("03.기존 MSTR 권한 정보 : [{}]", logTmp2);
+			final int logTmp3 = orgUserAuth.size();
+			logger.debug("03.기존 MSTR 권한 정보 : [{}]", logTmp3);
 			
 			
 			//04.기존 부서 확인
@@ -236,15 +244,14 @@ public class SyncUser {
 				final String strKey = orgMstrGroupKeys.next();
 				String strValue = orgMstrGroup.get(strKey);
 			}
-			final int logTmp3 = orgMstrGroup.size();
-			logger.debug("04.기존 MSTR 부서 정보 : [{}]", logTmp3);
+			final int logTmp4 = orgMstrGroup.size();
+			logger.debug("04.기존 MSTR 부서 정보 : [{}]", logTmp4);
 			
 			
-			batchDept(session, objSource);
+//			batchDept(session, objSource);
 			
 			
 			//07.체크할 사용자 정보 가져오기
-//			final List<Map<String, Object>> userList = userJdbcTemplate.selectEiamUser();
 			userList = userJdbcTemplate.selectEiamUser();
 			final int logTmp7 = userList.size();
 			logger.debug("07.체크할 유저정보 : [{}]", logTmp7);
@@ -264,7 +271,11 @@ public class SyncUser {
 	}
 	
 	
-	
+	/**
+	 * 부서 처리
+	 * @param serverSession
+	 * @param objSource
+	 */
 	private void batchDept(final WebIServerSession serverSession, final WebObjectSource objSource) {
 		//05.체크할 부서 정보 가져오기
 		final List<Map<String, Object>> departmentList = userJdbcTemplate.selectEiamDepartment();
@@ -313,96 +324,109 @@ public class SyncUser {
 	}
 	
 	
+	/**
+	 * 사용자 처리
+	 * @param serverSession
+	 * @param objSource
+	 */
 	private void batchUser(final WebIServerSession serverSession, final WebObjectSource objSource) {
 		//08.사용자 등록
 		for(final Map<String, Object> userInfo : userList) {
 			try {
 				WebUserEntity trustee;
-				WebUser user;
+				WebUser user = null;
 				
-				final String crtUsrId = userInfo.get("사용자사번").toString();
-				final String crtUsrNm = userInfo.get("사용자이름").toString();
-				final String crtUsrDeptNm = userInfo.get("부서명").toString();
-				final String crtUsrAuthNm = userInfo.get("권한명").toString();
-				final String crtUsrCheck = userInfo.get("계정상태").toString();
+				final String crtUsrId = (String) userInfo.get("사용자사번");
+				final String crtUsrNm = (String) userInfo.get("사용자이름");
+				final String crtUsrDeptNm = (String) userInfo.get("부서명");
+				final String crtUsrAuthNm = (String) userInfo.get("권한명");
+				final String crtUsrCheck = (String) userInfo.get("계정상태");
 				
-				logger.debug("08.처리 사용자 [{}][{}] ==================================", crtUsrId, crtUsrNm);
 				if (orgMstrUser.containsKey(crtUsrId)) {
+					logger.debug("08.처리 사용자 [{}][{}] ==================================", crtUsrId, crtUsrNm);
+					
 					//기존 유저 확인
 					user = MstrUserUtil.getUser(objSource, orgMstrUser.get(crtUsrId));
 					trustee = user;
 					//유저 활성화 / 비활성화
 					changeUserDisable(objSource, user, trustee, crtUsrCheck);
 				} else {
-					user = MstrUserUtil.createUser(serverSession, crtUsrId, crtUsrNm, CustomProperties.getProperty("mstr.user.default.pwd"));
-					
-					trustee = user;
-					orgMstrUser.put(trustee.getAbbreviation(), trustee.getID());
-					
-					final String logTmp8 = trustee.getAbbreviation();
-					final String logTmp9 = trustee.getName();
-					logger.info("08.신규 유저 추가 : [{}][{}]", logTmp8, logTmp9);
-				}
-				
-				
-				//권한 판단(일반 파워)
-				final Map<String, String> userAuthList = SyncUserUtil.searchUserGroup(user, orgUserAuth);
-				logger.debug("08.유저 AS-IS 권한 : [{}]", userAuthList);
-				logger.debug("08.유저 TO-BE 권한 : [{}]", crtUsrAuthNm);
-				final Iterator<String> userAuthListKeys = userAuthList.keySet().iterator();
-				while(userAuthListKeys.hasNext()) {
-					final String strKey = userAuthListKeys.next();
-					final String strValue = userAuthList.get(strKey);
-					
-					if(!strKey.equals(crtUsrAuthNm)) {
-						//다른 경우 제거
-						MstrUserUtil.removeFromUserGroup(objSource, user, strValue);
-						logger.info("08.AS-IS 권한 제거 : [{}]", strKey);
+					if(PortalCodeUtil.CHECK_Y.equals(crtUsrCheck)) {
+						logger.debug("08.처리 사용자 [{}][{}] ==================================", crtUsrId, crtUsrNm);
+						
+						user = MstrUserUtil.createUser(serverSession, crtUsrId, crtUsrNm, CustomProperties.getProperty("mstr.user.default.pwd"));
+						
+						trustee = user;
+						orgMstrUser.put(trustee.getAbbreviation(), trustee.getID());
+						
+						final String logTmp8 = trustee.getAbbreviation();
+						final String logTmp9 = trustee.getName();
+						logger.info("08.신규 유저 추가 : [{}][{}]", logTmp8, logTmp9);
 					}
 				}
 				
-				if(!userAuthList.containsKey(crtUsrAuthNm)) {
-					if(orgUserAuth.containsKey(crtUsrAuthNm)) {
-						//권한 없는 경우 추가
-						MstrUserUtil.addToUserGroup(objSource, user, orgUserAuth.get(crtUsrAuthNm));
-						logger.info("08.TO-BE 권한 추가 : [{}]", crtUsrAuthNm);
-					} else {
-						logger.info("08.TO-BE 권한 존재하지 않음 : [{}]", crtUsrAuthNm);
+				if(user != null) {
+					//권한 판단(일반 파워)
+					final Map<String, String> userAuthList = SyncUserUtil.searchUserGroup(user, orgUserAuth);
+					logger.debug("08.유저 AS-IS 권한 : [{}]", userAuthList);
+					logger.debug("08.유저 TO-BE 권한 : [{}]", crtUsrAuthNm);
+					final Iterator<String> userAuthListKeys = userAuthList.keySet().iterator();
+					while(userAuthListKeys.hasNext()) {
+						final String strKey = userAuthListKeys.next();
+						final String strValue = userAuthList.get(strKey);
+						
+						if(!strKey.equals(crtUsrAuthNm)) {
+							//다른 경우 제거
+							MstrUserUtil.removeFromUserGroup(objSource, user, strValue);
+							logger.info("08.AS-IS 권한 제거 : [{}]", strKey);
+						}
 					}
-				}
-				
-				
-				//부서 판단
-				final Map<String, String> userGroupList = SyncUserUtil.searchUserGroup(user, orgMstrGroup);
-				logger.debug("08.유저 AS-IS 부서 : [{}]", userGroupList);
-				logger.debug("08.유저 TO-BE 부서 : [{}]", crtUsrDeptNm);
-				final Iterator<String> userGroupListKeys = userGroupList.keySet().iterator();
-				while(userGroupListKeys.hasNext()) {
-					final String strKey = userGroupListKeys.next();
-					final String strValue = userGroupList.get(strKey);
 					
-					if(!strKey.equals(crtUsrDeptNm)) {
-						//다른 경우 제거
-						MstrUserUtil.removeFromUserGroup(objSource, user, strValue);
-						logger.info("08.AS-IS 부서 제거 : [{}]", strKey);
+					if(!userAuthList.containsKey(crtUsrAuthNm)) {
+						if(orgUserAuth.containsKey(crtUsrAuthNm)) {
+							//권한 없는 경우 추가
+							MstrUserUtil.addToUserGroup(objSource, user, orgUserAuth.get(crtUsrAuthNm));
+							logger.info("08.TO-BE 권한 추가 : [{}]", crtUsrAuthNm);
+						} else {
+							logger.info("08.TO-BE 권한 존재하지 않음 : [{}]", crtUsrAuthNm);
+						}
 					}
+					
+					
+					//부서 판단
+					final Map<String, String> userGroupList = SyncUserUtil.searchUserGroup(user, orgMstrGroup);
+					logger.debug("08.유저 AS-IS 부서 : [{}]", userGroupList);
+					logger.debug("08.유저 TO-BE 부서 : [{}]", crtUsrDeptNm);
+					final Iterator<String> userGroupListKeys = userGroupList.keySet().iterator();
+					while(userGroupListKeys.hasNext()) {
+						final String strKey = userGroupListKeys.next();
+						final String strValue = userGroupList.get(strKey);
+						
+						if(!strKey.equals(crtUsrDeptNm)) {
+							//다른 경우 제거
+							MstrUserUtil.removeFromUserGroup(objSource, user, strValue);
+							logger.info("08.AS-IS 부서 제거 : [{}]", strKey);
+						}
+					}
+					
+					if(!userGroupList.containsKey(crtUsrDeptNm)) {
+						//부서 없는 경우 추가
+						if(orgMstrGroup.containsKey(crtUsrDeptNm)) {
+							MstrUserUtil.addToUserGroup(objSource, user, orgMstrGroup.get(crtUsrDeptNm));
+							logger.info("08.TO-BE 부서 추가 : [{}]", crtUsrDeptNm);
+						} else {
+							logger.info("08.TO-BE 부서 존재하지 않음 : [{}]", crtUsrDeptNm);
+						}
+					}
+					
+					logger.debug("==================================================================");
 				}
 				
-				if(!userGroupList.containsKey(crtUsrDeptNm)) {
-					//부서 없는 경우 추가
-					if(orgMstrGroup.containsKey(crtUsrDeptNm)) {
-						MstrUserUtil.addToUserGroup(objSource, user, orgMstrGroup.get(crtUsrDeptNm));
-						logger.info("08.TO-BE 부서 추가 : [{}]", crtUsrDeptNm);
-					} else {
-						logger.info("08.TO-BE 부서 존재하지 않음 : [{}]", crtUsrDeptNm);
-					}
-				}
 				
-				logger.debug("==================================================================");
 			} catch (WebBeanException | WebObjectsException e) {
-				final String logTmp5 = userInfo.get("사용자사번").toString();
-				logger.debug("08.사용자 에러 - [{}]", logTmp5);
-				logger.error("08.userList Error", e);
+				final String logTmp99 = (String) userInfo.get("사용자사번");
+				logger.debug("99.사용자 에러 - [{}]", logTmp99);
+				logger.error("99.userList Error", e);
 			}
 		}
 	}
@@ -417,35 +441,39 @@ public class SyncUser {
 	 * @throws WebObjectsException
 	 */
 	private void changeUserDisable(final WebObjectSource objSource, final WebUser user, final WebUserEntity trustee, final String crtUsrCheck) throws WebObjectsException {
-		
-		final Map<String, String> userAuthList = SyncUserUtil.searchUserGroup(user, orgUserAuth);
+		//사용자 그룹 확인
+		final List<String> userAuthList = MstrUserUtil.getUserGroupIdList(user);
 		
 		//기존 등록 유저 : [계정 사용불가] -> [계정 활성화]
-		if ("Y".equals(crtUsrCheck) && !user.isEnabled()) {
-			user.setEnabled(true);
-			objSource.save(user);
-			
-			if(userAuthList.containsValue(DELETE_GROUP_ID)) {
-				MstrUserUtil.removeFromUserGroup(objSource, user, DELETE_GROUP_ID);
+		if (PortalCodeUtil.CHECK_Y.equals(crtUsrCheck)) {
+			if(!user.isEnabled()) {
+				user.setEnabled(true);
+				objSource.save(user);
+				
+				final String logTmp5 = trustee.getAbbreviation();
+				final String logTmp6 = trustee.getName();
+				logger.info("08.[계정 사용불가] -> [계정 활성화] - [{}][{}]", logTmp5, logTmp6);
 			}
 			
-			final String logTmp5 = trustee.getAbbreviation();
-			final String logTmp6 = trustee.getName();
-			logger.info("08.[계정 사용불가] -> [계정 활성화] - [{}][{}]", logTmp5, logTmp6);
+			if(userAuthList.contains(DELETE_GROUP_ID)) {
+				MstrUserUtil.removeFromUserGroup(objSource, user, DELETE_GROUP_ID);
+			}
 		}
 		
 		//기존 등록 유저 : [계정 활성화] -> [계정 사용불가]
-		if("N".equals(crtUsrCheck) && user.isEnabled()) {
-			user.setEnabled(false);
-			objSource.save(user);
-			
-			if(!userAuthList.containsValue(DELETE_GROUP_ID)) {
-				MstrUserUtil.addToUserGroup(objSource, user, DELETE_GROUP_ID);
+		if(PortalCodeUtil.CHECK_N.equals(crtUsrCheck)) {
+			if(user.isEnabled()) {
+				user.setEnabled(false);
+				objSource.save(user);
+				
+				final String logTmp5 = trustee.getAbbreviation();
+				final String logTmp6 = trustee.getName();
+				logger.info("08.[계정 활성화] -> [계정 사용불가] - [{}][{}]", logTmp5, logTmp6);
 			}
 			
-			final String logTmp5 = trustee.getAbbreviation();
-			final String logTmp6 = trustee.getName();
-			logger.info("08.[계정 활성화] -> [계정 사용불가] - [{}][{}]", logTmp5, logTmp6);
+			if(!userAuthList.contains(DELETE_GROUP_ID)) {
+				MstrUserUtil.addToUserGroup(objSource, user, DELETE_GROUP_ID);
+			}
 		}
 	}
 }

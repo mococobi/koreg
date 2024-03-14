@@ -394,7 +394,7 @@ public class MstrReportUtil {
 
             for (final String objectId : param.keySet()) {
             	final String logTmp1 = prompt.getID().replaceAll(PortalCodeUtil.logChange,"");
-            	logger.debug("=> [{}]", logTmp1);
+            	logger.debug("=> prompt.getID() : [{}]", logTmp1);
 
                 if (!StringUtils.equals(objectId, prompt.getID())) {
                     continue;
@@ -433,13 +433,13 @@ public class MstrReportUtil {
 	                            
 	                        	final String logTmp2 = elementValueList.toString().replaceAll(PortalCodeUtil.logChange,"");
 	                            String logTmp3 = element.getID().replaceAll(PortalCodeUtil.logChange,"");
-	                            logger.debug("=>elementsPrompt [{}], [{}]", logTmp1, logTmp2);
+	                            logger.debug("=> elementsPrompt [{}], [{}]", logTmp1, logTmp2);
 	
 	                            for (final String elementValue : elementValueList) {
 	                                if (StringUtils.isNotEmpty(elementValue) && StringUtils.equals(elementValue, element.getID())) {
 	                                    answers.add(elementValue, element.getDisplayName());
 	                                    String logTmp4 = elementValue.replaceAll(PortalCodeUtil.logChange,"");
-	                                    logger.debug("=>add this element: [{}]", logTmp1);
+	                                    logger.debug("=> add this element: [{}]", logTmp1);
 	                                }
 	                            }
 	                        }
