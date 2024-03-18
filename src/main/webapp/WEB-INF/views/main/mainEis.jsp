@@ -688,6 +688,8 @@
     
     //영역 숨김 및 표시
     function showAndHideTab() {
+    	document.title = leftMenuList[leftMenuIdx]['name'];
+    	
 		//프롬프트 영역
     	$('div[class="run-box flex"]').each(function() {
 			$(this).hide();

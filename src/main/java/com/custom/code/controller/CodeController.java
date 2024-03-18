@@ -49,7 +49,7 @@ public class CodeController {
     
     
     /**
-     * 코드 분류 - 리스트 조회 - 그리드
+     * 코드 분류 - 리스트 조회
      * @return
      */
     @PostMapping("/code/codeTypeList.json")
