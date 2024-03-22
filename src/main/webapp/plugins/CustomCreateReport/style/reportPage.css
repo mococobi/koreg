@@ -2,32 +2,32 @@
 
 /* 메뉴바 - 기본 */
 .mstrListBlockToolbarListContainer {
-	background: #e5e9ec;
+	background: #fffffb;
 }
 
 /* 메뉴바 - 기본 */
 .mstrListBlockToolbarItem, .mstrListBlockToolbarItemHover {
-	background: #e5e9ec;
+	background: #fffffb;
 }
 
 /* 메뉴바 - 드랍다운 */
 .mstrFloatingMenu {
-	background: #e5e9ec;
+	background: #fffffb;
 }
 
 /* 메뉴바 - 선택 메뉴 */
 .mstrListBlockToolbarItemSelected, .mstrListBlockToolbarItemSelectedHover {
-	background: #576373;
+	background: #0e396c;
 }
 
 /* 아이콘바 - 바탕 */
 .mstrTabbedMenuVBox .mstrViewStack, .mstrDockTop {
-	background: #576373;
+	background: #0e396c;
 }
 
 /* 아이콘바 - 아이콘 */
 .mstrToolbar2End {
-	background: #576373;
+	background: #0e396c;
 }
 
 /* 툴바 - 글자 선택 색상 */

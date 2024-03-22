@@ -294,7 +294,7 @@ public class LoginController {
 			logger.error("!!! loginUser Exception", e);
 			
 			String errMsg = e.getMessage();
-			if(errMsg.indexOf("로그인 실패") > -1) {
+			if(errMsg != null && errMsg.indexOf("로그인 실패") > -1) {
 				errMsg = userId + errMsg;
 			}
 			
@@ -351,7 +351,7 @@ public class LoginController {
 			logger.error("!!! loginUserTrust Exception", e);
 			
 			String errMsg = e.getMessage();
-			if(errMsg.indexOf("로그인 실패") > -1) {
+			if(errMsg != null && errMsg.indexOf("로그인 실패") > -1) {
 				errMsg = userId + errMsg;
 			}
 			

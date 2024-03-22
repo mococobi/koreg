@@ -674,7 +674,7 @@
     function connMstr() {
     	$.ajax({
 	  		  type : 'post'
-	  		, url : __contextPath + '/servlet/mstrWeb?evt=3187&src=mstrWeb.3187'
+	  		, url : '${pageContext.request.contextPath}/servlet/mstrWeb?evt=3187&src=mstrWeb.3187'
 	   		, async : true
 	  		, success : function(data, text, request) {
 	  			//작업이 성공적으로 발생했을 경우

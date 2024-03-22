@@ -13,9 +13,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -25,24 +23,18 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.WriteListener;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.microstrategy.web.objects.WebIServerSession;
-import com.microstrategy.web.objects.WebObjectSource;
 import com.microstrategy.web.objects.WebObjectsException;
-import com.microstrategy.web.objects.admin.users.WebUser;
-import com.mococo.microstrategy.sdk.util.MstrUserUtil;
-import com.mococo.microstrategy.sdk.util.MstrUtil;
 import com.mococo.web.util.CustomProperties;
-import com.mococo.web.util.EncryptUtil;
 import com.mococo.web.util.HttpUtil;
 
 
@@ -89,6 +81,8 @@ public class DownloadServletFilter implements Filter {
 	 */
 	private boolean isExportRequest(final HttpServletRequest request) {
 		final String path = request.getServletPath();
+//		logger.debug("isExportRequest path ===> [{}]", path);
+		
 		boolean result = false;
 		
 		if (path == null || "".equals(path)) {
@@ -127,6 +121,7 @@ public class DownloadServletFilter implements Filter {
 		String signUserObjId = "";
 		String signUserName = "";
 		
+		/*
 		if (StringUtils.isNotEmpty(signUserId)) {
 			WebIServerSession session = null;
 			try {
@@ -158,13 +153,14 @@ public class DownloadServletFilter implements Filter {
 				}
 			}
 		}
+		*/
 		
-		String tmpFileDir = drm_default_path;
-		String tmpFileName = fileName;
+		final String tmpFileDir = drm_default_path;
+		final String tmpFileName = fileName;
 		
 		//로컬 샘플 파일 테스트
-//		tmpFileDir = "/mococo/portal/1/";
-//		tmpFileName = "test.xlsx";
+//		final String tmpFileDir = "/mococo/portal/1/";
+//		final String tmpFileName = "test.xlsx";
 		
 		//기본 파일
 		final File rtnEncDrmFile = new File(tmpFileDir, tmpFileName);
@@ -226,18 +222,6 @@ public class DownloadServletFilter implements Filter {
 						}
 					}
 					
-					for (final String hName : wrapper.getHeaderNames()) {
-						final String hValue = wrapper.getHeader(hName);
-//						logger.debug("wrapper.getInfo Name : [{}], Value : [{}]", hName, hValue);
-						if (hValue.contains("filename=")) {
-							downFileName = URLDecoder.decode(hValue.split("filename=")[1], "UTF-8");
-							logger.debug("downloadFileName === [{}]", downFileName);
-							downFileExt = downFileName.substring(downFileName.lastIndexOf('.'), downFileName.lastIndexOf(';'));
-							logger.debug("downloadFileExtension === [{}]", downFileExt);
-							break;
-						}
-					}
-					
 					final String responType = response.getContentType();
 					logger.debug("response2 = [{}]", responType);
 					if (downFileExt.toLowerCase(Locale.getDefault()).contains("pdf") || "application/pdf".equals(responType) ) {
@@ -289,7 +273,6 @@ public class DownloadServletFilter implements Filter {
 						}
 						
 						try (
-//							InputStream input = new FileInputStream(isMoved ? orgRenameFile : orgfile);
 							OutputStream output = response.getOutputStream();
 						){
 							encryptFile(output, isMoved ? orgRenameFile.getName() : orgfile.getName(), signUserId, clientIpAddr);
@@ -376,7 +359,7 @@ public class DownloadServletFilter implements Filter {
 		
 		@Override
 		public void flush() throws IOException { encryptStream.flush(); }
-	}	
+	}
 	
 	
 	/**
@@ -440,12 +423,6 @@ public class DownloadServletFilter implements Filter {
 		}
 		
 		@Override
-		public void setContentLength(int length) { }
-		
-		@Override
-		public void setContentLengthLong(long length) { }
-		
-		@Override
 		public void setHeader(final String name, final String value) { 
 			if (!"content-length".equalsIgnoreCase(name)) { 
 				super.setHeader(name, value); 
@@ -455,7 +432,8 @@ public class DownloadServletFilter implements Filter {
 		@Override
 		public void addHeader(final String name, final String value) { 
 			if (!"content-length".equalsIgnoreCase(name)) { 
-				super.setHeader(name, value); 
+//				super.setHeader(name, value);
+				super.addHeader(name, value);
 			} 
 		}
 		
@@ -469,7 +447,8 @@ public class DownloadServletFilter implements Filter {
 		@Override
 		public void addIntHeader(final String name, final int value) { 
 			if (!"content-length".equalsIgnoreCase(name)) { 
-				super.setIntHeader(name, value); 
+//				super.setIntHeader(name, value);
+				super.addIntHeader(name, value);
 			} 
 		}
 		
